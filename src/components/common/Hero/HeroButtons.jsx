@@ -4,10 +4,7 @@ import heroData from "@/data/heroData";
 function HeroButtons() {
   return (
     <div className="mt-10 flex flex-wrap gap-5">
-      <Button
-        size="lg"
-        className="px-8 py-6 text-lg"
-      >
+      <Button size="lg" className="px-8 py-6 text-lg">
         {heroData.buttons.primary}
       </Button>
 

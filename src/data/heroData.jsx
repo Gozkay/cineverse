@@ -15,22 +15,10 @@ const heroData = {
   },
 
   stats: [
-    {
-      number: "15K+",
-      label: "Movies",
-    },
-    {
-      number: "5K+",
-      label: "Books",
-    },
-    {
-      number: "3K+",
-      label: "Manga",
-    },
-    {
-      number: "1K+",
-      label: "Comics",
-    },
+    { number: "15K+", label: "Movies" },
+    { number: "5K+", label: "Books" },
+    { number: "3K+", label: "Manga" },
+    { number: "1K+", label: "Comics" },
   ],
 };
 

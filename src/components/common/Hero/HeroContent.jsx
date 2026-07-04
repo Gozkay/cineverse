@@ -4,9 +4,8 @@ import HeroStats from "./HeroStats";
 
 function HeroContent() {
   return (
-    <div className="relative z-10 max-w-2xl">
-
-      <p className="mb-5 tracking-[4px] text-violet-400 uppercase">
+    <div className="max-w-2xl">
+      <p className="mb-5 uppercase tracking-[4px] text-violet-400">
         {heroData.badge}
       </p>
 
@@ -25,7 +24,6 @@ function HeroContent() {
       <HeroButtons />
 
       <HeroStats />
-
     </div>
   );
 }
