@@ -1,7 +1,7 @@
 function HeroFloatingCards() {
   return (
-    <div className="hidden lg:block">
-      {/* Coming Soon */}
+    <div className="hidden lg:flex items-center justify-center">
+      {/* Coming in the next phase */}
     </div>
   );
 }

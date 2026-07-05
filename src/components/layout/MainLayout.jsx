@@ -3,10 +3,13 @@ import Footer from "./Footer";
 
 function MainLayout({ children }) {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="relative z-0 min-h-screen bg-slate-950 text-white flex flex-col">
       <Navbar />
 
-      <main>{children}</main>
+      {/* Added relative layout configuration to main container element */}
+      <main className="relative flex-1 w-full h-full">
+        {children}
+      </main>
 
       <Footer />
     </div>
