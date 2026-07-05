@@ -5,11 +5,10 @@ import HeroFloatingCards from "./HeroFloatingCards"
 
 function Hero() {
   return (
-    /* We add relative and z-0 to establish the container bounds */
-    <section className="relative z-0 flex min-h-screen items-center overflow-hidden">
+    /* Removed bg-slate-950 class from here */
+    <section className="relative w-full min-h-screen flex items-center overflow-hidden">
       <HeroBackground />
       
-      {/* We add relative and z-10 here so text sits ON TOP of the image */}
       <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-6">
         <motion.div
           initial={{ opacity: 0, x: -80 }}

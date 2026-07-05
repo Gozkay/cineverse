@@ -1,17 +1,25 @@
-// Replace your current import with this relative path:
-import heroBg from "../../assets/images/hero-bg.png"
-
 function HeroBackground() {
   return (
-    <div className="absolute inset-0 z-0">
+    /* This outer container now holds the base dark color */
+    <div className="absolute inset-0 z-0 bg-slate-950 pointer-events-none">
+      {/* The Background Image */}
       <img
-        src={heroBg}
-        alt="Hero Background"
-        className="h-full w-full object-cover"
+        src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1925&auto=format&fit=crop"
+        alt="Hero Cinematic Background"
+        className="absolute inset-0 h-full w-full object-cover object-center"
       />
-      {/* Dark overlays to keep text readable */}
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="absolute inset-0 bg-gradient-to-r from-violet-950/60 via-black/30 to-black/60" />
+      
+      {/* Standard CSS color overlays that bypass Tailwind compile bugs */}
+      <div 
+        className="absolute inset-0" 
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+      />
+      <div 
+        className="absolute inset-0" 
+        style={{ 
+          backgroundImage: 'linear-gradient(to right, rgba(46, 16, 101, 0.7), rgba(15, 23, 42, 0.4), rgba(0, 0, 0, 0.6))' 
+        }}
+      />
     </div>
   )
 }
