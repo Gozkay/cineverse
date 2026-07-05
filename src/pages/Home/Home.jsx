@@ -1,5 +1,5 @@
 import MainLayout from "@/components/layout/MainLayout";
-import Hero from "@/components/common/Hero/Hero";
+import Hero from "@/components/Hero/Hero";
 import { Categories } from "@/components/Categories";
 import { TrendingMovies } from "@/components/Movies";
 

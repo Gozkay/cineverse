@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import tmdb from "@/api/tmdb";
+import tmdb from "@/services/tmdb";
 
 const fetchTrendingMovies = async () => {
   const response = await tmdb.get("/trending/movie/week");
