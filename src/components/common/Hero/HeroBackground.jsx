@@ -1,10 +1,12 @@
+import Herobg from "@/assets/images/hero-bg.png";
+
 function HeroBackground() {
   return (
     /* This outer container now holds the base dark color */
     <div className="absolute inset-0 z-0 bg-slate-950 pointer-events-none">
       {/* The Background Image */}
       <img
-        src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1925&auto=format&fit=crop"
+        src={Herobg}
         alt="Hero Cinematic Background"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
