@@ -64,8 +64,11 @@ function StaffManagement() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Staff Management</h1>
-            <p className="text-gray-400">Manage staff accounts — ban, suspend, or remove access</p>
+            <h1 className="text-2xl sm:text-3xl font-black">
+              <span className="text-white">Staff</span>{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Management</span>
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Manage staff accounts — ban, suspend, or remove access</p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>

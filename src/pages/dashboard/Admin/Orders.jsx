@@ -39,8 +39,11 @@ function AdminOrders() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Orders</h1>
-          <p className="text-gray-400">Manage all customer orders</p>
+          <h1 className="text-2xl sm:text-3xl font-black">
+            <span className="text-white">Order</span>{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Management</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Manage all customer orders</p>
         </div>
 
         <div className="rounded-xl bg-slate-900/50 ring-1 ring-slate-800 overflow-hidden">

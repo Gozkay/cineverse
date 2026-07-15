@@ -55,8 +55,8 @@ function OrderVolumeChart({ data, loading }) {
   }
 
   return (
-    <div className="rounded-xl bg-slate-900/50 p-5 ring-1 ring-slate-800">
-      <h3 className="mb-4 text-sm font-semibold text-white">Order Volume (Last 30 Days)</h3>
+    <div className="rounded-2xl bg-slate-900/50 p-5 ring-1 ring-white/5">
+      <h3 className="mb-4 text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Order Volume (Last 30 Days)</h3>
       <div className="h-64">
         <Bar data={chartData} options={options} />
       </div>

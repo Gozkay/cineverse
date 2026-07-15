@@ -42,13 +42,15 @@ function Profile() {
     <MainLayout>
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-8">
-          <div className="mb-8 flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-600 text-2xl font-bold text-white">
+          <div className="mb-8 flex items-center gap-5">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-2xl font-bold text-white shadow-lg shadow-violet-500/25">
               {(profile?.name || user?.user_metadata?.name || 'U')?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{profile?.name || user?.user_metadata?.name || 'User'}</h1>
-              <p className="text-sm capitalize text-gray-400">{role} • {profile?.email || user?.email}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">
+                {profile?.name || user?.user_metadata?.name || 'User'}
+              </h1>
+              <p className="text-sm capitalize text-gray-500">{role} &bull; {profile?.email || user?.email}</p>
             </div>
           </div>
 

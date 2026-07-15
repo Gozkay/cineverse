@@ -37,8 +37,11 @@ function Login() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <div className="rounded-2xl bg-slate-900/50 p-8 ring-1 ring-slate-800">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-              <p className="mt-2 text-gray-400">Sign in to your CineVerse account</p>
+              <h1 className="text-3xl sm:text-4xl font-black">
+                <span className="text-white">Welcome</span>{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Back</span>
+              </h1>
+              <p className="mt-2 text-sm text-gray-500">Sign in to your CineVerse account</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">

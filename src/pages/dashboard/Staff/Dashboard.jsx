@@ -24,8 +24,11 @@ function StaffDashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Staff Dashboard</h1>
-          <p className="text-gray-400">View and manage customer orders</p>
+          <h1 className="text-2xl sm:text-3xl font-black">
+            <span className="text-white">Staff</span>{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Dashboard</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">View and manage customer orders</p>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -25,8 +25,11 @@ function ManagerDashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Manager Overview</h1>
-          <p className="text-gray-400">Staff & order oversight</p>
+          <h1 className="text-2xl sm:text-3xl font-black">
+            <span className="text-white">Manager</span>{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Overview</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Staff & order oversight</p>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

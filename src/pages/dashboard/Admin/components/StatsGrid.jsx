@@ -22,10 +22,10 @@ function StatsGrid({ stats, loading }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1 }}
           onClick={() => card.route !== '#' && navigate(card.route)}
-          className="rounded-xl bg-slate-900/50 p-5 ring-1 ring-slate-800 text-left hover:ring-violet-500/30 transition-all"
+          className="rounded-2xl bg-slate-900/50 p-5 ring-1 ring-white/5 text-left hover:ring-violet-500/40 hover:-translate-y-0.5 transition-all duration-300"
         >
           <div className="mb-3 flex items-center justify-between">
-            <div className={`rounded-lg ${card.iconBg} p-2.5`}>
+            <div className={`rounded-xl ${card.iconBg} p-2.5 ring-1 ring-white/5`}>
               <card.icon className={card.iconColor} size={20} />
             </div>
           </div>

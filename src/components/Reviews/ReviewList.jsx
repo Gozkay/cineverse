@@ -57,7 +57,7 @@ function ReviewList({ productId, refreshKey }) {
       ) : (
         <div className="space-y-3">
           {reviews.map((review) => (
-            <div key={review.id} className="rounded-lg bg-slate-900/30 p-4 ring-1 ring-slate-800">
+            <div key={review.id} className="rounded-2xl bg-slate-900/30 p-4 ring-1 ring-white/5">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
