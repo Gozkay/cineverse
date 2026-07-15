@@ -7,28 +7,28 @@ import {
 
 const categoryData = [
   {
-    id: 1,
+    id: "movies",
     title: "Movies",
     icon: FaFilm,
     count: "15K+",
     color: "from-red-500 to-orange-500",
   },
   {
-    id: 2,
+    id: "books",
     title: "Books",
     icon: FaBook,
     count: "5K+",
     color: "from-blue-500 to-cyan-500",
   },
   {
-    id: 3,
+    id: "manga",
     title: "Manga",
     icon: FaDragon,
     count: "3K+",
     color: "from-pink-500 to-purple-500",
   },
   {
-    id: 4,
+    id: "comics",
     title: "Comics",
     icon: FaMasksTheater,
     count: "1K+",

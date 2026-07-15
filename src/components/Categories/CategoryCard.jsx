@@ -1,32 +1,47 @@
-import { motion } from "framer-motion";
+import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 function CategoryCard({ category }) {
-  const Icon = category.icon;
+  const IconComponent = category.icon
+
+  const routeMap = {
+    movies: '/movies',
+    books: '/books',
+    manga: '/manga',
+    comics: '/comics',
+  }
 
   return (
-    <motion.div
-      whileHover={{
-        y: -10,
-        scale: 1.05,
-      }}
-      transition={{ duration: 0.3 }}
-      className="group cursor-pointer rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-md"
-    >
-      <div
-        className={`mb-6 inline-flex rounded-2xl bg-gradient-to-r ${category.color} p-5`}
+    <Link to={routeMap[category.id] || '/products'}>
+      <motion.div
+        whileHover={{ scale: 1.03 }}
+        transition={{ type: 'spring', stiffness: 300 }}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-800 bg-slate-900 p-8 transition-all duration-300 hover:border-transparent hover:shadow-2xl"
+        style={{ '--hover-glow': category.color }}
       >
-        <Icon className="text-4xl text-white" />
-      </div>
+        <div
+          className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-10"
+          style={{
+            background: `linear-gradient(135deg, ${category.color.split(' ')[0]}, ${category.color.split(' ')[2] || category.color.split(' ')[0]})`,
+          }}
+        />
 
-      <h2 className="text-2xl font-bold">
-        {category.title}
-      </h2>
+        <div className="relative z-10">
+          <div
+            className="mb-4 inline-flex rounded-xl bg-gradient-to-br p-4 text-3xl text-white shadow-lg"
+            style={{
+              background: `linear-gradient(135deg, ${category.color.replace('from-', '').split(' ')[0] || category.color})`,
+            }}
+          >
+            <IconComponent />
+          </div>
 
-      <p className="mt-2 text-gray-400">
-        {category.count} Products
-      </p>
-    </motion.div>
-  );
+          <h3 className="mb-2 text-2xl font-bold text-white">{category.title}</h3>
+          <p className="text-sm text-gray-400">{category.count} items</p>
+        </div>
+      </motion.div>
+    </Link>
+  )
 }
 
-export default CategoryCard;
+export default CategoryCard
