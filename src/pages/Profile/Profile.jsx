@@ -23,12 +23,12 @@ const tabs = [
 ]
 
 function Profile() {
-  const { user, isStaffOrAbove, role, logout } = useAuth()
+  const { user, profile, isStaffOrAbove, role, logout } = useAuth()
   const [orders, setOrders] = useState([])
   const [activeTab, setActiveTab] = useState('orders')
 
   useEffect(() => {
-    if (user) setOrders(getOrdersByUser(user.id))
+    if (user) getOrdersByUser(user.id).then(data => setOrders(data || []))
   }, [user])
 
   const getDashboardLink = () => {
@@ -44,11 +44,11 @@ function Profile() {
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-8 flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-600 text-2xl font-bold text-white">
-              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              {(profile?.name || user?.user_metadata?.name || 'U')?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{user?.name || 'User'}</h1>
-              <p className="text-sm capitalize text-gray-400">{role} • {user?.email}</p>
+              <h1 className="text-2xl font-bold text-white">{profile?.name || user?.user_metadata?.name || 'User'}</h1>
+              <p className="text-sm capitalize text-gray-400">{role} • {profile?.email || user?.email}</p>
             </div>
           </div>
 
@@ -115,11 +115,11 @@ function Profile() {
               <div className="rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800">
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-400">Name</span>
-                  <span className="text-sm text-white">{user?.name}</span>
+                  <span className="text-sm text-white">{profile?.name || user?.user_metadata?.name}</span>
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-400">Email</span>
-                  <span className="text-sm text-white">{user?.email}</span>
+                  <span className="text-sm text-white">{profile?.email || user?.email}</span>
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-400">Role</span>

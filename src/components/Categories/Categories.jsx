@@ -5,19 +5,24 @@ function Categories() {
   return (
     <section className="bg-slate-950 py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <h2 className="mb-4 text-center text-5xl font-black">
-          Browse Categories
-        </h2>
+        <div className="text-center mb-16">
+          <h2 className="text-4xl sm:text-5xl font-black mb-4">
+            Browse{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">
+              Categories
+            </span>
+          </h2>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Everything you love in one beautiful marketplace.
+          </p>
+        </div>
 
-        <p className="mb-16 text-center text-gray-400">
-          Everything you love in one marketplace.
-        </p>
-
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {categoryData.map((category) => (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {categoryData.map((category, i) => (
             <CategoryCard
               key={category.id}
               category={category}
+              index={i}
             />
           ))}
         </div>

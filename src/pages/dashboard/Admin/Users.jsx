@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FaUser, FaBan, FaCheck, FaPause, FaPlay, FaTrash } from 'react-icons/fa'
+import { FaBan, FaCheck, FaPause, FaPlay, FaTrash } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -11,25 +11,30 @@ import toast from 'react-hot-toast'
 function AdminUsers() {
   const [users, setUsers] = useState([])
 
-  useEffect(() => { setUsers(getUsers()) }, [])
+  const loadUsers = async () => {
+    const data = await getUsers()
+    setUsers(data || [])
+  }
 
-  const handleBan = (id, isBanned) => {
-    if (isBanned) unbanUser(id)
-    else banUser(id)
-    setUsers(getUsers())
+  useEffect(() => { loadUsers() }, [])
+
+  const handleBan = async (id, isBanned) => {
+    if (isBanned) await unbanUser(id)
+    else await banUser(id)
+    await loadUsers()
     toast.success(isBanned ? 'User unbanned' : 'User banned')
   }
 
-  const handleSuspend = (id, isSuspended) => {
-    if (isSuspended) unsuspendUser(id)
-    else suspendUser(id)
-    setUsers(getUsers())
+  const handleSuspend = async (id, isSuspended) => {
+    if (isSuspended) await unsuspendUser(id)
+    else await suspendUser(id)
+    await loadUsers()
     toast.success(isSuspended ? 'User unsuspended' : 'User suspended')
   }
 
-  const handleRemove = (id) => {
-    removeStaff(id)
-    setUsers(getUsers())
+  const handleRemove = async (id) => {
+    await removeStaff(id)
+    await loadUsers()
     toast.success('User removed')
   }
 
@@ -79,7 +84,7 @@ function AdminUsers() {
                       <Badge variant="success">Active</Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-xs text-gray-500">{formatDateTime(user.createdAt)}</TableCell>
+                  <TableCell className="text-xs text-gray-500">{formatDateTime(user.created_at)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
                       {user.role !== 'admin' && (

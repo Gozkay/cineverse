@@ -10,12 +10,17 @@ import toast from 'react-hot-toast'
 function StaffOrders() {
   const [orders, setOrders] = useState([])
 
-  useEffect(() => { setOrders(getOrders()) }, [])
+  const loadOrders = async () => {
+    const data = await getOrders()
+    setOrders(data || [])
+  }
 
-  const handleStatusUpdate = (id, status) => {
-    updateOrderStatus(id, status)
-    setOrders(getOrders())
-    toast.success(`Order ${id.slice(0, 8)}... updated`)
+  useEffect(() => { loadOrders() }, [])
+
+  const handleStatusUpdate = async (id, status) => {
+    await updateOrderStatus(id, status)
+    await loadOrders()
+    toast.success(`Order updated`)
   }
 
   return (
@@ -48,12 +53,12 @@ function StaffOrders() {
                 orders.map((order) => (
                   <TableRow key={order.id} className="border-slate-800">
                     <TableCell className="font-mono text-xs text-gray-400">#{order.id.slice(0, 10)}</TableCell>
-                    <TableCell className="text-xs text-gray-400">{formatDateTime(order.createdAt)}</TableCell>
-                    <TableCell className="text-sm text-white">{order.shippingInfo?.fullName || 'N/A'}</TableCell>
+                    <TableCell className="text-xs text-gray-400">{formatDateTime(order.created_at)}</TableCell>
+                    <TableCell className="text-sm text-white">{order.shipping_info?.fullName || 'N/A'}</TableCell>
                     <TableCell>
                       <span className="text-sm text-white">{order.items?.length || 0}</span>
                     </TableCell>
-                    <TableCell className="text-white font-medium">{formatCurrency(order.totalAmount)}</TableCell>
+                    <TableCell className="text-white font-medium">{formatCurrency(order.total_amount)}</TableCell>
                     <TableCell>
                       <Badge variant={order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'destructive' : order.status === 'processing' ? 'info' : 'warning'} className="capitalize">{order.status}</Badge>
                     </TableCell>

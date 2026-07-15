@@ -1,28 +1,49 @@
-import { getAll, create, update, getById, remove as removeItem } from '@/lib/storage'
+import { supabase } from '@/lib/supabase'
 
-export function getOrders() {
-  return getAll('orders')
+export async function getOrders() {
+  const { data } = await supabase
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false })
+  return data || []
 }
 
-export function getOrdersByUser(userId) {
-  return getAll('orders').filter(o => o.userId === userId)
+export async function getOrdersByUser(userId) {
+  const { data } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+  return data || []
 }
 
-export function getOrderById(id) {
-  return getById('orders', id)
+export async function getOrderById(id) {
+  const { data } = await supabase.from('orders').select('*').eq('id', id).single()
+  return data
 }
 
-export function createOrder(orderData) {
-  return create('orders', {
-    ...orderData,
-    status: 'pending',
-  })
+export async function createOrder(orderData) {
+  const { data, error } = await supabase
+    .from('orders')
+    .insert({ ...orderData, status: 'pending' })
+    .select()
+    .single()
+  if (error) throw error
+  return data
 }
 
-export function updateOrderStatus(id, status) {
-  return update('orders', id, { status })
+export async function updateOrderStatus(id, status) {
+  const { data, error } = await supabase
+    .from('orders')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
 }
 
-export function deleteOrder(id) {
-  return removeItem('orders', id)
+export async function deleteOrder(id) {
+  const { error } = await supabase.from('orders').delete().eq('id', id)
+  return !error
 }

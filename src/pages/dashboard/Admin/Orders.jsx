@@ -22,12 +22,17 @@ function AdminOrders() {
   const [orders, setOrders] = useState([])
   const [selectedOrder, setSelectedOrder] = useState(null)
 
-  useEffect(() => { setOrders(getOrders()) }, [])
+  const loadOrders = async () => {
+    const data = await getOrders()
+    setOrders(data || [])
+  }
 
-  const handleStatusChange = (orderId, newStatus) => {
-    updateOrderStatus(orderId, newStatus)
-    setOrders(getOrders())
-    toast.success(`Order ${orderId.slice(0, 8)}... updated to ${newStatus}`)
+  useEffect(() => { loadOrders() }, [])
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    await updateOrderStatus(orderId, newStatus)
+    await loadOrders()
+    toast.success(`Order updated to ${newStatus}`)
   }
 
   return (
@@ -59,12 +64,12 @@ function AdminOrders() {
                 orders.map((order) => (
                   <TableRow key={order.id} className="border-slate-800">
                     <TableCell className="font-mono text-xs text-gray-400">#{order.id.slice(0, 10)}</TableCell>
-                    <TableCell className="text-xs text-gray-400">{formatDateTime(order.createdAt)}</TableCell>
+                    <TableCell className="text-xs text-gray-400">{formatDateTime(order.created_at)}</TableCell>
                     <TableCell>
                       <span className="text-sm text-white">{order.items?.length || 0} items</span>
                       <div className="text-[10px] text-gray-500">{order.items?.map(i => i.title).join(', ').slice(0, 40)}</div>
                     </TableCell>
-                    <TableCell className="text-white font-medium">{formatCurrency(order.totalAmount)}</TableCell>
+                    <TableCell className="text-white font-medium">{formatCurrency(order.total_amount)}</TableCell>
                     <TableCell>
                       <Badge variant={statusColors[order.status] || 'default'} className="capitalize">{order.status}</Badge>
                     </TableCell>
@@ -100,10 +105,10 @@ function AdminOrders() {
               <div>
                 <h4 className="mb-2 text-sm font-medium text-gray-400">Shipping Info</h4>
                 <div className="space-y-1 text-sm text-white">
-                  <p>{selectedOrder.shippingInfo?.fullName}</p>
-                  <p className="text-gray-400">{selectedOrder.shippingInfo?.address}</p>
-                  <p className="text-gray-400">{selectedOrder.shippingInfo?.city}, {selectedOrder.shippingInfo?.state}</p>
-                  <p className="text-gray-400">{selectedOrder.shippingInfo?.phone}</p>
+                  <p>{selectedOrder.shipping_info?.fullName}</p>
+                  <p className="text-gray-400">{selectedOrder.shipping_info?.address}</p>
+                  <p className="text-gray-400">{selectedOrder.shipping_info?.city}, {selectedOrder.shipping_info?.state}</p>
+                  <p className="text-gray-400">{selectedOrder.shipping_info?.phone}</p>
                 </div>
               </div>
               <div>
@@ -119,7 +124,7 @@ function AdminOrders() {
                 <hr className="my-2 border-slate-700" />
                 <div className="flex justify-between font-semibold">
                   <span className="text-white">Total</span>
-                  <span className="text-violet-400">{formatCurrency(selectedOrder.totalAmount)}</span>
+                  <span className="text-violet-400">{formatCurrency(selectedOrder.total_amount)}</span>
                 </div>
               </div>
             </div>

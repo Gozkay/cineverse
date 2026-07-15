@@ -28,8 +28,9 @@ async function getBookDetails(olid) {
 }
 
 function normalizeComic(work, subject) {
+  const id = work.key?.replace('/works/', '') || `comic_${Date.now()}`
   return {
-    id: work.key?.replace('/works/', '') || `comic_${Date.now()}`,
+    id,
     title: work.title || 'Unknown Title',
     authors: work.authors?.map(a => a.name) || ['Unknown'],
     coverId: work.cover_id || null,
@@ -39,7 +40,7 @@ function normalizeComic(work, subject) {
     subjects: [subject, ...(work.subject ? work.subject : [])],
     editionCount: work.edition_count || 0,
     firstPublishYear: work.first_publish_year || 'N/A',
-    price: Math.floor(Math.random() * 3500) + 1200,
+    price: (parseInt(id.slice(-8), 36) % 2300) + 1200,
     currency: 'NGN',
     category: 'comic',
     description: `A comic work in the ${subject} category. First published in ${work.first_publish_year || 'unknown year'}.`,
@@ -47,8 +48,9 @@ function normalizeComic(work, subject) {
 }
 
 function normalizeComicSearch(doc) {
+  const id = doc.key?.replace('/works/', '') || `comic_${Date.now()}`
   return {
-    id: doc.key?.replace('/works/', '') || `comic_${Date.now()}`,
+    id,
     title: doc.title || 'Unknown Title',
     authors: doc.author_name || ['Unknown'],
     coverId: doc.cover_i || null,
@@ -58,7 +60,7 @@ function normalizeComicSearch(doc) {
     subjects: doc.subject || ['Comics'],
     editionCount: doc.edition_count || 0,
     firstPublishYear: doc.first_publish_year || 'N/A',
-    price: Math.floor(Math.random() * 3500) + 1200,
+    price: (parseInt(id.slice(-8), 36) % 2300) + 1200,
     currency: 'NGN',
     category: 'comic',
     description: doc.description || doc.first_sentence?.[0] || `A comic work first published in ${doc.first_publish_year || 'unknown year'}.`,

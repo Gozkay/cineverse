@@ -1,67 +1,82 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { loginUser, registerUser } from '@/services/auth'
+import { loginUser, registerUser, logoutUser, onAuthChange, getSession } from '@/services/auth'
+import { supabase } from '@/lib/supabase'
 
 const AuthContext = createContext(null)
 
-const AUTH_KEY = 'cineverse_user'
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(AUTH_KEY)
-      if (stored) setUser(JSON.parse(stored))
-    } catch {
-      localStorage.removeItem(AUTH_KEY)
-    } finally {
-      setLoading(false)
-    }
+    getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user)
+        fetchProfile(session.user.id)
+      } else {
+        setLoading(false)
+      }
+    })
+
+    const { data: { subscription } } = onAuthChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user)
+        fetchProfile(session.user.id)
+      } else {
+        setUser(null)
+        setProfile(null)
+        setLoading(false)
+      }
+    })
+
+    return () => subscription?.unsubscribe()
   }, [])
 
+  async function fetchProfile(userId) {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+    setProfile(data)
+    setLoading(false)
+  }
+
   const login = useCallback(async (email, password) => {
-    const result = loginUser(email, password)
+    const result = await loginUser(email, password)
     if (result.success) {
       setUser(result.user)
-      localStorage.setItem(AUTH_KEY, JSON.stringify(result.user))
+      if (result.user?.id) fetchProfile(result.user.id)
     }
     return result
   }, [])
 
   const register = useCallback(async (userData) => {
-    const result = registerUser(userData)
+    const result = await registerUser(userData)
     if (result.success) {
       setUser(result.user)
-      localStorage.setItem(AUTH_KEY, JSON.stringify(result.user))
+      if (result.user?.id) fetchProfile(result.user.id)
     }
     return result
   }, [])
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await logoutUser()
     setUser(null)
-    localStorage.removeItem(AUTH_KEY)
-  }, [])
-
-  const refreshUser = useCallback(() => {
-    try {
-      const stored = localStorage.getItem(AUTH_KEY)
-      if (stored) setUser(JSON.parse(stored))
-    } catch {
-      setUser(null)
-    }
+    setProfile(null)
   }, [])
 
   const isAuthenticated = !!user
-  const role = user?.role || null
+  const role = profile?.role || null
   const isAdmin = role === 'admin'
   const isManager = role === 'manager'
   const isStaff = role === 'staff'
   const isCustomer = role === 'customer'
   const isStaffOrAbove = isStaff || isManager || isAdmin
 
+  const refreshUser = useCallback(() => {
+    if (user?.id) fetchProfile(user.id)
+  }, [user?.id])
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, isAuthenticated, role, isAdmin, isManager, isStaff, isCustomer, isStaffOrAbove, refreshUser }}>
+    <AuthContext.Provider value={{ user, profile, login, register, logout, loading, isAuthenticated, role, isAdmin, isManager, isStaff, isCustomer, isStaffOrAbove, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

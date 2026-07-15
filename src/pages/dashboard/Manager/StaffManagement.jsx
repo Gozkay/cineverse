@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { create as createUser } from '@/lib/storage'
+import { supabase } from '@/lib/supabase'
 import { getUsers, banUser, unbanUser, suspendUser, unsuspendUser, removeStaff } from '@/services/auth'
 import { formatDateTime } from '@/utils/formatDate'
 import toast from 'react-hot-toast'
@@ -16,34 +16,44 @@ function StaffManagement() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newStaff, setNewStaff] = useState({ name: '', email: '', password: 'staff123' })
 
-  useEffect(() => {
-    setStaff(getUsers().filter(u => u.role === 'staff'))
-  }, [])
+  const loadStaff = async () => {
+    const data = await getUsers()
+    setStaff((data || []).filter(u => u.role === 'staff'))
+  }
 
-  const handleBan = (id, isBanned) => {
-    isBanned ? unbanUser(id) : banUser(id)
-    setStaff(getUsers().filter(u => u.role === 'staff'))
+  useEffect(() => { loadStaff() }, [])
+
+  const handleBan = async (id, isBanned) => {
+    if (isBanned) await unbanUser(id)
+    else await banUser(id)
+    await loadStaff()
     toast.success(isBanned ? 'Staff unbanned' : 'Staff banned')
   }
 
-  const handleSuspend = (id, isSuspended) => {
-    isSuspended ? unsuspendUser(id) : suspendUser(id)
-    setStaff(getUsers().filter(u => u.role === 'staff'))
+  const handleSuspend = async (id, isSuspended) => {
+    if (isSuspended) await unsuspendUser(id)
+    else await suspendUser(id)
+    await loadStaff()
     toast.success(isSuspended ? 'Staff unsuspended' : 'Staff suspended')
   }
 
-  const handleRemove = (id) => {
+  const handleRemove = async (id) => {
     if (window.confirm('Remove this staff member permanently?')) {
-      removeStaff(id)
-      setStaff(getUsers().filter(u => u.role === 'staff'))
+      await removeStaff(id)
+      await loadStaff()
       toast.success('Staff removed')
     }
   }
 
-  const handleAddStaff = () => {
+  const handleAddStaff = async () => {
     if (!newStaff.name || !newStaff.email) { toast.error('Name and email are required'); return }
-    createUser('users', { ...newStaff, role: 'staff', avatar: null, banned: false, suspended: false })
-    setStaff(getUsers().filter(u => u.role === 'staff'))
+    const { error } = await supabase.auth.signUp({
+      email: newStaff.email,
+      password: newStaff.password,
+      options: { data: { name: newStaff.name } },
+    })
+    if (error) { toast.error(error.message); return }
+    await loadStaff()
     setDialogOpen(false)
     setNewStaff({ name: '', email: '', password: 'staff123' })
     toast.success('Staff member added')
@@ -119,7 +129,7 @@ function StaffManagement() {
                         <Badge variant="success">Active</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-gray-500">{formatDateTime(user.createdAt)}</TableCell>
+                    <TableCell className="text-xs text-gray-500">{formatDateTime(user.created_at)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" size="icon-xs" onClick={() => handleBan(user.id, user.banned)} className={user.banned ? 'text-green-400' : 'text-red-400'}>
