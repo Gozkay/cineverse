@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaArrowLeft, FaShoppingCart, FaHeart, FaStar, FaBook, FaUser, FaCalendar, FaBuilding, FaLanguage, FaFileAlt } from 'react-icons/fa'
@@ -7,10 +8,13 @@ import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { ROUTES } from '@/constants/routes'
+import ReviewForm from '@/components/Reviews/ReviewForm'
+import ReviewList from '@/components/Reviews/ReviewList'
 import toast from 'react-hot-toast'
 
 function BookDetails() {
   const { id } = useParams()
+  const [reviewRefreshKey, setReviewRefreshKey] = useState(0)
   const { data: book, isLoading, error } = useBookDetails(id)
   const { addItem } = useCart()
   const { addItem: addWishlist, removeItem: removeWishlist, isInWishlist } = useWishlist()
@@ -127,6 +131,14 @@ function BookDetails() {
               <div className="mt-6">
                 <h2 className="mb-3 text-lg font-semibold text-white">Description</h2>
                 <p className="leading-relaxed text-gray-400">{book.description}</p>
+              </div>
+
+              <div className="mt-12 border-t border-slate-800 pt-8">
+                <h2 className="mb-6 text-xl font-bold text-white">Reviews</h2>
+                <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+                  <ReviewList productId={id} refreshKey={reviewRefreshKey} />
+                  <ReviewForm productId={id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
+                </div>
               </div>
             </motion.div>
           </div>

@@ -15,11 +15,14 @@ function Cart() {
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white">Shopping Cart</h1>
-              <p className="mt-1 text-gray-400">{itemCount} {itemCount === 1 ? 'item' : 'items'} in your cart</p>
+              <h1 className="text-3xl sm:text-4xl font-black">
+                <span className="text-white">Shopping</span>{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Cart</span>
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">{itemCount} {itemCount === 1 ? 'item' : 'items'} in your cart</p>
             </div>
-            <Link to={ROUTES.MOVIES} className="flex items-center gap-2 text-sm text-violet-400 hover:underline">
-              <FaArrowLeft /> Continue Shopping
+            <Link to={ROUTES.MOVIES} className="group flex items-center gap-2 text-sm text-gray-400 hover:text-violet-400 transition-colors">
+              <FaArrowLeft className="transition-transform group-hover:-translate-x-0.5" /> Continue Shopping
             </Link>
           </div>
 
@@ -27,7 +30,7 @@ function Cart() {
             <div className="flex flex-col items-center justify-center py-20">
               <FaShoppingCart className="mb-4 text-6xl text-gray-700" />
               <h2 className="mb-2 text-xl font-semibold text-white">Your cart is empty</h2>
-              <p className="mb-6 text-gray-400">Looks like you haven't added anything yet.</p>
+              <p className="mb-6 text-gray-500">Looks like you haven't added anything yet.</p>
               <Link to={ROUTES.MOVIES} className="rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition-colors">Start Shopping</Link>
             </div>
           ) : (

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -18,10 +19,13 @@ import MovieCast from "@/components/Movies/MovieCast";
 import SimilarMovies from "@/components/Movies/SimilarMovies";
 import MovieGallery from "@/components/Movies/MovieGallery";
 import MovieReviews from "@/components/Movies/MovieReviews";
+import ReviewForm from "@/components/Reviews/ReviewForm";
+import ReviewList from "@/components/Reviews/ReviewList";
 import { WatchProviders } from "@/components/Movies";
 
 function MovieDetails() {
   const { id } = useParams();
+  const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["movie", id],
@@ -72,7 +76,7 @@ function MovieDetails() {
 
       <div className="relative z-20 mx-auto -mt-44 max-w-7xl px-6 pb-20">
 
-        <MovieInfo movie={data.movie} />
+        <MovieInfo movie={data.movie} videos={data.videos} />
 
         <MovieTrailer
             movie={data.movie}
@@ -87,6 +91,14 @@ function MovieDetails() {
         <MovieCast cast={data.cast} />
 
         <SimilarMovies movies={data.similar} />
+
+        <section className="mt-16 border-t border-slate-900 pt-12">
+          <h2 className="mb-6 text-2xl font-bold text-white">Reviews</h2>
+          <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
+            <ReviewList productId={id} refreshKey={reviewRefreshKey} />
+            <ReviewForm productId={id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
+          </div>
+        </section>
 
       </div>
 

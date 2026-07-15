@@ -7,11 +7,14 @@ import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { ROUTES } from '@/constants/routes'
+import ReviewForm from '@/components/Reviews/ReviewForm'
+import ReviewList from '@/components/Reviews/ReviewList'
 import { searchComics } from '@/services/comics'
 import toast from 'react-hot-toast'
 
 function ComicDetails() {
   const { id } = useParams()
+  const [reviewRefreshKey, setReviewRefreshKey] = useState(0)
   const [comic, setComic] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -124,6 +127,14 @@ function ComicDetails() {
               <div className="mt-6">
                 <h2 className="mb-3 text-lg font-semibold text-white">Description</h2>
                 <p className="leading-relaxed text-gray-400">{comic.description}</p>
+              </div>
+
+              <div className="mt-12 border-t border-slate-800 pt-8">
+                <h2 className="mb-6 text-xl font-bold text-white">Reviews</h2>
+                <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+                  <ReviewList productId={id} refreshKey={reviewRefreshKey} />
+                  <ReviewForm productId={id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
+                </div>
               </div>
             </motion.div>
           </div>

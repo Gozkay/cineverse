@@ -59,5 +59,5 @@ export function clearCollection(collection) {
 
 export function getNextId(collection) {
   const items = getCollection(collection)
-  return items.length > 0 ? Math.max(...items.map(i => parseInt(i.id) || 0)) + 1 : 1
+  return items.length > 0 ? Math.max(...items.map(i => parseInt(i.id) || 0), 0) + 1 : 1
 }

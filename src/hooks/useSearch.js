@@ -12,7 +12,7 @@ async function searchMovies(query) {
     ...movie,
     poster_url: movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : null,
     category: 'movie',
-    price: Math.floor(Math.random() * 4000) + 2000,
+    price: (parseInt(movie.id?.toString().slice(-8) || '0', 36) % 2000) + 2000,
   }))
 }
 

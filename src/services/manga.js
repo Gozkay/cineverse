@@ -43,7 +43,7 @@ function normalizeManga(item) {
     status: item.status || 'Unknown',
     published: item.published?.string || 'N/A',
     type: item.type || 'Manga',
-    price: Math.floor(Math.random() * 3000) + 1000,
+    price: (item.mal_id ? (item.mal_id % 2000) + 1000 : (parseInt(item.id?.slice(-8) || '0', 36) % 2000) + 1000),
     currency: 'NGN',
     category: 'manga',
   }

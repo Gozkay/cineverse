@@ -1,62 +1,88 @@
-import { getAll, create, query, update as updateItem, remove as removeItem } from '@/lib/storage'
+import { supabase } from '@/lib/supabase'
 
-export function loginUser(email, password) {
-  const users = getAll('users')
-  const user = users.find(u => u.email === email && u.password === password)
-  if (!user) return { success: false, error: 'Invalid email or password' }
-  if (user.banned) return { success: false, error: 'Your account has been banned. Contact support.' }
-  if (user.suspended) return { success: false, error: 'Your account has been suspended.' }
-  const { password: _, ...safeUser } = user
+export async function loginUser(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) return { success: false, error: error.message }
+  const profile = await getProfile(data.user.id)
+  const safeUser = { ...data.user, ...profile }
   return { success: true, user: safeUser }
 }
 
-export function registerUser(userData) {
-  const users = getAll('users')
-  const exists = users.find(u => u.email === userData.email)
-  if (exists) return { success: false, error: 'Email already registered' }
-  const newUser = create('users', {
-    ...userData,
-    role: 'customer',
-    avatar: null,
-    banned: false,
-    suspended: false,
+export async function registerUser({ name, email, password }) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name } },
   })
-  const { password: _, ...safeUser } = newUser
+  if (error) return { success: false, error: error.message }
+
+  if (data.user) {
+    const { error: profileError } = await supabase.from('profiles').insert({
+      id: data.user.id,
+      name,
+      role: 'customer',
+    })
+    if (profileError) return { success: false, error: profileError.message }
+  }
+
+  const profile = data.user ? await getProfile(data.user.id) : null
+  const safeUser = data.user ? { ...data.user, ...profile } : data.user
   return { success: true, user: safeUser }
 }
 
-export function getUsers() {
-  return getAll('users').map(({ password, ...u }) => u)
+export function getSession() {
+  return supabase.auth.getSession()
 }
 
-export function getUserById(id) {
-  const users = getAll('users')
-  const user = users.find(u => u.id === id)
-  if (!user) return null
-  const { password: _, ...safeUser } = user
-  return safeUser
+export function onAuthChange(callback) {
+  return supabase.auth.onAuthStateChange((event, session) => {
+    callback(event, session)
+  })
 }
 
-export function updateUser(id, updates) {
-  return updateItem('users', id, updates)
+export async function logoutUser() {
+  const { error } = await supabase.auth.signOut()
+  if (error) return { success: false, error: error.message }
+  return { success: true }
 }
 
-export function banUser(id) {
-  return updateItem('users', id, { banned: true })
+async function getProfile(userId) {
+  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+  return data || {}
 }
 
-export function unbanUser(id) {
-  return updateItem('users', id, { banned: false })
+export async function getUsers() {
+  const { data: profiles } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  return profiles || []
 }
 
-export function suspendUser(id) {
-  return updateItem('users', id, { suspended: true })
+export async function getUserById(id) {
+  const { data } = await supabase.from('profiles').select('*').eq('id', id).single()
+  return data
 }
 
-export function unsuspendUser(id) {
-  return updateItem('users', id, { suspended: false })
+export async function updateUser(id, updates) {
+  const { data } = await supabase.from('profiles').update(updates).eq('id', id).select().single()
+  return data
 }
 
-export function removeStaff(id) {
-  return removeItem('users', id)
+export async function banUser(id) {
+  return updateUser(id, { banned: true })
+}
+
+export async function unbanUser(id) {
+  return updateUser(id, { banned: false })
+}
+
+export async function suspendUser(id) {
+  return updateUser(id, { suspended: true })
+}
+
+export async function unsuspendUser(id) {
+  return updateUser(id, { suspended: false })
+}
+
+export async function removeStaff(id) {
+  const { error } = await supabase.from('profiles').delete().eq('id', id)
+  return !error
 }

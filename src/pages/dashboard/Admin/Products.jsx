@@ -16,7 +16,7 @@ import { useComics } from '@/hooks/useComics'
 import toast from 'react-hot-toast'
 
 const categoryIcons = { movie: FaFilm, book: FaBook, manga: FaDragon, comic: FaMasksTheater }
-const categoryColors = { movie: 'red', book: 'blue', manga: 'pink', comic: 'emerald' }
+const categoryColors = { movie: 'text-red-400', book: 'text-blue-400', manga: 'text-pink-400', comic: 'text-emerald-400' }
 
 function AdminProducts() {
   const [activeCategory, setActiveCategory] = useState('movie')
@@ -141,7 +141,7 @@ function AdminProducts() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className={`text-xs capitalize text-${categoryColors[product.category]}-400`}>{product.category}</span>
+                    <span className={`text-xs capitalize ${categoryColors[product.category]}`}>{product.category}</span>
                   </TableCell>
                   <TableCell className="text-white">{formatCurrency(product.price)}</TableCell>
                   <TableCell>

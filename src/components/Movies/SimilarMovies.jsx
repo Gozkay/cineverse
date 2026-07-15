@@ -1,4 +1,5 @@
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
+import { ROUTES } from "@/constants/routes";
 import { Link } from "react-router-dom";
 
 function SimilarMovies({ movies }) {
@@ -14,7 +15,7 @@ function SimilarMovies({ movies }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {movies.slice(0, 5).map((simMovie) => (
           <Link 
-            to={`/movie/${simMovie.id}`} 
+            to={ROUTES.MOVIE_DETAIL(simMovie.id)} 
             key={simMovie.id} 
             className="group cursor-pointer space-y-2 block"
           >

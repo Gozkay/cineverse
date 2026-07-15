@@ -35,7 +35,7 @@ function normalizeBook(item) {
     language: info.language || 'en',
     averageRating: info.averageRating || 0,
     ratingsCount: info.ratingsCount || 0,
-    price: Math.floor(Math.random() * 4000) + 1500,
+    price: (parseInt(item.id.slice(-8), 36) % 2500) + 1500,
     currency: 'NGN',
     category: 'book',
     previewLink: info.previewLink || '#',

@@ -1,12 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaArrowLeft, FaCheck, FaCreditCard, FaTruck, FaClipboardList, FaShoppingBag } from 'react-icons/fa'
+import { FaArrowLeft, FaCheck, FaCreditCard, FaTruck, FaShoppingBag } from 'react-icons/fa'
 import MainLayout from '@/components/layout/MainLayout'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { ROUTES } from '@/constants/routes'
+import { usePaystack } from '@/hooks/usePaystack'
 import { createOrder } from '@/services/orders'
 import toast from 'react-hot-toast'
 
@@ -14,14 +15,16 @@ const steps = ['Review Cart', 'Shipping Info', 'Payment', 'Confirmation']
 
 function Checkout() {
   const { items, subtotal, clearCart } = useCart()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
+  const { initializePayment } = usePaystack()
   const [step, setStep] = useState(1)
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [orderId, setOrderId] = useState(null)
+  const [paying, setPaying] = useState(false)
   const [shipping, setShipping] = useState({
-    fullName: user?.name || '',
-    email: user?.email || '',
+    fullName: profile?.name || user?.user_metadata?.name || '',
+    email: profile?.email || user?.email || '',
     address: '',
     city: '',
     state: '',
@@ -44,9 +47,9 @@ function Checkout() {
     return Object.keys(errs).length === 0
   }
 
-  const handlePlaceOrder = () => {
+  const placeOrder = async (paymentRef) => {
     const orderData = {
-      userId: user?.id || 'guest',
+      user_id: user?.id || 'guest',
       items: items.map(item => ({
         productId: item.id,
         title: item.title,
@@ -55,17 +58,46 @@ function Checkout() {
         image: item.image,
         category: item.category,
       })),
-      totalAmount: subtotal,
+      total_amount: subtotal,
       status: 'pending',
-      shippingInfo: shipping,
-      paymentMethod: payment.method,
+      shipping_info: shipping,
+      payment_method: payment.method,
+      payment_ref: paymentRef || null,
     }
-    const order = createOrder(orderData)
-    setOrderId(order.id)
-    setOrderPlaced(true)
-    clearCart()
-    setStep(4)
-    toast.success('Order placed successfully!')
+    try {
+      const order = await createOrder(orderData)
+      setOrderId(order.id)
+      setOrderPlaced(true)
+      clearCart()
+      setStep(4)
+      toast.success('Order placed successfully!')
+    } catch {
+      toast.error('Failed to place order. Please try again.')
+    }
+  }
+
+  const handlePayWithPaystack = () => {
+    setPaying(true)
+    initializePayment({
+      email: shipping.email || user?.email || 'customer@cineverse.com',
+      amount: subtotal,
+      onSuccess: (ref) => {
+        setPaying(false)
+        placeOrder(ref)
+      },
+      onClose: () => {
+        setPaying(false)
+        toast.error('Payment cancelled')
+      },
+    })
+  }
+
+  const handlePlaceOrder = async () => {
+    if (payment.method === 'card') {
+      handlePayWithPaystack()
+    } else {
+      await placeOrder(null)
+    }
   }
 
   const renderStepIndicator = () => (
@@ -110,7 +142,10 @@ function Checkout() {
             <FaArrowLeft /> Back to Cart
           </Link>
 
-          <h1 className="mb-8 text-3xl font-bold text-white">Checkout</h1>
+          <h1 className="mb-8 text-3xl sm:text-4xl font-black">
+            <span className="text-white">Complete</span>{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Checkout</span>
+          </h1>
           {renderStepIndicator()}
 
           <AnimatePresence mode="wait">
@@ -193,25 +228,9 @@ function Checkout() {
                   ))}
                 </div>
                 {payment.method === 'card' && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Card Number</label>
-                      <input placeholder="4242 4242 4242 4242" value={payment.cardNumber} onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Cardholder Name</label>
-                      <input placeholder="John Doe" value={payment.cardName} onChange={(e) => setPayment({ ...payment, cardName: e.target.value })} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="mb-1 block text-xs text-gray-400">Expiry</label>
-                        <input placeholder="MM/YY" value={payment.expiry} onChange={(e) => setPayment({ ...payment, expiry: e.target.value })} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs text-gray-400">CVV</label>
-                        <input placeholder="123" value={payment.cvv} onChange={(e) => setPayment({ ...payment, cvv: e.target.value })} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
-                      </div>
-                    </div>
+                  <div className="rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800 text-sm text-gray-400">
+                    Pay <span className="font-semibold text-white">{formatCurrency(subtotal)}</span> securely via <span className="font-medium text-violet-400">Paystack</span>.
+                    <p className="mt-2 text-xs text-gray-500">You'll be redirected to Paystack's secure checkout. We support cards, bank transfer, USSD, and mobile money.</p>
                   </div>
                 )}
                 {payment.method === 'transfer' && (
@@ -227,7 +246,7 @@ function Checkout() {
                 )}
                 <div className="flex gap-3">
                   <button onClick={() => setStep(2)} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-medium text-gray-300 hover:bg-slate-800 transition-colors">Back</button>
-                  <button onClick={handlePlaceOrder} className="flex-1 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-500 transition-colors">Place Order — {formatCurrency(subtotal)}</button>
+                  <button onClick={handlePlaceOrder} disabled={paying} className="flex-1 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-50 transition-colors">{paying ? 'Processing...' : `Place Order — ${formatCurrency(subtotal)}`}</button>
                 </div>
               </motion.div>
             )}
