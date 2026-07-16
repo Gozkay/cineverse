@@ -52,7 +52,8 @@ async function getProfile(userId) {
 }
 
 export async function getUsers() {
-  const { data: profiles } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  const { data: profiles, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
   return profiles || []
 }
 
@@ -62,7 +63,8 @@ export async function getUserById(id) {
 }
 
 export async function updateUser(id, updates) {
-  const { data } = await supabase.from('profiles').update(updates).eq('id', id).select().single()
+  const { data, error } = await supabase.from('profiles').update(updates).eq('id', id).select().single()
+  if (error) throw new Error(error.message)
   return data
 }
 
@@ -84,5 +86,5 @@ export async function unsuspendUser(id) {
 
 export async function removeStaff(id) {
   const { error } = await supabase.from('profiles').delete().eq('id', id)
-  return !error
+  if (error) throw new Error(error.message)
 }

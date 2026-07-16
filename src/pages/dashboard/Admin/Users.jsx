@@ -10,10 +10,18 @@ import toast from 'react-hot-toast'
 
 function AdminUsers() {
   const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const loadUsers = async () => {
-    const data = await getUsers()
-    setUsers(data || [])
+    setLoading(true)
+    try {
+      const data = await getUsers()
+      setUsers(data || [])
+    } catch (err) {
+      toast.error('Failed to load users')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { loadUsers() }, [])
@@ -50,6 +58,14 @@ function AdminUsers() {
         </div>
 
         <div className="rounded-xl bg-slate-900/50 ring-1 ring-slate-800 overflow-hidden">
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="h-8 w-48 animate-pulse rounded-full bg-slate-800/80 shimmer mx-auto mb-3" />
+              <div className="h-4 w-32 animate-pulse rounded-full bg-slate-800/80 shimmer mx-auto" />
+            </div>
+          ) : users.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">No users found</div>
+          ) : (
           <Table>
             <TableHeader>
               <TableRow className="border-slate-800">
@@ -113,6 +129,7 @@ function AdminUsers() {
               ))}
             </TableBody>
           </Table>
+          )}
         </div>
       </div>
     </DashboardLayout>
