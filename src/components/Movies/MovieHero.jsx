@@ -1,6 +1,7 @@
 import { FaStar, FaHeart, FaShoppingCart } from "react-icons/fa";
 import { BACKDROP_BASE_URL, IMAGE_BASE_URL } from "@/constants/tmdb";
 import heroBg from "@/assets/images/hero-bg.png";
+import PropTypes from 'prop-types';
 
 function MovieHero({ movie }) {
   return (
@@ -64,5 +65,23 @@ function MovieHero({ movie }) {
     </section>
   );
 }
+
+MovieHero.propTypes = {
+  movie: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    backdrop_path: PropTypes.string,
+    poster_path: PropTypes.string,
+    vote_average: PropTypes.number.isRequired,
+    release_date: PropTypes.string,
+    runtime: PropTypes.number,
+    overview: PropTypes.string,
+    genres: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number,
+        name: PropTypes.string,
+      })
+    ),
+  }),
+};
 
 export default MovieHero;

@@ -18,15 +18,6 @@ export async function searchComics(query, limit = 20) {
   return (data.docs || []).map(normalizeComicSearch)
 }
 
-async function getBookDetails(olid) {
-  try {
-    const { data } = await openLibrary.get(`/works/${olid}.json`)
-    return data
-  } catch {
-    return null
-  }
-}
-
 function normalizeComic(work, subject) {
   const id = work.key?.replace('/works/', '') || `comic_${Date.now()}`
   return {

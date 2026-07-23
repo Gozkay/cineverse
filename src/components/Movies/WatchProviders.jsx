@@ -1,4 +1,5 @@
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
+import PropTypes from 'prop-types';
 
 function WatchProviders({ providers }) {
   const nigeria = providers?.NG || providers?.US;
@@ -33,5 +34,28 @@ function WatchProviders({ providers }) {
     </section>
   );
 }
+
+WatchProviders.propTypes = {
+  providers: PropTypes.shape({
+    NG: PropTypes.shape({
+      flatrate: PropTypes.arrayOf(
+        PropTypes.shape({
+          provider_id: PropTypes.number,
+          logo_path: PropTypes.string,
+          provider_name: PropTypes.string,
+        })
+      ),
+    }),
+    US: PropTypes.shape({
+      flatrate: PropTypes.arrayOf(
+        PropTypes.shape({
+          provider_id: PropTypes.number,
+          logo_path: PropTypes.string,
+          provider_name: PropTypes.string,
+        })
+      ),
+    }),
+  }),
+};
 
 export default WatchProviders;

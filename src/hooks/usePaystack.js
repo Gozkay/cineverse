@@ -1,15 +1,27 @@
 import { useCallback } from 'react'
 
+let paystackScriptLoaded = false
+
 export function usePaystack() {
   const initializePayment = useCallback(({ email, amount, onSuccess, onClose }) => {
-    if (!window.PaystackPop) {
+    if (window.PaystackPop) {
+      openPaystack({ email, amount, onSuccess, onClose })
+      return
+    }
+    if (!paystackScriptLoaded) {
+      paystackScriptLoaded = true
       const script = document.createElement('script')
       script.src = 'https://js.paystack.co/v1/inline.js'
       script.onload = () => openPaystack({ email, amount, onSuccess, onClose })
       document.body.appendChild(script)
       return
     }
-    openPaystack({ email, amount, onSuccess, onClose })
+    const checkInterval = setInterval(() => {
+      if (window.PaystackPop) {
+        clearInterval(checkInterval)
+        openPaystack({ email, amount, onSuccess, onClose })
+      }
+    }, 200)
   }, [])
 
   return { initializePayment }

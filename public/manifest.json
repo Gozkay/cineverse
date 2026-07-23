@@ -1,0 +1,16 @@
+{
+  "name": "CineVerse",
+  "short_name": "CineVerse",
+  "description": "E-commerce marketplace for movies, books, manga, and comics",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

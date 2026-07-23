@@ -1,28 +1,33 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
 import toast from 'react-hot-toast'
 
+const loginSchema = z.object({
+  email: z.string().email('Enter a valid email'),
+  password: z.string().min(1, 'Password is required'),
+})
+
 function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || ROUTES.HOME
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!email || !password) { toast.error('Please fill in all fields'); return }
-    setLoading(true)
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(loginSchema),
+  })
+
+  const onSubmit = async ({ email, password }) => {
     const result = await login(email, password)
-    setLoading(false)
     if (result.success) {
       toast.success(`Welcome back, ${result.user.name}!`)
       navigate(from, { replace: true })
@@ -44,38 +49,32 @@ function Login() {
               <p className="mt-2 text-sm text-gray-500">Sign in to your CineVerse account</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-sm text-gray-400">Email</label>
                 <div className="relative">
                   <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="h-11 w-full rounded-xl border border-slate-700 bg-slate-800/50 pl-10 pr-3 text-sm text-white outline-none focus:border-violet-500 transition-colors" />
+                  <input type="email" {...register('email')} placeholder="you@example.com" className="h-11 w-full rounded-xl border border-slate-700 bg-slate-800/50 pl-10 pr-3 text-sm text-white outline-none focus:border-violet-500 transition-colors" />
                 </div>
+                {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>}
               </div>
 
               <div>
                 <label className="mb-1.5 block text-sm text-gray-400">Password</label>
                 <div className="relative">
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
-                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="h-11 w-full rounded-xl border border-slate-700 bg-slate-800/50 pl-10 pr-10 text-sm text-white outline-none focus:border-violet-500 transition-colors" />
+                  <input type={showPassword ? 'text' : 'password'} {...register('password')} placeholder="••••••••" className="h-11 w-full rounded-xl border border-slate-700 bg-slate-800/50 pl-10 pr-10 text-sm text-white outline-none focus:border-violet-500 transition-colors" />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                     {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                   </button>
                 </div>
+                {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>}
               </div>
 
-              <button type="submit" disabled={loading} className="h-11 w-full rounded-xl bg-violet-600 text-sm font-semibold text-white hover:bg-violet-500 disabled:opacity-50 transition-colors">
-                {loading ? 'Signing in...' : 'Sign In'}
+              <button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-violet-600 text-sm font-semibold text-white hover:bg-violet-500 disabled:opacity-50 transition-colors">
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
-
-            <div className="mt-6 text-center text-sm text-gray-500">
-              <span className="text-gray-500">Demo: </span>
-              <button onClick={() => { setEmail('admin@cineverse.com'); setPassword('admin123') }} className="text-violet-400 hover:underline mx-1">Admin</button>
-              <button onClick={() => { setEmail('manager@cineverse.com'); setPassword('manager123') }} className="text-violet-400 hover:underline mx-1">Manager</button>
-              <button onClick={() => { setEmail('staff1@cineverse.com'); setPassword('staff123') }} className="text-violet-400 hover:underline mx-1">Staff</button>
-              <button onClick={() => { setEmail('john@example.com'); setPassword('customer123') }} className="text-violet-400 hover:underline mx-1">Customer</button>
-            </div>
 
             <p className="mt-6 text-center text-sm text-gray-500">
               Don't have an account? <Link to={ROUTES.REGISTER} className="text-violet-400 hover:underline">Sign up</Link>

@@ -9,6 +9,7 @@ import {
 } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip)
+import PropTypes from 'prop-types'
 
 function OrderVolumeChart({ data, loading }) {
   if (loading) {
@@ -62,6 +63,14 @@ function OrderVolumeChart({ data, loading }) {
       </div>
     </div>
   )
+}
+
+OrderVolumeChart.propTypes = {
+  data: PropTypes.shape({
+    labels: PropTypes.arrayOf(PropTypes.string),
+    values: PropTypes.arrayOf(PropTypes.number),
+  }),
+  loading: PropTypes.bool,
 }
 
 export default OrderVolumeChart

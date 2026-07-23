@@ -1,4 +1,5 @@
 import { FaPlay } from "react-icons/fa";
+import PropTypes from 'prop-types';
 
 function MovieInfo({ movie, videos }) {
   const trailer = videos?.find(
@@ -71,5 +72,30 @@ function MovieInfo({ movie, videos }) {
     </section>
   );
 }
+
+MovieInfo.propTypes = {
+  movie: PropTypes.shape({
+    overview: PropTypes.string,
+    original_language: PropTypes.string,
+    status: PropTypes.string,
+    runtime: PropTypes.number,
+    budget: PropTypes.number,
+    revenue: PropTypes.number,
+    genres: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number,
+        name: PropTypes.string,
+      })
+    ),
+    vote_average: PropTypes.number,
+  }),
+  videos: PropTypes.arrayOf(
+    PropTypes.shape({
+      site: PropTypes.string,
+      type: PropTypes.string,
+      key: PropTypes.string,
+    })
+  ),
+};
 
 export default MovieInfo;

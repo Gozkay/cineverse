@@ -6,6 +6,8 @@ import { ROUTES } from "@/constants/routes";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { memo } from "react";
+import PropTypes from "prop-types";
 import toast from "react-hot-toast";
 
 function MovieCard({ movie, index = 0 }) {
@@ -94,4 +96,16 @@ function MovieCard({ movie, index = 0 }) {
   );
 }
 
-export default MovieCard;
+MovieCard.propTypes = {
+  movie: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired,
+    poster_path: PropTypes.string,
+    vote_average: PropTypes.number,
+    release_date: PropTypes.string,
+    price: PropTypes.number,
+  }).isRequired,
+  index: PropTypes.number,
+}
+
+export default memo(MovieCard);

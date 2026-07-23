@@ -1,20 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { FaStar, FaTrash } from 'react-icons/fa'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { formatDateTime } from '@/utils/formatDate'
 import toast from 'react-hot-toast'
+import PropTypes from 'prop-types'
 
-function ReviewList({ productId, refreshKey }) {
+function ReviewList({ productId }) {
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const { user, isAdmin } = useAuth()
 
-  useEffect(() => {
-    loadReviews()
-  }, [productId, refreshKey])
-
-  async function loadReviews() {
+  const loadReviews = useCallback(async () => {
     setLoading(true)
     const { data } = await supabase
       .from('reviews')
@@ -23,7 +20,11 @@ function ReviewList({ productId, refreshKey }) {
       .order('created_at', { ascending: false })
     setReviews(data || [])
     setLoading(false)
-  }
+  }, [productId])
+
+  useEffect(() => {
+    loadReviews() // eslint-disable-line react-hooks/set-state-in-effect
+  }, [loadReviews])
 
   const handleDelete = async (reviewId) => {
     const { error } = await supabase.from('reviews').delete().eq('id', reviewId)
@@ -88,6 +89,10 @@ function ReviewList({ productId, refreshKey }) {
       )}
     </div>
   )
+}
+
+ReviewList.propTypes = {
+  productId: PropTypes.string.isRequired,
 }
 
 export default ReviewList

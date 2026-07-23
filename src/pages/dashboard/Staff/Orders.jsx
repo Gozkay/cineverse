@@ -15,7 +15,7 @@ function StaffOrders() {
     setOrders(data || [])
   }
 
-  useEffect(() => { loadOrders() }, [])
+  useEffect(() => { getOrders().then(data => setOrders(data || [])) }, [])
 
   const handleStatusUpdate = async (id, status) => {
     await updateOrderStatus(id, status)

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { FaShoppingBag, FaEye } from 'react-icons/fa'
+import { FaEye } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +27,7 @@ function AdminOrders() {
     setOrders(data || [])
   }
 
-  useEffect(() => { loadOrders() }, [])
+  useEffect(() => { getOrders().then(data => setOrders(data || [])) }, [])
 
   const handleStatusChange = async (orderId, newStatus) => {
     await updateOrderStatus(orderId, newStatus)

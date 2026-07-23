@@ -5,23 +5,19 @@ const WishlistContext = createContext(null)
 const WISHLIST_KEY = 'cineverse_wishlist'
 
 export function WishlistProvider({ children }) {
-  const [items, setItems] = useState([])
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
+  const [items, setItems] = useState(() => {
     try {
       const stored = localStorage.getItem(WISHLIST_KEY)
-      if (stored) setItems(JSON.parse(stored))
+      return stored ? JSON.parse(stored) : []
     } catch {
       localStorage.removeItem(WISHLIST_KEY)
-    } finally {
-      setLoaded(true)
+      return []
     }
-  }, [])
+  })
 
   useEffect(() => {
-    if (loaded) localStorage.setItem(WISHLIST_KEY, JSON.stringify(items))
-  }, [items, loaded])
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify(items))
+  }, [items])
 
   const addItem = useCallback((product) => {
     setItems(prev => {
@@ -51,12 +47,13 @@ export function WishlistProvider({ children }) {
   }, [])
 
   return (
-    <WishlistContext.Provider value={{ items, addItem, removeItem, isInWishlist, clearWishlist, loaded }}>
+    <WishlistContext.Provider value={{ items, addItem, removeItem, isInWishlist, clearWishlist }}>
       {children}
     </WishlistContext.Provider>
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useWishlist() {
   const context = useContext(WishlistContext)
   if (!context) throw new Error('useWishlist must be used within a WishlistProvider')

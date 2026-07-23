@@ -1,5 +1,6 @@
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
 import { motion } from "framer-motion";
+import PropTypes from 'prop-types';
 
 function MovieGallery({ images }) {
   if (!images?.backdrops?.length) return null;
@@ -35,5 +36,20 @@ function MovieGallery({ images }) {
     </section>
   );
 }
+
+MovieGallery.propTypes = {
+  images: PropTypes.shape({
+    backdrops: PropTypes.arrayOf(
+      PropTypes.shape({
+        file_path: PropTypes.string,
+      })
+    ),
+    posters: PropTypes.arrayOf(
+      PropTypes.shape({
+        file_path: PropTypes.string,
+      })
+    ),
+  }),
+};
 
 export default MovieGallery;

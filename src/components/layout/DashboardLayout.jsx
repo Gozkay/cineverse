@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { FaTachometerAlt, FaBox, FaShoppingBag, FaUsers, FaUserTie, FaSignOutAlt, FaBars, FaTimes, FaHome } from 'react-icons/fa'
 import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
+import PropTypes from 'prop-types'
 
 function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -103,6 +104,10 @@ function DashboardLayout({ children }) {
       </div>
     </div>
   )
+}
+
+DashboardLayout.propTypes = {
+  children: PropTypes.node.isRequired,
 }
 
 export default DashboardLayout

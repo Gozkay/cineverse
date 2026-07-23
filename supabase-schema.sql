@@ -4,6 +4,7 @@
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
+  email TEXT,
   role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('customer','staff','manager','admin')),
   avatar TEXT,
   banned BOOLEAN DEFAULT false,
@@ -102,6 +103,16 @@ CREATE POLICY "Profiles are viewable by everyone"
 
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Admins can update any profile"
+  ON profiles FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Admins can delete profiles"
+  ON profiles FOR DELETE USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
 
 -- Products policies
 CREATE POLICY "Products are viewable by everyone"

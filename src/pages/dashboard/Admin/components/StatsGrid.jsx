@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { FaUsers, FaShoppingBag, FaMoneyBillWave, FaBox } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants/routes'
+import PropTypes from 'prop-types'
 
 const cards = [
   { label: 'Total Users', key: 'users', icon: FaUsers, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-400', route: ROUTES.DASHBOARD_ADMIN_USERS },
@@ -41,6 +42,16 @@ function StatsGrid({ stats, loading }) {
       ))}
     </div>
   )
+}
+
+StatsGrid.propTypes = {
+  stats: PropTypes.shape({
+    users: PropTypes.number,
+    orders: PropTypes.number,
+    revenue: PropTypes.number,
+    pending: PropTypes.number,
+  }),
+  loading: PropTypes.bool,
 }
 
 export default StatsGrid

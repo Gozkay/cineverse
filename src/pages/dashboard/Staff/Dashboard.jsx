@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FaShoppingBag, FaBox, FaClock, FaCheckCircle } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { getAll } from '@/lib/storage'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { supabase } from '@/lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants/routes'
 
@@ -11,13 +10,17 @@ function StaffDashboard() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const orders = getAll('orders')
-    setStats({
-      total: orders.length,
-      pending: orders.filter(o => o.status === 'pending').length,
-      processing: orders.filter(o => o.status === 'processing').length,
-      delivered: orders.filter(o => o.status === 'delivered').length,
-    })
+    async function loadData() {
+      const { data: orders } = await supabase.from('orders').select('status')
+      const ordersList = orders || []
+      setStats({
+        total: ordersList.length,
+        pending: ordersList.filter(o => o.status === 'pending').length,
+        processing: ordersList.filter(o => o.status === 'processing').length,
+        delivered: ordersList.filter(o => o.status === 'delivered').length,
+      })
+    }
+    loadData()
   }, [])
 
   return (
@@ -37,7 +40,7 @@ function StaffDashboard() {
             { label: 'Pending', value: stats.pending, icon: FaClock, color: 'amber' },
             { label: 'Processing', value: stats.processing, icon: FaBox, color: 'blue' },
             { label: 'Delivered', value: stats.delivered, icon: FaCheckCircle, color: 'green' },
-          ].map((card, i) => (
+          ].map((card) => (
             <div key={card.label} className="rounded-xl bg-slate-900/50 p-5 ring-1 ring-slate-800">
               <div className="mb-3 rounded-lg bg-violet-500/10 p-2.5 w-fit">
                 <card.icon className="text-violet-400" size={20} />

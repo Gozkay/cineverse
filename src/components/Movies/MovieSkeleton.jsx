@@ -11,4 +11,6 @@ function MovieSkeleton() {
   );
 }
 
+MovieSkeleton.propTypes = {};
+
 export default MovieSkeleton;

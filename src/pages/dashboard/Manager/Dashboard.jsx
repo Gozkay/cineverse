@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FaUserTie, FaShoppingBag, FaBox, FaExclamationTriangle } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { getAll } from '@/lib/storage'
+import { supabase } from '@/lib/supabase'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants/routes'
@@ -11,14 +11,18 @@ function ManagerDashboard() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const users = getAll('users')
-    const orders = getAll('orders')
-    setStats({
-      staff: users.filter(u => u.role === 'staff').length,
-      orders: orders.length,
-      pending: orders.filter(o => o.status === 'pending').length,
-      revenue: orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0),
-    })
+    async function loadData() {
+      const { count: staffCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'staff')
+      const { data: orders } = await supabase.from('orders').select('total_amount, status')
+      const ordersList = orders || []
+      setStats({
+        staff: staffCount || 0,
+        orders: ordersList.length,
+        pending: ordersList.filter(o => o.status === 'pending').length,
+        revenue: ordersList.reduce((sum, o) => sum + (o.total_amount || 0), 0),
+      })
+    }
+    loadData()
   }, [])
 
   return (
@@ -38,7 +42,7 @@ function ManagerDashboard() {
             { label: 'Total Orders', value: stats.orders, icon: FaShoppingBag, color: 'blue' },
             { label: 'Pending Orders', value: stats.pending, icon: FaExclamationTriangle, color: 'amber' },
             { label: 'Total Revenue', value: formatCurrency(stats.revenue), icon: FaBox, color: 'green' },
-          ].map((card, i) => (
+          ].map((card) => (
             <div key={card.label} className="rounded-xl bg-slate-900/50 p-5 ring-1 ring-slate-800">
               <div className="mb-3 rounded-lg bg-violet-500/10 p-2.5 w-fit">
                 <card.icon className="text-violet-400" size={20} />

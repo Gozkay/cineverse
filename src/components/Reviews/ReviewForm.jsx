@@ -1,15 +1,25 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { FaStar } from 'react-icons/fa'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
+import PropTypes from 'prop-types'
+
+const reviewSchema = z.object({
+  comment: z.string().min(1, 'Please write a comment'),
+})
 
 function ReviewForm({ productId, onReviewAdded }) {
   const { user } = useAuth()
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
-  const [comment, setComment] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(reviewSchema),
+  })
 
   if (!user) {
     return (
@@ -19,20 +29,15 @@ function ReviewForm({ productId, onReviewAdded }) {
     )
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const onSubmit = async ({ comment }) => {
     if (rating === 0) { toast.error('Please select a rating'); return }
-    if (!comment.trim()) { toast.error('Please write a comment'); return }
 
-    setSubmitting(true)
     const { error } = await supabase.from('reviews').insert({
       user_id: user.id,
       product_id: productId,
       rating,
       comment: comment.trim(),
     }).select().single()
-
-    setSubmitting(false)
 
     if (error) {
       if (error.code === '23505') {
@@ -45,12 +50,12 @@ function ReviewForm({ productId, onReviewAdded }) {
 
     toast.success('Review submitted!')
     setRating(0)
-    setComment('')
+    reset()
     onReviewAdded?.()
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl bg-slate-900/50 p-5 ring-1 ring-white/5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-2xl bg-slate-900/50 p-5 ring-1 ring-white/5">
       <h3 className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Write a Review</h3>
 
       <div className="flex items-center gap-1">
@@ -75,22 +80,27 @@ function ReviewForm({ productId, onReviewAdded }) {
       </div>
 
       <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        {...register('comment')}
         placeholder="Share your thoughts about this product..."
         rows={3}
         className="w-full rounded-xl border border-slate-700/50 bg-slate-800/50 px-3 py-2 text-sm text-white outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/10 resize-none transition-all"
       />
+      {errors.comment && <p className="text-xs text-red-400">{errors.comment.message}</p>}
 
       <button
         type="submit"
-        disabled={submitting}
+        disabled={isSubmitting}
         className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2 text-sm font-medium text-white hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-50 transition-all shadow-lg shadow-violet-500/25"
       >
-        {submitting ? 'Submitting...' : 'Submit Review'}
+        {isSubmitting ? 'Submitting...' : 'Submit Review'}
       </button>
     </form>
   )
+}
+
+ReviewForm.propTypes = {
+  productId: PropTypes.string.isRequired,
+  onReviewAdded: PropTypes.func,
 }
 
 export default ReviewForm

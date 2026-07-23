@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://cineverse.app/</loc><priority>1.0</priority></url>
+  <url><loc>https://cineverse.app/movies</loc><priority>0.8</priority></url>
+  <url><loc>https://cineverse.app/books</loc><priority>0.8</priority></url>
+  <url><loc>https://cineverse.app/manga</loc><priority>0.8</priority></url>
+  <url><loc>https://cineverse.app/comics</loc><priority>0.8</priority></url>
+  <url><loc>https://cineverse.app/cart</loc><priority>0.5</priority></url>
+  <url><loc>https://cineverse.app/wishlist</loc><priority>0.5</priority></url>
+  <url><loc>https://cineverse.app/search</loc><priority>0.6</priority></url>
+</urlset>

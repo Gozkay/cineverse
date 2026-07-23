@@ -1,4 +1,5 @@
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
+import PropTypes from 'prop-types';
 
 function MovieCast({ cast }) {
   if (!cast || cast.length === 0) return null;
@@ -35,5 +36,16 @@ function MovieCast({ cast }) {
     </div>
   );
 }
+
+MovieCast.propTypes = {
+  cast: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string,
+      character: PropTypes.string,
+      profile_path: PropTypes.string,
+    })
+  ),
+};
 
 export default MovieCast;

@@ -11,6 +11,7 @@ import {
 } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
+import PropTypes from 'prop-types'
 
 function RevenueChart({ data, loading }) {
   if (loading) {
@@ -72,6 +73,14 @@ function RevenueChart({ data, loading }) {
       </div>
     </div>
   )
+}
+
+RevenueChart.propTypes = {
+  data: PropTypes.shape({
+    labels: PropTypes.arrayOf(PropTypes.string),
+    values: PropTypes.arrayOf(PropTypes.number),
+  }),
+  loading: PropTypes.bool,
 }
 
 export default RevenueChart

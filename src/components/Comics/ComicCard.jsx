@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaHeart, FaShoppingCart } from 'react-icons/fa'
@@ -5,6 +6,7 @@ import { ROUTES } from '@/constants/routes'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { formatCurrency } from '@/utils/formatCurrency'
+import PropTypes from 'prop-types'
 import toast from 'react-hot-toast'
 
 function ComicCard({ comic, index = 0 }) {
@@ -76,4 +78,16 @@ function ComicCard({ comic, index = 0 }) {
   )
 }
 
-export default ComicCard
+ComicCard.propTypes = {
+  comic: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    price: PropTypes.number,
+    authors: PropTypes.arrayOf(PropTypes.string),
+    firstPublishYear: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }).isRequired,
+  index: PropTypes.number,
+}
+
+export default memo(ComicCard)

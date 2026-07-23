@@ -17,33 +17,45 @@ function AdminUsers() {
     try {
       const data = await getUsers()
       setUsers(data || [])
-    } catch (err) {
+    } catch {
       toast.error('Failed to load users')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => { loadUsers() }, [])
+  useEffect(() => { loadUsers() }, []) // eslint-disable-line react-hooks/set-state-in-effect
 
   const handleBan = async (id, isBanned) => {
-    if (isBanned) await unbanUser(id)
-    else await banUser(id)
-    await loadUsers()
-    toast.success(isBanned ? 'User unbanned' : 'User banned')
+    try {
+      if (isBanned) await unbanUser(id)
+      else await banUser(id)
+      await loadUsers()
+      toast.success(isBanned ? 'User unbanned' : 'User banned')
+    } catch {
+      toast.error('Failed to update user status')
+    }
   }
 
   const handleSuspend = async (id, isSuspended) => {
-    if (isSuspended) await unsuspendUser(id)
-    else await suspendUser(id)
-    await loadUsers()
-    toast.success(isSuspended ? 'User unsuspended' : 'User suspended')
+    try {
+      if (isSuspended) await unsuspendUser(id)
+      else await suspendUser(id)
+      await loadUsers()
+      toast.success(isSuspended ? 'User unsuspended' : 'User suspended')
+    } catch {
+      toast.error('Failed to update user status')
+    }
   }
 
   const handleRemove = async (id) => {
-    await removeStaff(id)
-    await loadUsers()
-    toast.success('User removed')
+    try {
+      await removeStaff(id)
+      await loadUsers()
+      toast.success('User removed')
+    } catch {
+      toast.error('Failed to remove user')
+    }
   }
 
   return (
@@ -88,7 +100,7 @@ function AdminUsers() {
                       <span className="text-sm text-white">{user.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-400">{user.email}</TableCell>
+                  <TableCell className="text-sm text-gray-400">{user.email || '—'}</TableCell>
                   <TableCell>
                     <Badge variant={user.role === 'admin' ? 'destructive' : user.role === 'manager' ? 'warning' : user.role === 'staff' ? 'info' : 'secondary'} className="capitalize">
                       {user.role}

@@ -1,4 +1,4 @@
-import Herobg from "@/assets/images/hero-bg.png";
+import Herobg from "@/assets/images/hero-bg.webp";
 
 function HeroBackground() {
   return (
@@ -6,7 +6,7 @@ function HeroBackground() {
       <div className="absolute inset-0 bg-slate-950" />
       <img
         src={Herobg}
-        alt=""
+        alt="Cinematic background"
         className="absolute inset-0 h-full w-full object-cover object-center opacity-60"
       />
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.80)' }} />

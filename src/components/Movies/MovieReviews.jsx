@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { FaStar, FaUserCircle } from "react-icons/fa";
+import PropTypes from 'prop-types';
 
 function MovieReviews({ reviews }) {
   if (!reviews?.length) return null;
@@ -74,5 +75,19 @@ function MovieReviews({ reviews }) {
     </section>
   );
 }
+
+MovieReviews.propTypes = {
+  reviews: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      author: PropTypes.string,
+      content: PropTypes.string,
+      created_at: PropTypes.string,
+      author_details: PropTypes.shape({
+        rating: PropTypes.number,
+      }),
+    })
+  ),
+};
 
 export default MovieReviews;

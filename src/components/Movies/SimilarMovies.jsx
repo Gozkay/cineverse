@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
 import { ROUTES } from "@/constants/routes";
 import { Link } from "react-router-dom";
+import PropTypes from 'prop-types';
 
 function SimilarMovies({ movies }) {
   if (!movies || movies.length === 0) return null;
@@ -42,5 +43,15 @@ function SimilarMovies({ movies }) {
     </div>
   );
 }
+
+SimilarMovies.propTypes = {
+  movies: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string,
+      poster_path: PropTypes.string,
+    })
+  ),
+};
 
 export default SimilarMovies;

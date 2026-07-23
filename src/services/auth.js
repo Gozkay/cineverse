@@ -20,6 +20,7 @@ export async function registerUser({ name, email, password }) {
     const { error: profileError } = await supabase.from('profiles').insert({
       id: data.user.id,
       name,
+      email,
       role: 'customer',
     })
     if (profileError) return { success: false, error: profileError.message }
@@ -69,22 +70,31 @@ export async function updateUser(id, updates) {
 }
 
 export async function banUser(id) {
-  return updateUser(id, { banned: true })
+  const { error } = await supabase.from('profiles').update({ banned: true }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function unbanUser(id) {
-  return updateUser(id, { banned: false })
+  const { error } = await supabase.from('profiles').update({ banned: false }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function suspendUser(id) {
-  return updateUser(id, { suspended: true })
+  const { error } = await supabase.from('profiles').update({ suspended: true }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function unsuspendUser(id) {
-  return updateUser(id, { suspended: false })
+  const { error } = await supabase.from('profiles').update({ suspended: false }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function removeStaff(id) {
   const { error } = await supabase.from('profiles').delete().eq('id', id)
   if (error) throw new Error(error.message)
+  return { success: true }
 }

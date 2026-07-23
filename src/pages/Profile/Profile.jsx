@@ -50,7 +50,7 @@ function Profile() {
               <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">
                 {profile?.name || user?.user_metadata?.name || 'User'}
               </h1>
-              <p className="text-sm capitalize text-gray-500">{role} &bull; {profile?.email || user?.email}</p>
+              <p className="text-sm capitalize text-gray-500">{role} &bull; {user?.email}</p>
             </div>
           </div>
 
@@ -89,7 +89,7 @@ function Profile() {
                       <div className="mb-3 flex items-center justify-between">
                         <div>
                           <span className="font-mono text-xs text-gray-500">#{order.id}</span>
-                          <span className="ml-3 text-xs text-gray-500">{formatDateTime(order.createdAt)}</span>
+                          <span className="ml-3 text-xs text-gray-500">{formatDateTime(order.created_at)}</span>
                         </div>
                         <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium capitalize ${statusColors[order.status] || 'text-gray-400'}`}>{order.status}</span>
                       </div>
@@ -102,8 +102,8 @@ function Profile() {
                         ))}
                       </div>
                       <div className="mt-3 flex items-center justify-between border-t border-slate-800 pt-3">
-                        <span className="text-xs text-gray-500">{order.shippingInfo?.address}, {order.shippingInfo?.city}</span>
-                        <span className="text-sm font-bold text-violet-400">{formatCurrency(order.totalAmount)}</span>
+                        <span className="text-xs text-gray-500">{order.shipping_info?.address}, {order.shipping_info?.city}</span>
+                        <span className="text-sm font-bold text-violet-400">{formatCurrency(order.total_amount)}</span>
                       </div>
                     </motion.div>
                   ))}
@@ -121,7 +121,7 @@ function Profile() {
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-400">Email</span>
-                  <span className="text-sm text-white">{profile?.email || user?.email}</span>
+                  <span className="text-sm text-white">{user?.email}</span>
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-400">Role</span>

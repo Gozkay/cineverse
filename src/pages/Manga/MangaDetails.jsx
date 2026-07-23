@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FaArrowLeft, FaShoppingCart, FaHeart, FaStar, FaDragon, FaUser, FaBook, FaLayerGroup, FaStar as FaStarSolid } from 'react-icons/fa'
+import { FaArrowLeft, FaShoppingCart, FaHeart, FaStar, FaUser, FaBook, FaLayerGroup, FaStar as FaStarSolid } from 'react-icons/fa'
 import MainLayout from '@/components/layout/MainLayout'
 import { useMangaDetails } from '@/hooks/useManga'
 import { useCart } from '@/context/CartContext'

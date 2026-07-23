@@ -7,6 +7,7 @@ import {
 } from 'chart.js'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
+import PropTypes from 'prop-types'
 
 const COLORS = {
   movie: '#ef4444',
@@ -79,6 +80,16 @@ function CategoryPieChart({ data, loading }) {
       </div>
     </div>
   )
+}
+
+CategoryPieChart.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      value: PropTypes.number,
+    })
+  ),
+  loading: PropTypes.bool,
 }
 
 export default CategoryPieChart
