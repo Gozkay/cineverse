@@ -4,15 +4,19 @@ const googleBooks = axios.create({
   baseURL: 'https://www.googleapis.com/books/v1',
 })
 
+const BOOKS_API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_KEY
+
 export async function searchBooks(query, maxResults = 20) {
   const { data } = await googleBooks.get('/volumes', {
-    params: { q: query, maxResults, langRestrict: 'en' },
+    params: { q: query, maxResults, langRestrict: 'en', key: BOOKS_API_KEY },
   })
   return (data.items || []).map(normalizeBook)
 }
 
 export async function getBookById(id) {
-  const { data } = await googleBooks.get(`/volumes/${id}`)
+  const { data } = await googleBooks.get(`/volumes/${id}`, {
+    params: { key: BOOKS_API_KEY },
+  })
   return normalizeBook(data)
 }
 
