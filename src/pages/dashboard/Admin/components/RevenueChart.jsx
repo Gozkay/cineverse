@@ -11,6 +11,7 @@ import {
 } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
+import PropTypes from 'prop-types'
 
 function RevenueChart({ data, loading }) {
   if (loading) {
@@ -65,13 +66,21 @@ function RevenueChart({ data, loading }) {
   }
 
   return (
-    <div className="rounded-xl bg-slate-900/50 p-5 ring-1 ring-slate-800">
-      <h3 className="mb-4 text-sm font-semibold text-white">Revenue (Last 30 Days)</h3>
+    <div className="rounded-2xl bg-slate-900/50 p-5 ring-1 ring-white/5">
+      <h3 className="mb-4 text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Revenue (Last 30 Days)</h3>
       <div className="h-64">
         <Line data={chartData} options={options} />
       </div>
     </div>
   )
+}
+
+RevenueChart.propTypes = {
+  data: PropTypes.shape({
+    labels: PropTypes.arrayOf(PropTypes.string),
+    values: PropTypes.arrayOf(PropTypes.number),
+  }),
+  loading: PropTypes.bool,
 }
 
 export default RevenueChart

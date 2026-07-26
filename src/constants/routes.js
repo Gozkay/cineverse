@@ -8,8 +8,6 @@ export const ROUTES = {
   MANGA_DETAIL: (id) => `/manga/${id}`,
   COMICS: '/comics',
   COMIC_DETAIL: (id) => `/comics/${id}`,
-  PRODUCTS: '/products',
-  PRODUCT_DETAIL: (id) => `/products/${id}`,
   CART: '/cart',
   CHECKOUT: '/checkout',
   WISHLIST: '/wishlist',

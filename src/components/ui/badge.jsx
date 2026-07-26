@@ -1,4 +1,3 @@
-import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = {
@@ -25,4 +24,4 @@ function Badge({ className, variant = "default", ...props }) {
   )
 }
 
-export { Badge, badgeVariants }
+export { Badge, badgeVariants } // eslint-disable-line react-refresh/only-export-components

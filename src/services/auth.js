@@ -20,6 +20,7 @@ export async function registerUser({ name, email, password }) {
     const { error: profileError } = await supabase.from('profiles').insert({
       id: data.user.id,
       name,
+      email,
       role: 'customer',
     })
     if (profileError) return { success: false, error: profileError.message }
@@ -52,7 +53,8 @@ async function getProfile(userId) {
 }
 
 export async function getUsers() {
-  const { data: profiles } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  const { data: profiles, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
   return profiles || []
 }
 
@@ -62,27 +64,37 @@ export async function getUserById(id) {
 }
 
 export async function updateUser(id, updates) {
-  const { data } = await supabase.from('profiles').update(updates).eq('id', id).select().single()
+  const { data, error } = await supabase.from('profiles').update(updates).eq('id', id).select().single()
+  if (error) throw new Error(error.message)
   return data
 }
 
 export async function banUser(id) {
-  return updateUser(id, { banned: true })
+  const { error } = await supabase.from('profiles').update({ banned: true }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function unbanUser(id) {
-  return updateUser(id, { banned: false })
+  const { error } = await supabase.from('profiles').update({ banned: false }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function suspendUser(id) {
-  return updateUser(id, { suspended: true })
+  const { error } = await supabase.from('profiles').update({ suspended: true }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function unsuspendUser(id) {
-  return updateUser(id, { suspended: false })
+  const { error } = await supabase.from('profiles').update({ suspended: false }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
 }
 
 export async function removeStaff(id) {
   const { error } = await supabase.from('profiles').delete().eq('id', id)
-  return !error
+  if (error) throw new Error(error.message)
+  return { success: true }
 }

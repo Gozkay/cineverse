@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaHeart, FaShoppingCart, FaStar } from 'react-icons/fa'
@@ -5,6 +6,7 @@ import { ROUTES } from '@/constants/routes'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { formatCurrency } from '@/utils/formatCurrency'
+import PropTypes from 'prop-types'
 import toast from 'react-hot-toast'
 
 function MangaCard({ manga, index = 0 }) {
@@ -83,4 +85,18 @@ function MangaCard({ manga, index = 0 }) {
   )
 }
 
-export default MangaCard
+MangaCard.propTypes = {
+  manga: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    price: PropTypes.number,
+    authors: PropTypes.arrayOf(PropTypes.string),
+    score: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    type: PropTypes.string,
+    chapters: PropTypes.number,
+  }).isRequired,
+  index: PropTypes.number,
+}
+
+export default memo(MangaCard)

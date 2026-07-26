@@ -82,7 +82,6 @@ function Navbar() {
           {searchOpen ? (
             <form onSubmit={handleSearch} className="flex items-center gap-2">
               <div className="relative">
-                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={12} />
                 <input
                   type="text"
                   value={searchQuery}
@@ -91,8 +90,12 @@ function Navbar() {
                   className="h-9 w-52 rounded-xl border border-slate-700/50 bg-slate-800/50 pl-9 pr-3 text-sm text-white placeholder-gray-500 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
                   autoFocus
                 />
+                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={12} />
               </div>
-              <button onClick={() => setSearchOpen(false)} className="text-gray-500 hover:text-white transition-colors">
+              <button type="submit" className="flex h-9 w-9 items-center justify-center rounded-xl text-violet-400 hover:text-violet-300 hover:bg-violet-500/10 transition-all">
+                <FaSearch size={14} />
+              </button>
+              <button type="button" onClick={() => setSearchOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all">
                 <FaTimes size={14} />
               </button>
             </form>
@@ -157,15 +160,20 @@ function Navbar() {
       {mobileOpen && (
         <div className="border-t border-white/5 bg-slate-950/95 backdrop-blur-xl md:hidden">
           <div className="space-y-1 px-4 py-4">
-            <form onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) { navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`); setMobileOpen(false); setSearchQuery(''); } }} className="relative mb-3">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={12} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="h-10 w-full rounded-xl border border-slate-700/50 bg-slate-800/50 pl-9 pr-3 text-sm text-white outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
-              />
+            <form onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) { navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`); setMobileOpen(false); setSearchQuery(''); } }} className="flex gap-2 mb-3">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="h-10 w-full rounded-xl border border-slate-700/50 bg-slate-800/50 pl-9 pr-3 text-sm text-white outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                />
+                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={12} />
+              </div>
+              <button type="submit" className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-500 hover:to-fuchsia-500 transition-all shrink-0">
+                <FaSearch size={14} />
+              </button>
             </form>
             {navLinks.map((link) => (
               <NavLink

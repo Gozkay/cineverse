@@ -13,7 +13,7 @@ Discover, buy, and sell your favorite entertainment media in one beautiful dark-
 | **State** | React Context (Cart, Wishlist, Auth) |
 | **Payments** | Paystack inline popup |
 | **Database** | Supabase (PostgreSQL) |
-| **Data Sources** | TMDB API (movies), Open Library (books), Jikan API (manga), Comic Vine (comics) |
+| **Data Sources** | TMDB API (movies), Google Books API (books), Jikan API (manga), Open Library (comics) |
 | **Build** | Vite 8 (Rolldown) |
 | **Auth** | Supabase Auth (email/password + Google OAuth) |
 

@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
+import PropTypes from 'prop-types'
 
 export function ProtectedRoute({ children, roles }) {
   const { isAuthenticated, role, loading } = useAuth()
@@ -23,4 +24,9 @@ export function ProtectedRoute({ children, roles }) {
   }
 
   return children
+}
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node,
+  roles: PropTypes.arrayOf(PropTypes.string),
 }
