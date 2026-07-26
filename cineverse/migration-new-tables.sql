@@ -124,3 +124,8 @@ CREATE POLICY "Users can manage own seller request" ON seller_requests FOR ALL U
 CREATE POLICY "Admins manage seller requests" ON seller_requests FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
+
+-- 8. Fix: add missing INSERT policy on profiles (required for registration)
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+CREATE POLICY "Users can insert own profile"
+  ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
