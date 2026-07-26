@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
@@ -22,8 +23,16 @@ const registerSchema = z.object({
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false)
-  const { register: registerUser } = useAuth()
+  const [registered, setRegistered] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
+  const { register: registerUser, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isAuthenticated && registered) {
+      navigate(ROUTES.HOME, { replace: true })
+    }
+  }, [isAuthenticated, registered, navigate])
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(registerSchema),
@@ -32,8 +41,9 @@ function Register() {
   const onSubmit = async ({ name, email, password }) => {
     const result = await registerUser({ name, email, password })
     if (result.success) {
-      toast.success('Account created successfully!')
-      navigate(ROUTES.HOME)
+      setRegistered(true)
+      setRegisteredEmail(email)
+      toast.success('Account created! Check your email to verify.')
     } else {
       toast.error(result.error)
     }
@@ -41,6 +51,7 @@ function Register() {
 
   return (
     <MainLayout>
+      <Seo title="Create Account" noIndex />
       <div className="flex min-h-screen items-center justify-center bg-slate-950 px-6 py-20">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <div className="rounded-2xl bg-slate-900/50 p-8 ring-1 ring-slate-800">
@@ -52,7 +63,24 @@ function Register() {
               <p className="mt-2 text-sm text-gray-500">Join CineVerse today</p>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {registered ? (
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-violet-500/10">
+                  <FaEnvelope className="text-2xl text-violet-400" />
+                </div>
+                <h2 className="mb-2 text-lg font-semibold text-white">Check your email</h2>
+                <p className="mb-6 text-sm text-gray-400">
+                  We sent a verification link to                   <span className="text-violet-400">{registeredEmail}</span>. Click the link to activate your account.
+                </p>
+                <p className="text-xs text-gray-500">
+                  Didn't receive it? Check your spam folder or try signing up again.
+                </p>
+                <p className="mt-6 text-center text-sm text-gray-500">
+                  Already have an account? <Link to={ROUTES.LOGIN} className="text-violet-400 hover:underline">Sign in</Link>
+                </p>
+              </div>
+            ) : (
+            <><form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-sm text-gray-400">Full Name</label>
                 <div className="relative">
@@ -100,6 +128,8 @@ function Register() {
             <p className="mt-6 text-center text-sm text-gray-500">
               Already have an account? <Link to={ROUTES.LOGIN} className="text-violet-400 hover:underline">Sign in</Link>
             </p>
+            </>
+            )}
           </div>
         </motion.div>
       </div>

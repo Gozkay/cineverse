@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaHeart, FaShoppingCart, FaTrash, FaArrowLeft } from 'react-icons/fa'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useWishlist } from '@/context/WishlistContext'
 import { useCart } from '@/context/CartContext'
@@ -26,6 +27,7 @@ function Wishlist() {
 
   return (
     <MainLayout>
+      <Seo title="My Wishlist" noIndex />
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-8 flex items-center justify-between">

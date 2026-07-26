@@ -12,7 +12,7 @@ const reviewSchema = z.object({
   comment: z.string().min(1, 'Please write a comment'),
 })
 
-function ReviewForm({ productId, onReviewAdded }) {
+function ReviewForm({ productSlug, onReviewAdded }) {
   const { user } = useAuth()
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
@@ -34,7 +34,7 @@ function ReviewForm({ productId, onReviewAdded }) {
 
     const { error } = await supabase.from('reviews').insert({
       user_id: user.id,
-      product_id: productId,
+      product_slug: productSlug,
       rating,
       comment: comment.trim(),
     }).select().single()
@@ -99,7 +99,7 @@ function ReviewForm({ productId, onReviewAdded }) {
 }
 
 ReviewForm.propTypes = {
-  productId: PropTypes.string.isRequired,
+  productSlug: PropTypes.string.isRequired,
   onReviewAdded: PropTypes.func,
 }
 

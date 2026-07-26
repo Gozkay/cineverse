@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { FaArrowLeft, FaCheck, FaCreditCard, FaTruck, FaShoppingBag } from 'react-icons/fa'
+import { FaArrowLeft, FaCheck, FaCreditCard, FaTruck, FaShoppingBag, FaTag, FaTimes } from 'react-icons/fa'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
@@ -12,6 +13,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { ROUTES } from '@/constants/routes'
 import { usePaystack } from '@/hooks/usePaystack'
 import { createOrder } from '@/services/orders'
+import { getCouponByCode, validateCoupon, incrementCouponUsage } from '@/services/coupons'
 import toast from 'react-hot-toast'
 
 const steps = ['Review Cart', 'Shipping Info', 'Payment', 'Confirmation']
@@ -36,6 +38,12 @@ function Checkout() {
   const [paying, setPaying] = useState(false)
   const [payment, setPayment] = useState({ method: 'card' })
   const [shippingData, setShippingData] = useState(null)
+  const [couponCode, setCouponCode] = useState('')
+  const [coupon, setCoupon] = useState(null)
+  const [discount, setDiscount] = useState(0)
+  const [applyingCoupon, setApplyingCoupon] = useState(false)
+
+  const total = subtotal - discount
 
   const stepsIcons = [FaShoppingBag, FaTruck, FaCreditCard, FaCheck]
 
@@ -56,6 +64,27 @@ function Checkout() {
     return <Navigate to={ROUTES.LOGIN} state={{ from: { pathname: ROUTES.CHECKOUT } }} replace />
   }
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return toast.error('Enter a coupon code')
+    setApplyingCoupon(true)
+    const c = await getCouponByCode(couponCode.trim())
+    const result = validateCoupon(c, subtotal)
+    if (result.valid) {
+      setCoupon(c)
+      setDiscount(result.discount)
+      toast.success(`Coupon applied! You save ${formatCurrency(result.discount)}`)
+    } else {
+      toast.error(result.reason)
+    }
+    setApplyingCoupon(false)
+  }
+
+  const handleRemoveCoupon = () => {
+    setCoupon(null)
+    setDiscount(0)
+    setCouponCode('')
+  }
+
   const placeOrder = async (paymentRef) => {
     const orderData = {
       user_id: user.id,
@@ -67,13 +96,16 @@ function Checkout() {
         image: item.image,
         category: item.category,
       })),
-      total_amount: subtotal,
+      total_amount: total,
+      discount,
+      coupon_code: coupon?.code || null,
       status: 'pending',
       shipping_info: shippingData,
       payment_method: payment.method,
       payment_ref: paymentRef || null,
     }
     try {
+      if (coupon) await incrementCouponUsage(coupon.id)
       const order = await createOrder(orderData)
       setOrderId(order.id)
       setOrderPlaced(true)
@@ -89,7 +121,7 @@ function Checkout() {
     setPaying(true)
     initializePayment({
       email: shippingData?.email || user?.email || 'customer@cineverse.com',
-      amount: subtotal,
+      amount: total,
       onSuccess: (ref) => {
         setPaying(false)
         placeOrder(ref)
@@ -150,6 +182,7 @@ function Checkout() {
 
   return (
     <MainLayout>
+      <Seo title="Checkout" noIndex />
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-4xl px-6 py-8">
           <Link to={ROUTES.CART} className="mb-6 inline-flex items-center gap-2 text-sm text-gray-400 hover:text-violet-400 transition-colors">
@@ -157,7 +190,7 @@ function Checkout() {
           </Link>
 
           <h1 className="mb-8 text-3xl sm:text-4xl font-black">
-            <span className="text-white">Complete</span>{" "}
+            <span className="text-white">Complete</span>{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Checkout</span>
           </h1>
           {renderStepIndicator()}
@@ -178,9 +211,47 @@ function Checkout() {
                     <p className="text-sm font-semibold text-violet-400">{formatCurrency(item.price * item.quantity)}</p>
                   </div>
                 ))}
-                <div className="flex justify-between rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800">
-                  <span className="font-semibold text-white">Total</span>
-                  <span className="text-lg font-bold text-violet-400">{formatCurrency(subtotal)}</span>
+
+                <div className="rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800 space-y-3">
+                  <h3 className="text-sm font-semibold text-violet-400"><FaTag className="mr-1.5 inline" size={12} />Coupon</h3>
+                  {coupon ? (
+                    <div className="flex items-center justify-between rounded-lg bg-emerald-500/10 px-3 py-2 text-sm">
+                      <span className="font-mono text-emerald-400">{coupon.code}</span>
+                      <span className="flex items-center gap-2">
+                        <span className="text-emerald-400">-{formatCurrency(discount)}</span>
+                        <button onClick={handleRemoveCoupon} className="text-gray-500 hover:text-white"><FaTimes size={12} /></button>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        value={couponCode}
+                        onChange={e => setCouponCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                        className="h-9 flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 text-sm text-white uppercase outline-none focus:border-violet-500"
+                        placeholder="Enter coupon code"
+                      />
+                      <button onClick={handleApplyCoupon} disabled={applyingCoupon || !couponCode.trim()} className="h-9 rounded-lg bg-violet-600 px-4 text-xs font-medium text-white hover:bg-violet-500 disabled:opacity-50">
+                        {applyingCoupon ? '...' : 'Apply'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2 rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Subtotal</span>
+                    <span className="text-white">{formatCurrency(subtotal)}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Discount</span>
+                      <span className="text-emerald-400">-{formatCurrency(discount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t border-slate-800 pt-2 text-lg font-bold">
+                    <span className="text-white">Total</span>
+                    <span className="text-violet-400">{formatCurrency(total)}</span>
+                  </div>
                 </div>
                 <button onClick={() => setStep(2)} className="w-full rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition-colors">Continue to Shipping</button>
               </motion.div>
@@ -236,7 +307,7 @@ function Checkout() {
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <h2 className="text-lg font-semibold text-white">Payment Method</h2>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   {['card', 'transfer', 'cash'].map((method) => (
                     <button key={method} onClick={() => setPayment({ ...payment, method })} className={`flex-1 rounded-xl border py-3 text-sm font-medium capitalize transition-all ${payment.method === method ? 'border-violet-500 bg-violet-500/10 text-violet-400' : 'border-slate-700 text-gray-400 hover:bg-slate-800'}`}>
                       {method === 'card' ? <><FaCreditCard className="mr-2 inline" /> Card</> : method === 'transfer' ? 'Bank Transfer' : 'Cash on Delivery'}
@@ -245,24 +316,40 @@ function Checkout() {
                 </div>
                 {payment.method === 'card' && (
                   <div className="rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800 text-sm text-gray-400">
-                    Pay <span className="font-semibold text-white">{formatCurrency(subtotal)}</span> securely via <span className="font-medium text-violet-400">Paystack</span>.
-                    <p className="mt-2 text-xs text-gray-500">You'll be redirected to Paystack's secure checkout. We support cards, bank transfer, USSD, and mobile money.</p>
+                    Pay <span className="font-semibold text-white">{formatCurrency(total)}</span> securely via <span className="font-medium text-violet-400">Paystack</span>.
+                    <p className="mt-2 text-xs text-gray-500">You&apos;ll be redirected to Paystack&apos;s secure checkout. We support cards, bank transfer, USSD, and mobile money.</p>
                   </div>
                 )}
                 {payment.method === 'transfer' && (
                   <div className="rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800 text-sm text-gray-400">
-                    Transfer the total amount of <span className="font-semibold text-white">{formatCurrency(subtotal)}</span> to:<br />
+                    Transfer the total amount of <span className="font-semibold text-white">{formatCurrency(total)}</span> to:<br />
                     <span className="mt-2 block font-mono text-white">CineVerse Bank<br />Account: 0123456789<br />Sort Code: 01-02-03</span>
                   </div>
                 )}
                 {payment.method === 'cash' && (
                   <div className="rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800 text-sm text-gray-400">
-                    Pay <span className="font-semibold text-white">{formatCurrency(subtotal)}</span> upon delivery. No extra fees.
+                    Pay <span className="font-semibold text-white">{formatCurrency(total)}</span> upon delivery. No extra fees.
                   </div>
                 )}
+                <div className="space-y-2 rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Subtotal</span>
+                    <span className="text-white">{formatCurrency(subtotal)}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Discount</span>
+                      <span className="text-emerald-400">-{formatCurrency(discount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t border-slate-800 pt-2 text-lg font-bold">
+                    <span className="text-white">Total</span>
+                    <span className="text-violet-400">{formatCurrency(total)}</span>
+                  </div>
+                </div>
                 <div className="flex gap-3">
                   <button onClick={() => setStep(2)} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-medium text-gray-300 hover:bg-slate-800 transition-colors">Back</button>
-                  <button onClick={handlePlaceOrder} disabled={paying} className="flex-1 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-50 transition-colors">{paying ? 'Processing...' : `Place Order — ${formatCurrency(subtotal)}`}</button>
+                  <button onClick={handlePlaceOrder} disabled={paying} className="flex-1 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-50 transition-colors">{paying ? 'Processing...' : `Place Order — ${formatCurrency(total)}`}</button>
                 </div>
               </motion.div>
             )}
@@ -272,8 +359,9 @@ function Checkout() {
                 <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-500/20">
                   <FaCheck className="text-4xl text-green-400" />
                 </div>
-                <h2 className="mb-2 text-2xl font-bold text-white">Order Placed! 🎉</h2>
+                <h2 className="mb-2 text-2xl font-bold text-white">Order Placed!</h2>
                 <p className="mb-2 text-gray-400">Your order has been placed successfully.</p>
+                {discount > 0 && <p className="mb-2 text-sm text-emerald-400">You saved {formatCurrency(discount)} with coupon!</p>}
                 <p className="mb-8 text-sm text-gray-500">Order ID: <span className="font-mono text-violet-400">{orderId}</span></p>
                 <div className="flex gap-4">
                   <Link to={ROUTES.HOME} className="rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-500">Continue Shopping</Link>

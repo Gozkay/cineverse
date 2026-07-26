@@ -12,11 +12,17 @@ export async function registerUser({ name, email, password }) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name } },
+    options: {
+      data: { name },
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+    },
   })
   if (error) return { success: false, error: error.message }
 
   if (data.user) {
+    if (!data.user.identities?.length) {
+      return { success: false, error: 'This email is already registered. Please sign in.' }
+    }
     const { error: profileError } = await supabase.from('profiles').insert({
       id: data.user.id,
       name,
@@ -96,5 +102,37 @@ export async function unsuspendUser(id) {
 export async function removeStaff(id) {
   const { error } = await supabase.from('profiles').delete().eq('id', id)
   if (error) throw new Error(error.message)
+  return { success: true }
+}
+
+export async function resetPassword(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/update-password`,
+  })
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
+
+export async function updatePassword(newPassword) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
+
+export async function changeUserRole(id, role) {
+  const { error } = await supabase.from('profiles').update({ role }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
+}
+
+export async function updateProfile(userId, updates) {
+  const { data, error } = await supabase.from('profiles').update(updates).eq('id', userId).select().single()
+  if (error) return { success: false, error: error.message }
+  return { success: true, data }
+}
+
+export async function deleteAccount() {
+  const { error } = await supabase.rpc('delete_user')
+  if (error) return { success: false, error: error.message }
   return { success: true }
 }

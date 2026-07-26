@@ -2,6 +2,7 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaSearch, FaFilm, FaBook, FaDragon } from 'react-icons/fa'
 import { FaMasksTheater } from 'react-icons/fa6'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useMovieSearch } from '@/hooks/useSearch'
 import { useBookSearch } from '@/hooks/useBooks'
@@ -25,6 +26,7 @@ function Search() {
 
   return (
     <MainLayout>
+      <Seo title="Search" noIndex />
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-10">

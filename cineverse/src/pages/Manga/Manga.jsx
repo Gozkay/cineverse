@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import MangaCard from '@/components/Manga/MangaCard'
 import { useManga } from '@/hooks/useManga'
@@ -11,6 +12,7 @@ function Manga() {
 
   return (
     <MainLayout>
+      <Seo title="Manga" description="Dive into the world of manga — action, romance, fantasy, and everything between." />
       <div className="relative min-h-screen bg-slate-950">
         <div className="relative overflow-hidden py-24">
           <div className="absolute inset-0 bg-gradient-to-b from-pink-900/20 via-slate-950/50 to-slate-950" />

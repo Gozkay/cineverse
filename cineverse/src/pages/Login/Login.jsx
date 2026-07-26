@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
@@ -38,6 +39,7 @@ function Login() {
 
   return (
     <MainLayout>
+      <Seo title="Sign In" noIndex />
       <div className="flex min-h-screen items-center justify-center bg-slate-950 px-6 py-20">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <div className="rounded-2xl bg-slate-900/50 p-8 ring-1 ring-slate-800">
@@ -69,6 +71,10 @@ function Login() {
                   </button>
                 </div>
                 {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>}
+              </div>
+
+              <div className="flex items-center justify-end">
+                <Link to={ROUTES.RESET_PASSWORD} className="text-xs text-gray-500 hover:text-violet-400 transition-colors">Forgot Password?</Link>
               </div>
 
               <button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-violet-600 text-sm font-semibold text-white hover:bg-violet-500 disabled:opacity-50 transition-colors">

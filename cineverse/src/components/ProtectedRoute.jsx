@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
 import PropTypes from 'prop-types'
 
-export function ProtectedRoute({ children, roles }) {
+export function ProtectedRoute({ children, roles, redirectTo = ROUTES.LOGIN }) {
   const { isAuthenticated, role, loading } = useAuth()
   const location = useLocation()
 
@@ -16,7 +16,7 @@ export function ProtectedRoute({ children, roles }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />
+    return <Navigate to={redirectTo} state={{ from: location }} replace />
   }
 
   if (roles && !roles.includes(role)) {
@@ -29,4 +29,5 @@ export function ProtectedRoute({ children, roles }) {
 ProtectedRoute.propTypes = {
   children: PropTypes.node,
   roles: PropTypes.arrayOf(PropTypes.string),
+  redirectTo: PropTypes.string,
 }

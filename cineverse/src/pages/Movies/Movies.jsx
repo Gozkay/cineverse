@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaFilm, FaSearch, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { TrendingMovies } from '@/components/Movies'
 import { useMovieSearch } from '@/hooks/useSearch'
@@ -19,6 +20,7 @@ function Movies() {
 
   return (
     <MainLayout>
+      <Seo title="Movies" description="Browse trending and popular movies. Add them to your cart and bring the cinema home." />
       <div className="relative min-h-screen bg-slate-950">
         <div className="relative overflow-hidden py-24">
           <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-slate-950/50 to-slate-950" />

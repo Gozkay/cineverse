@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaTrash, FaShoppingCart, FaArrowLeft, FaPlus, FaMinus } from 'react-icons/fa'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useCart } from '@/context/CartContext'
 import { formatCurrency } from '@/utils/formatCurrency'
@@ -11,6 +12,7 @@ function Cart() {
 
   return (
     <MainLayout>
+      <Seo title="Shopping Cart" noIndex />
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-8 flex items-center justify-between">
@@ -56,12 +58,12 @@ function Cart() {
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 text-xs text-white hover:bg-slate-700">
-                            <FaMinus size={10} />
+                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-xs text-white hover:bg-slate-700">
+                            <FaMinus size={12} />
                           </button>
-                          <span className="w-8 text-center text-sm text-white">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 text-xs text-white hover:bg-slate-700">
-                            <FaPlus size={10} />
+                          <span className="w-10 text-center text-sm text-white">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-xs text-white hover:bg-slate-700">
+                            <FaPlus size={12} />
                           </button>
                         </div>
                         <div className="flex items-center gap-3">

@@ -6,7 +6,7 @@ import { formatDateTime } from '@/utils/formatDate'
 import toast from 'react-hot-toast'
 import PropTypes from 'prop-types'
 
-function ReviewList({ productId }) {
+function ReviewList({ productSlug, refreshKey }) {
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const { user, isAdmin } = useAuth()
@@ -16,11 +16,11 @@ function ReviewList({ productId }) {
     const { data } = await supabase
       .from('reviews')
       .select('*, profiles:user_id(name, avatar)')
-      .eq('product_id', productId)
+      .eq('product_slug', productSlug)
       .order('created_at', { ascending: false })
     setReviews(data || [])
     setLoading(false)
-  }, [productId])
+  }, [productSlug, refreshKey])
 
   useEffect(() => {
     loadReviews() // eslint-disable-line react-hooks/set-state-in-effect
@@ -92,7 +92,8 @@ function ReviewList({ productId }) {
 }
 
 ReviewList.propTypes = {
-  productId: PropTypes.string.isRequired,
+  productSlug: PropTypes.string.isRequired,
+  refreshKey: PropTypes.number,
 }
 
 export default ReviewList

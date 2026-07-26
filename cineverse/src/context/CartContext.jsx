@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { getCartItems, addCartItem, updateCartItemQuantity, removeCartItem, clearCart as clearCartApi } from '@/services/cart'
 import toast from 'react-hot-toast'
 
 const CartContext = createContext(null)
 const CART_KEY = 'cineverse_cart'
 
 export function CartProvider({ children }) {
+  const { user } = useAuth()
   const [items, setItems] = useState(() => {
     try {
       const stored = localStorage.getItem(CART_KEY)
@@ -14,54 +17,134 @@ export function CartProvider({ children }) {
       return []
     }
   })
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    if (user && !loaded) {
+      getCartItems(user.id).then(serverItems => {
+        if (serverItems.length > 0) {
+          const localItems = items
+          const merged = [...serverItems.map(i => ({
+            id: i.product_slug,
+            product_slug: i.product_slug,
+            title: i.title,
+            price: i.price,
+            image: i.image,
+            category: i.category,
+            quantity: i.quantity,
+          }))]
+          for (const local of localItems) {
+            if (!merged.find(m => m.product_slug === local.product_slug || m.id === local.id)) {
+              merged.push(local)
+              addCartItem(user.id, {
+                product_slug: local.product_slug || `${local.category}:${local.id}`,
+                title: local.title,
+                price: local.price,
+                image: local.image || '',
+                category: local.category,
+                quantity: local.quantity,
+              }).catch(() => {})
+            }
+          }
+          setItems(merged)
+        } else if (items.length > 0) {
+          for (const item of items) {
+            addCartItem(user.id, {
+              product_slug: item.product_slug || `${item.category}:${item.id}`,
+              title: item.title,
+              price: item.price,
+              image: item.image || '',
+              category: item.category,
+              quantity: item.quantity,
+            }).catch(() => {})
+          }
+        }
+        setLoaded(true)
+      }).catch(() => { setLoaded(true) })
+    } else if (!user) {
+      setLoaded(false)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   useEffect(() => {
     localStorage.setItem(CART_KEY, JSON.stringify(items))
   }, [items])
 
   const addItem = useCallback((product, quantity = 1) => {
+    const productSlug = `${product.category || 'movie'}:${product.id}`
     setItems(prev => {
-      const existing = prev.find(item => item.id === product.id)
+      const existing = prev.find(item => item.product_slug === productSlug || item.id === product.id)
       if (existing) {
         toast.success(`Updated "${product.title}" quantity`)
+        if (user) {
+          updateCartItemQuantity(existing.id, existing.quantity + quantity).catch(() => {})
+        }
         return prev.map(item =>
-          item.id === product.id
+          (item.product_slug === productSlug || item.id === product.id)
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
       }
       toast.success(`Added "${product.title}" to cart`)
-      return [...prev, { ...product, quantity }]
+      const newItem = {
+        id: productSlug,
+        product_slug: productSlug,
+        title: product.title,
+        price: product.price,
+        image: product.image || product.poster_path || '',
+        category: product.category || 'movie',
+        quantity,
+      }
+      if (user) {
+        addCartItem(user.id, {
+          product_slug: productSlug,
+          title: product.title,
+          price: product.price,
+          image: product.image || product.poster_path || '',
+          category: product.category || 'movie',
+          quantity,
+        }).catch(() => {})
+      }
+      return [...prev, newItem]
     })
-  }, [])
+  }, [user])
 
-  const removeItem = useCallback((id) => {
+  const removeItem = useCallback((slug) => {
     setItems(prev => {
-      const item = prev.find(i => i.id === id)
+      const item = prev.find(i => i.product_slug === slug || i.id === slug)
       if (item) toast.success(`Removed "${item.title}" from cart`)
-      return prev.filter(item => item.id !== id)
+      if (user) {
+        removeCartItem(item?.id).catch(() => {})
+      }
+      return prev.filter(i => i.product_slug !== slug && i.id !== slug)
     })
-  }, [])
+  }, [user])
 
-  const updateQuantity = useCallback((id, quantity) => {
-    if (quantity < 1) return removeItem(id)
+  const updateQuantity = useCallback((slug, quantity) => {
+    if (quantity < 1) return removeItem(slug)
     setItems(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        (item.product_slug === slug || item.id === slug) ? { ...item, quantity } : item
       )
     )
-  }, [removeItem])
+    if (user) {
+      const item = items.find(i => i.product_slug === slug || i.id === slug)
+      if (item?.id) updateCartItemQuantity(item.id, quantity).catch(() => {})
+    }
+  }, [user, items, removeItem])
 
-  const clearCart = useCallback(() => {
+  const clearAll = useCallback(() => {
     setItems([])
+    if (user) clearCartApi(user.id).catch(() => {})
     toast.success('Cart cleared')
-  }, [])
+  }, [user])
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, itemCount, subtotal }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart: clearAll, itemCount, subtotal }}>
       {children}
     </CartContext.Provider>
   )

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { FaBan, FaCheck, FaPause, FaPlay, FaTrash } from 'react-icons/fa'
+import { FaBan, FaCheck, FaPause, FaPlay, FaTrash, FaShieldAlt } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
-import { getUsers, banUser, unbanUser, suspendUser, unsuspendUser, removeStaff } from '@/services/auth'
+import { getUsers, banUser, unbanUser, suspendUser, unsuspendUser, removeStaff, changeUserRole } from '@/services/auth'
 import { formatDateTime } from '@/utils/formatDate'
 import toast from 'react-hot-toast'
+
+const roles = ['customer', 'staff', 'manager', 'admin']
 
 function AdminUsers() {
   const [users, setUsers] = useState([])
@@ -24,7 +26,7 @@ function AdminUsers() {
     }
   }
 
-  useEffect(() => { loadUsers() }, []) // eslint-disable-line react-hooks/set-state-in-effect
+  useEffect(() => { loadUsers() }, [])
 
   const handleBan = async (id, isBanned) => {
     try {
@@ -58,12 +60,22 @@ function AdminUsers() {
     }
   }
 
+  const handleRoleChange = async (id, role) => {
+    try {
+      await changeUserRole(id, role)
+      await loadUsers()
+      toast.success(`Role updated to ${role}`)
+    } catch {
+      toast.error('Failed to change role')
+    }
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black">
-            <span className="text-white">User</span>{" "}
+            <span className="text-white">User</span>{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Management</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">Manage registered users</p>
@@ -102,9 +114,22 @@ function AdminUsers() {
                   </TableCell>
                   <TableCell className="text-sm text-gray-400">{user.email || '—'}</TableCell>
                   <TableCell>
-                    <Badge variant={user.role === 'admin' ? 'destructive' : user.role === 'manager' ? 'warning' : user.role === 'staff' ? 'info' : 'secondary'} className="capitalize">
-                      {user.role}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={user.role === 'admin' ? 'destructive' : user.role === 'manager' ? 'warning' : user.role === 'staff' ? 'info' : 'secondary'} className="capitalize">
+                        {user.role}
+                      </Badge>
+                      {user.role !== 'admin' && (
+                        <select
+                          value={user.role}
+                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                          className="h-6 w-auto rounded border border-slate-700 bg-slate-800 px-1 text-[10px] text-gray-400 outline-none"
+                        >
+                          {roles.filter(r => r !== 'admin').map(r => (
+                            <option key={r} value={r} className="capitalize">{r}</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {user.banned ? (

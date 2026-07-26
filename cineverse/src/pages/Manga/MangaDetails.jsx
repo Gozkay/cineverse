@@ -10,6 +10,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { ROUTES } from '@/constants/routes'
 import ReviewForm from '@/components/Reviews/ReviewForm'
 import ReviewList from '@/components/Reviews/ReviewList'
+import { useSyncProduct } from '@/hooks/useSyncProduct'
 import toast from 'react-hot-toast'
 
 function MangaDetails() {
@@ -56,6 +57,17 @@ function MangaDetails() {
   }
 
   const inWishlist = isInWishlist(manga.id)
+
+  useSyncProduct({
+    id,
+    external_id: manga.mal_id?.toString() || id,
+    title: manga.title,
+    description: manga.description,
+    category: 'manga',
+    image: manga.image,
+    rating: manga.score,
+    rating_count: manga.scoredBy,
+  })
 
   return (
     <MainLayout>
@@ -148,8 +160,8 @@ function MangaDetails() {
               <div className="mt-12 border-t border-slate-800 pt-8">
                 <h2 className="mb-6 text-xl font-bold text-white">Reviews</h2>
                 <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-                  <ReviewList productId={id} refreshKey={reviewRefreshKey} />
-                  <ReviewForm productId={id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
+                  <ReviewList productSlug={"manga:" + id} refreshKey={reviewRefreshKey} />
+                  <ReviewForm productSlug={"manga:" + id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
                 </div>
               </div>
             </motion.div>

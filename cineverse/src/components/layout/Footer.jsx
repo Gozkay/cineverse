@@ -38,6 +38,7 @@ function Footer() {
               <li><Link to={ROUTES.REGISTER} className="text-sm text-gray-500 hover:text-violet-400 transition-colors">Register</Link></li>
               <li><Link to={ROUTES.CART} className="text-sm text-gray-500 hover:text-violet-400 transition-colors">Cart</Link></li>
               <li><Link to={ROUTES.WISHLIST} className="text-sm text-gray-500 hover:text-violet-400 transition-colors">Wishlist</Link></li>
+              <li><Link to={ROUTES.BECOME_SELLER} className="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Become a Seller</Link></li>
             </ul>
           </div>
           <div className="space-y-3">

@@ -9,6 +9,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { ROUTES } from '@/constants/routes'
 import ReviewForm from '@/components/Reviews/ReviewForm'
 import ReviewList from '@/components/Reviews/ReviewList'
+import { useSyncProduct } from '@/hooks/useSyncProduct'
 import { searchComics } from '@/services/comics'
 import toast from 'react-hot-toast'
 
@@ -75,6 +76,17 @@ function ComicDetails() {
 
   const inWishlist = isInWishlist(comic.id)
 
+  useSyncProduct({
+    id,
+    external_id: id,
+    title: comic.title,
+    description: comic.description,
+    category: 'comic',
+    image: comic.image,
+    rating: 0,
+    rating_count: 0,
+  })
+
   return (
     <MainLayout>
       <div className="min-h-screen bg-slate-950">
@@ -132,8 +144,8 @@ function ComicDetails() {
               <div className="mt-12 border-t border-slate-800 pt-8">
                 <h2 className="mb-6 text-xl font-bold text-white">Reviews</h2>
                 <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-                  <ReviewList productId={id} refreshKey={reviewRefreshKey} />
-                  <ReviewForm productId={id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
+                  <ReviewList productSlug={"comic:" + id} refreshKey={reviewRefreshKey} />
+                  <ReviewForm productSlug={"comic:" + id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
                 </div>
               </div>
             </motion.div>

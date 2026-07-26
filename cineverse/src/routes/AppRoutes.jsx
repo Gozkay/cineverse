@@ -12,7 +12,12 @@ const Cart = lazy(() => import("@/pages/Cart/Cart"));
 const Checkout = lazy(() => import("@/pages/Checkout/Checkout"));
 const Wishlist = lazy(() => import("@/pages/Wishlist/Wishlist"));
 const Profile = lazy(() => import("@/pages/Profile/Profile"));
+const OrderDetail = lazy(() => import("@/pages/Orders/OrderDetail"));
 const Search = lazy(() => import("@/pages/Search/Search"));
+const BecomeSeller = lazy(() => import("@/pages/BecomeSeller/BecomeSeller"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword/ResetPassword"));
+const UpdatePassword = lazy(() => import("@/pages/UpdatePassword/UpdatePassword"));
+const AuthCallback = lazy(() => import("@/pages/Auth/Callback"));
 
 const Movies = lazy(() => import("@/pages/Movies/Movies"));
 const MovieDetails = lazy(() => import("@/pages/Movies/MovieDetails"));
@@ -30,6 +35,7 @@ const AdminDashboard = lazy(() => import("@/pages/dashboard/Admin/Dashboard"));
 const AdminProducts = lazy(() => import("@/pages/dashboard/Admin/Products"));
 const AdminOrders = lazy(() => import("@/pages/dashboard/Admin/Orders"));
 const AdminUsers = lazy(() => import("@/pages/dashboard/Admin/Users"));
+const AdminCoupons = lazy(() => import("@/pages/dashboard/Admin/Coupons"));
 
 const ManagerDashboard = lazy(() => import("@/pages/dashboard/Manager/Dashboard"));
 const StaffManagement = lazy(() => import("@/pages/dashboard/Manager/StaffManagement"));
@@ -62,16 +68,22 @@ function AppRoutes() {
         <Route path={ROUTES.MANGA_DETAIL(":id")} element={<PageBoundary><MangaDetails /></PageBoundary>} />
         <Route path={ROUTES.COMICS} element={<PageBoundary><Comics /></PageBoundary>} />
         <Route path={ROUTES.COMIC_DETAIL(":id")} element={<PageBoundary><ComicDetails /></PageBoundary>} />
-        <Route path={ROUTES.CART} element={<ProtectedRoute><PageBoundary><Cart /></PageBoundary></ProtectedRoute>} />
-        <Route path={ROUTES.CHECKOUT} element={<ProtectedRoute><PageBoundary><Checkout /></PageBoundary></ProtectedRoute>} />
-        <Route path={ROUTES.WISHLIST} element={<ProtectedRoute><PageBoundary><Wishlist /></PageBoundary></ProtectedRoute>} />
-        <Route path={ROUTES.PROFILE} element={<ProtectedRoute><PageBoundary><Profile /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.CART} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><Cart /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.CHECKOUT} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><Checkout /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.WISHLIST} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><Wishlist /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.PROFILE} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><Profile /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.ORDER_DETAIL(":id")} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><OrderDetail /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.LOGIN} element={<PageBoundary><Login /></PageBoundary>} />
         <Route path={ROUTES.REGISTER} element={<PageBoundary><Register /></PageBoundary>} />
+        <Route path={ROUTES.RESET_PASSWORD} element={<PageBoundary><ResetPassword /></PageBoundary>} />
+        <Route path={ROUTES.UPDATE_PASSWORD} element={<PageBoundary><UpdatePassword /></PageBoundary>} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/search" element={<PageBoundary><Search /></PageBoundary>} />
+        <Route path={ROUTES.BECOME_SELLER} element={<PageBoundary><BecomeSeller /></PageBoundary>} />
 
         <Route path={ROUTES.DASHBOARD_ADMIN} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminDashboard /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.DASHBOARD_ADMIN_PRODUCTS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminProducts /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_ADMIN_COUPONS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminCoupons /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.DASHBOARD_ADMIN_ORDERS} element={<ProtectedRoute roles={['admin', 'manager']}><PageBoundary><AdminOrders /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.DASHBOARD_ADMIN_USERS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminUsers /></PageBoundary></ProtectedRoute>} />
 

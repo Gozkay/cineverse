@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import ComicCard from '@/components/Comics/ComicCard'
 import { useComics } from '@/hooks/useComics'
@@ -13,6 +14,7 @@ function Comics() {
 
   return (
     <MainLayout>
+      <Seo title="Comics" description="Discover comics, graphic novels, superheroes, and webcomics from every universe." />
       <div className="relative min-h-screen bg-slate-950">
         <div className="relative overflow-hidden py-24">
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/20 via-slate-950/50 to-slate-950" />

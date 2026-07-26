@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FaTachometerAlt, FaBox, FaShoppingBag, FaUsers, FaUserTie, FaSignOutAlt, FaBars, FaTimes, FaHome } from 'react-icons/fa'
+import { FaTachometerAlt, FaBox, FaShoppingBag, FaUsers, FaUserTie, FaSignOutAlt, FaBars, FaTimes, FaHome, FaTag } from 'react-icons/fa'
 import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
 import PropTypes from 'prop-types'
@@ -15,6 +15,7 @@ function DashboardLayout({ children }) {
     { to: ROUTES.DASHBOARD_ADMIN_PRODUCTS, label: 'Products', icon: FaBox },
     { to: ROUTES.DASHBOARD_ADMIN_ORDERS, label: 'Orders', icon: FaShoppingBag },
     { to: ROUTES.DASHBOARD_ADMIN_USERS, label: 'Users', icon: FaUsers },
+    { to: ROUTES.DASHBOARD_ADMIN_COUPONS, label: 'Coupons', icon: FaTag },
   ]
 
   const managerLinks = [

@@ -22,6 +22,7 @@ import MovieReviews from "@/components/Movies/MovieReviews";
 import ReviewForm from "@/components/Reviews/ReviewForm";
 import ReviewList from "@/components/Reviews/ReviewList";
 import { WatchProviders } from "@/components/Movies";
+import { useSyncProduct } from "@/hooks/useSyncProduct";
 
 function SectionSkeleton({ height = "h-48" }) {
   return (
@@ -104,6 +105,17 @@ function MovieDetails() {
   const reviews = reviewsQuery.data;
   const watchProviders = providersQuery.data;
 
+  useSyncProduct({
+    id,
+    external_id: id,
+    title: movie.title || movie.name,
+    description: movie.overview,
+    category: 'movie',
+    image: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
+    rating: movie.vote_average,
+    rating_count: movie.vote_count,
+  })
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
 
@@ -128,8 +140,8 @@ function MovieDetails() {
         <section className="mt-16 border-t border-slate-900 pt-12">
           <h2 className="mb-6 text-2xl font-bold text-white">Reviews</h2>
           <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
-            <ReviewList productId={id} refreshKey={reviewRefreshKey} />
-            <ReviewForm productId={id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
+            <ReviewList productSlug={"movie:" + id} refreshKey={reviewRefreshKey} />
+            <ReviewForm productSlug={"movie:" + id} onReviewAdded={() => setReviewRefreshKey(k => k + 1)} />
           </div>
         </section>
 
