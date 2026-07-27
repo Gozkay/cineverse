@@ -1,74 +1,89 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-
-import Home from "@/pages/Home/Home";
-import Login from "@/pages/Login/Login";
-import Register from "@/pages/Register/Register";
-import NotFound from "@/pages/NotFound/NotFound";
-import Cart from "@/pages/Cart/Cart";
-import Checkout from "@/pages/Checkout/Checkout";
-import Wishlist from "@/pages/Wishlist/Wishlist";
-import Profile from "@/pages/Profile/Profile";
-import Search from "@/pages/Search/Search";
-
-import Movies from "@/pages/Movies/Movies";
-import MovieDetails from "@/pages/Movies/MovieDetails";
-
-import Books from "@/pages/Books/Books";
-import BookDetails from "@/pages/Books/BookDetails";
-
-import Manga from "@/pages/Manga/Manga";
-import MangaDetails from "@/pages/Manga/MangaDetails";
-
-import Comics from "@/pages/Comics/Comics";
-import ComicDetails from "@/pages/Comics/ComicDetails";
-
-import AdminDashboard from "@/pages/dashboard/Admin/Dashboard";
-import AdminProducts from "@/pages/dashboard/Admin/Products";
-import AdminOrders from "@/pages/dashboard/Admin/Orders";
-import AdminUsers from "@/pages/dashboard/Admin/Users";
-
-import ManagerDashboard from "@/pages/dashboard/Manager/Dashboard";
-import StaffManagement from "@/pages/dashboard/Manager/StaffManagement";
-
-import StaffDashboard from "@/pages/dashboard/Staff/Dashboard";
-import StaffOrders from "@/pages/dashboard/Staff/Orders";
-
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ROUTES } from "@/constants/routes";
 
+const Home = lazy(() => import("@/pages/Home/Home"));
+const Login = lazy(() => import("@/pages/Login/Login"));
+const Register = lazy(() => import("@/pages/Register/Register"));
+const NotFound = lazy(() => import("@/pages/NotFound/NotFound"));
+const Cart = lazy(() => import("@/pages/Cart/Cart"));
+const Checkout = lazy(() => import("@/pages/Checkout/Checkout"));
+const Wishlist = lazy(() => import("@/pages/Wishlist/Wishlist"));
+const Profile = lazy(() => import("@/pages/Profile/Profile"));
+const Search = lazy(() => import("@/pages/Search/Search"));
+
+const Movies = lazy(() => import("@/pages/Movies/Movies"));
+const MovieDetails = lazy(() => import("@/pages/Movies/MovieDetails"));
+
+const Books = lazy(() => import("@/pages/Books/Books"));
+const BookDetails = lazy(() => import("@/pages/Books/BookDetails"));
+
+const Manga = lazy(() => import("@/pages/Manga/Manga"));
+const MangaDetails = lazy(() => import("@/pages/Manga/MangaDetails"));
+
+const Comics = lazy(() => import("@/pages/Comics/Comics"));
+const ComicDetails = lazy(() => import("@/pages/Comics/ComicDetails"));
+
+const AdminDashboard = lazy(() => import("@/pages/dashboard/Admin/Dashboard"));
+const AdminProducts = lazy(() => import("@/pages/dashboard/Admin/Products"));
+const AdminOrders = lazy(() => import("@/pages/dashboard/Admin/Orders"));
+const AdminUsers = lazy(() => import("@/pages/dashboard/Admin/Users"));
+
+const ManagerDashboard = lazy(() => import("@/pages/dashboard/Manager/Dashboard"));
+const StaffManagement = lazy(() => import("@/pages/dashboard/Manager/StaffManagement"));
+
+const StaffDashboard = lazy(() => import("@/pages/dashboard/Staff/Dashboard"));
+const StaffOrders = lazy(() => import("@/pages/dashboard/Staff/Orders"));
+
+function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-950">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
+    </div>
+  )
+}
+
+function PageBoundary({ children }) {
+  return <ErrorBoundary>{children}</ErrorBoundary>
+}
+
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path={ROUTES.HOME} element={<Home />} />
-      <Route path={ROUTES.MOVIES} element={<Movies />} />
-      <Route path={ROUTES.MOVIE_DETAIL(":id")} element={<MovieDetails />} />
-      <Route path={ROUTES.BOOKS} element={<Books />} />
-      <Route path={ROUTES.BOOK_DETAIL(":id")} element={<BookDetails />} />
-      <Route path={ROUTES.MANGA} element={<Manga />} />
-      <Route path={ROUTES.MANGA_DETAIL(":id")} element={<MangaDetails />} />
-      <Route path={ROUTES.COMICS} element={<Comics />} />
-      <Route path={ROUTES.COMIC_DETAIL(":id")} element={<ComicDetails />} />
-      <Route path={ROUTES.CART} element={<Cart />} />
-      <Route path={ROUTES.CHECKOUT} element={<Checkout />} />
-      <Route path={ROUTES.WISHLIST} element={<Wishlist />} />
-      <Route path={ROUTES.PROFILE} element={<Profile />} />
-      <Route path={ROUTES.LOGIN} element={<Login />} />
-      <Route path={ROUTES.REGISTER} element={<Register />} />
-      <Route path="/search" element={<Search />} />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path={ROUTES.HOME} element={<PageBoundary><Home /></PageBoundary>} />
+        <Route path={ROUTES.MOVIES} element={<PageBoundary><Movies /></PageBoundary>} />
+        <Route path={ROUTES.MOVIE_DETAIL(":id")} element={<PageBoundary><MovieDetails /></PageBoundary>} />
+        <Route path={ROUTES.BOOKS} element={<PageBoundary><Books /></PageBoundary>} />
+        <Route path={ROUTES.BOOK_DETAIL(":id")} element={<PageBoundary><BookDetails /></PageBoundary>} />
+        <Route path={ROUTES.MANGA} element={<PageBoundary><Manga /></PageBoundary>} />
+        <Route path={ROUTES.MANGA_DETAIL(":id")} element={<PageBoundary><MangaDetails /></PageBoundary>} />
+        <Route path={ROUTES.COMICS} element={<PageBoundary><Comics /></PageBoundary>} />
+        <Route path={ROUTES.COMIC_DETAIL(":id")} element={<PageBoundary><ComicDetails /></PageBoundary>} />
+        <Route path={ROUTES.CART} element={<ProtectedRoute><PageBoundary><Cart /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.CHECKOUT} element={<ProtectedRoute><PageBoundary><Checkout /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.WISHLIST} element={<ProtectedRoute><PageBoundary><Wishlist /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.PROFILE} element={<ProtectedRoute><PageBoundary><Profile /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.LOGIN} element={<PageBoundary><Login /></PageBoundary>} />
+        <Route path={ROUTES.REGISTER} element={<PageBoundary><Register /></PageBoundary>} />
+        <Route path="/search" element={<PageBoundary><Search /></PageBoundary>} />
 
-      <Route path={ROUTES.DASHBOARD_ADMIN} element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
-      <Route path={ROUTES.DASHBOARD_ADMIN_PRODUCTS} element={<ProtectedRoute roles={['admin']}><AdminProducts /></ProtectedRoute>} />
-      <Route path={ROUTES.DASHBOARD_ADMIN_ORDERS} element={<ProtectedRoute roles={['admin', 'manager']}><AdminOrders /></ProtectedRoute>} />
-      <Route path={ROUTES.DASHBOARD_ADMIN_USERS} element={<ProtectedRoute roles={['admin']}><AdminUsers /></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_ADMIN} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminDashboard /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_ADMIN_PRODUCTS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminProducts /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_ADMIN_ORDERS} element={<ProtectedRoute roles={['admin', 'manager']}><PageBoundary><AdminOrders /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_ADMIN_USERS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminUsers /></PageBoundary></ProtectedRoute>} />
 
-      <Route path={ROUTES.DASHBOARD_MANAGER} element={<ProtectedRoute roles={['manager']}><ManagerDashboard /></ProtectedRoute>} />
-      <Route path={ROUTES.DASHBOARD_MANAGER_STAFF} element={<ProtectedRoute roles={['manager']}><StaffManagement /></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_MANAGER} element={<ProtectedRoute roles={['manager']}><PageBoundary><ManagerDashboard /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_MANAGER_STAFF} element={<ProtectedRoute roles={['manager']}><PageBoundary><StaffManagement /></PageBoundary></ProtectedRoute>} />
 
-      <Route path={ROUTES.DASHBOARD_STAFF} element={<ProtectedRoute roles={['staff']}><StaffDashboard /></ProtectedRoute>} />
-      <Route path={ROUTES.DASHBOARD_STAFF_ORDERS} element={<ProtectedRoute roles={['staff']}><StaffOrders /></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_STAFF} element={<ProtectedRoute roles={['staff']}><PageBoundary><StaffDashboard /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_STAFF_ORDERS} element={<ProtectedRoute roles={['staff']}><PageBoundary><StaffOrders /></PageBoundary></ProtectedRoute>} />
 
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<PageBoundary><NotFound /></PageBoundary>} />
+      </Routes>
+    </Suspense>
   );
 }
 

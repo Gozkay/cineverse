@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { FaArrowLeft, FaCheck, FaCreditCard, FaTruck, FaShoppingBag } from 'react-icons/fa'
 import MainLayout from '@/components/layout/MainLayout'
 import { useCart } from '@/context/CartContext'
@@ -13,43 +16,49 @@ import toast from 'react-hot-toast'
 
 const steps = ['Review Cart', 'Shipping Info', 'Payment', 'Confirmation']
 
+const shippingSchema = z.object({
+  fullName: z.string().min(1, 'Required'),
+  email: z.string().email().optional().or(z.literal('')),
+  address: z.string().min(1, 'Required'),
+  city: z.string().min(1, 'Required'),
+  state: z.string().min(1, 'Required'),
+  zip: z.string().optional(),
+  phone: z.string().min(1, 'Required'),
+})
+
 function Checkout() {
   const { items, subtotal, clearCart } = useCart()
-  const { user, profile } = useAuth()
-  const navigate = useNavigate()
+  const { user, profile, isAuthenticated } = useAuth()
   const { initializePayment } = usePaystack()
   const [step, setStep] = useState(1)
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [orderId, setOrderId] = useState(null)
   const [paying, setPaying] = useState(false)
-  const [shipping, setShipping] = useState({
-    fullName: profile?.name || user?.user_metadata?.name || '',
-    email: profile?.email || user?.email || '',
-    address: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-  })
-  const [payment, setPayment] = useState({ method: 'card', cardNumber: '', cardName: '', expiry: '', cvv: '' })
-  const [errors, setErrors] = useState({})
+  const [payment, setPayment] = useState({ method: 'card' })
+  const [shippingData, setShippingData] = useState(null)
 
   const stepsIcons = [FaShoppingBag, FaTruck, FaCreditCard, FaCheck]
 
-  const validateShipping = () => {
-    const errs = {}
-    if (!shipping.fullName.trim()) errs.fullName = 'Required'
-    if (!shipping.address.trim()) errs.address = 'Required'
-    if (!shipping.city.trim()) errs.city = 'Required'
-    if (!shipping.state.trim()) errs.state = 'Required'
-    if (!shipping.phone.trim()) errs.phone = 'Required'
-    setErrors(errs)
-    return Object.keys(errs).length === 0
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      fullName: profile?.name || user?.user_metadata?.name || '',
+      email: user?.email || '',
+      address: '',
+      city: '',
+      state: '',
+      zip: '',
+      phone: '',
+    },
+    resolver: zodResolver(shippingSchema),
+  })
+
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.LOGIN} state={{ from: { pathname: ROUTES.CHECKOUT } }} replace />
   }
 
   const placeOrder = async (paymentRef) => {
     const orderData = {
-      user_id: user?.id || 'guest',
+      user_id: user.id,
       items: items.map(item => ({
         productId: item.id,
         title: item.title,
@@ -60,7 +69,7 @@ function Checkout() {
       })),
       total_amount: subtotal,
       status: 'pending',
-      shipping_info: shipping,
+      shipping_info: shippingData,
       payment_method: payment.method,
       payment_ref: paymentRef || null,
     }
@@ -79,7 +88,7 @@ function Checkout() {
   const handlePayWithPaystack = () => {
     setPaying(true)
     initializePayment({
-      email: shipping.email || user?.email || 'customer@cineverse.com',
+      email: shippingData?.email || user?.email || 'customer@cineverse.com',
       amount: subtotal,
       onSuccess: (ref) => {
         setPaying(false)
@@ -98,6 +107,11 @@ function Checkout() {
     } else {
       await placeOrder(null)
     }
+  }
+
+  const onShippingSubmit = (data) => {
+    setShippingData(data)
+    setStep(3)
   }
 
   const renderStepIndicator = () => (
@@ -175,45 +189,47 @@ function Checkout() {
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <h2 className="text-lg font-semibold text-white">Shipping Information</h2>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <label className="mb-1 block text-xs text-gray-400">Full Name</label>
-                    <input value={shipping.fullName} onChange={(e) => setShipping({ ...shipping, fullName: e.target.value })} className={`h-10 w-full rounded-lg border ${errors.fullName ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
-                    {errors.fullName && <p className="mt-1 text-xs text-red-400">{errors.fullName}</p>}
+                <form onSubmit={handleSubmit(onShippingSubmit)} className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-xs text-gray-400">Full Name</label>
+                      <input {...register('fullName')} className={`h-10 w-full rounded-lg border ${errors.fullName ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
+                      {errors.fullName && <p className="mt-1 text-xs text-red-400">{errors.fullName.message}</p>}
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-xs text-gray-400">Email</label>
+                      <input {...register('email')} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-xs text-gray-400">Address</label>
+                      <input {...register('address')} className={`h-10 w-full rounded-lg border ${errors.address ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
+                      {errors.address && <p className="mt-1 text-xs text-red-400">{errors.address.message}</p>}
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs text-gray-400">City</label>
+                      <input {...register('city')} className={`h-10 w-full rounded-lg border ${errors.city ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
+                      {errors.city && <p className="mt-1 text-xs text-red-400">{errors.city.message}</p>}
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs text-gray-400">State</label>
+                      <input {...register('state')} className={`h-10 w-full rounded-lg border ${errors.state ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
+                      {errors.state && <p className="mt-1 text-xs text-red-400">{errors.state.message}</p>}
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs text-gray-400">ZIP Code</label>
+                      <input {...register('zip')} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs text-gray-400">Phone</label>
+                      <input {...register('phone')} className={`h-10 w-full rounded-lg border ${errors.phone ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
+                      {errors.phone && <p className="mt-1 text-xs text-red-400">{errors.phone.message}</p>}
+                    </div>
                   </div>
-                  <div className="sm:col-span-2">
-                    <label className="mb-1 block text-xs text-gray-400">Email</label>
-                    <input value={shipping.email} onChange={(e) => setShipping({ ...shipping, email: e.target.value })} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
+                  <div className="flex gap-3">
+                    <button type="button" onClick={() => setStep(1)} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-medium text-gray-300 hover:bg-slate-800 transition-colors">Back</button>
+                    <button type="submit" className="flex-1 rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition-colors">Continue to Payment</button>
                   </div>
-                  <div className="sm:col-span-2">
-                    <label className="mb-1 block text-xs text-gray-400">Address</label>
-                    <input value={shipping.address} onChange={(e) => setShipping({ ...shipping, address: e.target.value })} className={`h-10 w-full rounded-lg border ${errors.address ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
-                    {errors.address && <p className="mt-1 text-xs text-red-400">{errors.address}</p>}
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">City</label>
-                    <input value={shipping.city} onChange={(e) => setShipping({ ...shipping, city: e.target.value })} className={`h-10 w-full rounded-lg border ${errors.city ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
-                    {errors.city && <p className="mt-1 text-xs text-red-400">{errors.city}</p>}
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">State</label>
-                    <input value={shipping.state} onChange={(e) => setShipping({ ...shipping, state: e.target.value })} className={`h-10 w-full rounded-lg border ${errors.state ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
-                    {errors.state && <p className="mt-1 text-xs text-red-400">{errors.state}</p>}
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">ZIP Code</label>
-                    <input value={shipping.zip} onChange={(e) => setShipping({ ...shipping, zip: e.target.value })} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500" />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Phone</label>
-                    <input value={shipping.phone} onChange={(e) => setShipping({ ...shipping, phone: e.target.value })} className={`h-10 w-full rounded-lg border ${errors.phone ? 'border-red-500' : 'border-slate-700'} bg-slate-800/50 px-3 text-sm text-white outline-none focus:border-violet-500`} />
-                    {errors.phone && <p className="mt-1 text-xs text-red-400">{errors.phone}</p>}
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setStep(1)} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-medium text-gray-300 hover:bg-slate-800 transition-colors">Back</button>
-                  <button onClick={() => { if (validateShipping()) setStep(3) }} className="flex-1 rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition-colors">Continue to Payment</button>
-                </div>
+                </form>
               </motion.div>
             )}
 

@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FaFilm, FaSearch, FaTimes } from 'react-icons/fa'
+import { FaFilm, FaSearch, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import MainLayout from '@/components/layout/MainLayout'
 import { TrendingMovies } from '@/components/Movies'
-import { useTrendingMovies } from '@/hooks/useTrendingMovies'
 import { useMovieSearch } from '@/hooks/useSearch'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants/routes'
@@ -12,7 +11,10 @@ import { IMAGE_BASE_URL } from '@/constants/tmdb'
 function Movies() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
-  const { data: searchResults, isLoading: searchLoading } = useMovieSearch(searchQuery)
+  const [page, setPage] = useState(1)
+  const { data: searchData, isLoading: searchLoading } = useMovieSearch(searchQuery, page)
+  const searchResults = searchData?.results || []
+  const totalPages = searchData?.totalPages || 0
   const navigate = useNavigate()
 
   return (
@@ -72,28 +74,49 @@ function Movies() {
                     </div>
                   ))}
                 </div>
-              ) : searchResults?.length > 0 ? (
-                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                  {searchResults.map((movie, i) => (
-                    <motion.div
-                      key={movie.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      onClick={() => navigate(ROUTES.MOVIE_DETAIL(movie.id))}
-                      className="group cursor-pointer overflow-hidden rounded-2xl bg-slate-900/40 ring-1 ring-white/5 transition-all duration-500 hover:ring-red-500/40 hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-1"
-                    >
-                      <div className="relative aspect-[3/4] overflow-hidden bg-slate-800">
-                        <div className="absolute inset-0 shimmer opacity-30 group-hover:opacity-0 transition-opacity duration-500" />
-                        <img src={movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : 'https://via.placeholder.com/300x400?text=No+Poster'} alt={movie.title} className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110" loading="lazy" />
-                      </div>
-                      <div className="p-3">
-                        <h3 className="line-clamp-1 text-sm font-semibold text-white">{movie.title}</h3>
-                        <p className="mt-1 text-xs text-gray-500">{movie.release_date?.slice(0, 4) || 'N/A'}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+              ) : searchResults.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {searchResults.map((movie, i) => (
+                      <motion.div
+                        key={movie.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        onClick={() => navigate(ROUTES.MOVIE_DETAIL(movie.id))}
+                        className="group cursor-pointer overflow-hidden rounded-2xl bg-slate-900/40 ring-1 ring-white/5 transition-all duration-500 hover:ring-red-500/40 hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-1"
+                      >
+                        <div className="relative aspect-[3/4] overflow-hidden bg-slate-800">
+                          <div className="absolute inset-0 shimmer opacity-30 group-hover:opacity-0 transition-opacity duration-500" />
+                          <img src={movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : 'https://via.placeholder.com/300x400?text=No+Poster'} alt={movie.title} className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110" loading="lazy" />
+                        </div>
+                        <div className="p-3">
+                          <h3 className="line-clamp-1 text-sm font-semibold text-white">{movie.title}</h3>
+                          <p className="mt-1 text-xs text-gray-500">{movie.release_date?.slice(0, 4) || 'N/A'}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex items-center justify-center gap-4">
+                      <button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page <= 1}
+                        className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-sm text-gray-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <FaChevronLeft size={12} /> Previous
+                      </button>
+                      <span className="text-sm text-gray-500">Page {page} of {totalPages}</span>
+                      <button
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page >= totalPages}
+                        className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-sm text-gray-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Next <FaChevronRight size={12} />
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <p className="text-center text-gray-500">No movies found for "{searchQuery}"</p>
               )}

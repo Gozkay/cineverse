@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FaUserTie, FaBan, FaCheck, FaPause, FaPlay, FaTrash, FaUserPlus, FaExclamationTriangle } from 'react-icons/fa'
+import { FaUserTie, FaBan, FaCheck, FaPause, FaPlay, FaTrash, FaUserPlus } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,14 +14,16 @@ import toast from 'react-hot-toast'
 function StaffManagement() {
   const [staff, setStaff] = useState([])
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [newStaff, setNewStaff] = useState({ name: '', email: '', password: 'staff123' })
+  const [newStaff, setNewStaff] = useState(() => ({
+    name: '', email: '', password: Math.random().toString(36).slice(-10)
+  }))
 
   const loadStaff = async () => {
     const data = await getUsers()
     setStaff((data || []).filter(u => u.role === 'staff'))
   }
 
-  useEffect(() => { loadStaff() }, [])
+  useEffect(() => { getUsers().then(data => setStaff((data || []).filter(u => u.role === 'staff'))) }, [])
 
   const handleBan = async (id, isBanned) => {
     if (isBanned) await unbanUser(id)
@@ -55,7 +57,7 @@ function StaffManagement() {
     if (error) { toast.error(error.message); return }
     await loadStaff()
     setDialogOpen(false)
-    setNewStaff({ name: '', email: '', password: 'staff123' })
+    setNewStaff({ name: '', email: '', password: Math.random().toString(36).slice(-10) })
     toast.success('Staff member added')
   }
 
@@ -64,8 +66,11 @@ function StaffManagement() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Staff Management</h1>
-            <p className="text-gray-400">Manage staff accounts — ban, suspend, or remove access</p>
+            <h1 className="text-2xl sm:text-3xl font-black">
+              <span className="text-white">Staff</span>{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Management</span>
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Manage staff accounts — ban, suspend, or remove access</p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>

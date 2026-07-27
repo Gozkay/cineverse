@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { FaPlus, FaEdit, FaTrash, FaBox, FaFilm, FaBook, FaDragon } from 'react-icons/fa'
+import { FaPlus, FaEdit, FaTrash, FaFilm, FaBook, FaDragon } from 'react-icons/fa'
 import { FaMasksTheater } from 'react-icons/fa6'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { useTrendingMovies } from '@/hooks/useTrendingMovies'
@@ -15,7 +13,7 @@ import { useManga } from '@/hooks/useManga'
 import { useComics } from '@/hooks/useComics'
 import toast from 'react-hot-toast'
 
-const categoryIcons = { movie: FaFilm, book: FaBook, manga: FaDragon, comic: FaMasksTheater }
+
 const categoryColors = { movie: 'text-red-400', book: 'text-blue-400', manga: 'text-pink-400', comic: 'text-emerald-400' }
 
 function AdminProducts() {
@@ -39,7 +37,7 @@ function AdminProducts() {
       category: activeCategory,
       rating: item.vote_average || item.averageRating || item.score || 0,
     }))
-    setProducts(items)
+    setProducts(items) // eslint-disable-line react-hooks/set-state-in-effect
   }, [activeCategory, movies, books, manga, comics])
 
   const handleDelete = (id) => {
@@ -65,8 +63,11 @@ function AdminProducts() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Products</h1>
-            <p className="text-gray-400">Manage your product catalog</p>
+            <h1 className="text-2xl sm:text-3xl font-black">
+              <span className="text-white">Product</span>{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Management</span>
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Manage your product catalog</p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -135,7 +136,7 @@ function AdminProducts() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-8 overflow-hidden rounded bg-slate-800">
-                        <img src={product.image || ''} alt="" className="h-full w-full object-cover" onError={(e) => { e.target.src = '' }} />
+                        <img src={product.image || ''} alt={product.title} className="h-full w-full object-cover" onError={(e) => { e.target.src = '' }} />
                       </div>
                       <span className="text-sm text-white line-clamp-1">{product.title}</span>
                     </div>

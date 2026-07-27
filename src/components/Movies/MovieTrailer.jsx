@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { FaPlay, FaStar, FaClock, FaCalendarAlt } from "react-icons/fa";
 
 import { BACKDROP_BASE_URL } from "@/constants/tmdb";
+import PropTypes from 'prop-types';
 
 function MovieTrailer({ movie, videos }) {
   const trailer = videos?.find(
@@ -190,5 +191,23 @@ function MovieTrailer({ movie, videos }) {
     </section>
   );
 }
+
+MovieTrailer.propTypes = {
+  movie: PropTypes.shape({
+    backdrop_path: PropTypes.string,
+    title: PropTypes.string,
+    vote_average: PropTypes.number,
+    runtime: PropTypes.number,
+    release_date: PropTypes.string,
+  }),
+  videos: PropTypes.arrayOf(
+    PropTypes.shape({
+      site: PropTypes.string,
+      type: PropTypes.string,
+      key: PropTypes.string,
+      name: PropTypes.string,
+    })
+  ),
+};
 
 export default MovieTrailer;

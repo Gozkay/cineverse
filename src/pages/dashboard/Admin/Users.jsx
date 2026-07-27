@@ -10,43 +10,74 @@ import toast from 'react-hot-toast'
 
 function AdminUsers() {
   const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const loadUsers = async () => {
-    const data = await getUsers()
-    setUsers(data || [])
+    setLoading(true)
+    try {
+      const data = await getUsers()
+      setUsers(data || [])
+    } catch {
+      toast.error('Failed to load users')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  useEffect(() => { loadUsers() }, [])
+  useEffect(() => { loadUsers() }, []) // eslint-disable-line react-hooks/set-state-in-effect
 
   const handleBan = async (id, isBanned) => {
-    if (isBanned) await unbanUser(id)
-    else await banUser(id)
-    await loadUsers()
-    toast.success(isBanned ? 'User unbanned' : 'User banned')
+    try {
+      if (isBanned) await unbanUser(id)
+      else await banUser(id)
+      await loadUsers()
+      toast.success(isBanned ? 'User unbanned' : 'User banned')
+    } catch {
+      toast.error('Failed to update user status')
+    }
   }
 
   const handleSuspend = async (id, isSuspended) => {
-    if (isSuspended) await unsuspendUser(id)
-    else await suspendUser(id)
-    await loadUsers()
-    toast.success(isSuspended ? 'User unsuspended' : 'User suspended')
+    try {
+      if (isSuspended) await unsuspendUser(id)
+      else await suspendUser(id)
+      await loadUsers()
+      toast.success(isSuspended ? 'User unsuspended' : 'User suspended')
+    } catch {
+      toast.error('Failed to update user status')
+    }
   }
 
   const handleRemove = async (id) => {
-    await removeStaff(id)
-    await loadUsers()
-    toast.success('User removed')
+    try {
+      await removeStaff(id)
+      await loadUsers()
+      toast.success('User removed')
+    } catch {
+      toast.error('Failed to remove user')
+    }
   }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Users</h1>
-          <p className="text-gray-400">Manage all registered users</p>
+          <h1 className="text-2xl sm:text-3xl font-black">
+            <span className="text-white">User</span>{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Management</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Manage registered users</p>
         </div>
 
         <div className="rounded-xl bg-slate-900/50 ring-1 ring-slate-800 overflow-hidden">
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="h-8 w-48 animate-pulse rounded-full bg-slate-800/80 shimmer mx-auto mb-3" />
+              <div className="h-4 w-32 animate-pulse rounded-full bg-slate-800/80 shimmer mx-auto" />
+            </div>
+          ) : users.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">No users found</div>
+          ) : (
           <Table>
             <TableHeader>
               <TableRow className="border-slate-800">
@@ -69,7 +100,7 @@ function AdminUsers() {
                       <span className="text-sm text-white">{user.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-400">{user.email}</TableCell>
+                  <TableCell className="text-sm text-gray-400">{user.email || '—'}</TableCell>
                   <TableCell>
                     <Badge variant={user.role === 'admin' ? 'destructive' : user.role === 'manager' ? 'warning' : user.role === 'staff' ? 'info' : 'secondary'} className="capitalize">
                       {user.role}
@@ -110,6 +141,7 @@ function AdminUsers() {
               ))}
             </TableBody>
           </Table>
+          )}
         </div>
       </div>
     </DashboardLayout>

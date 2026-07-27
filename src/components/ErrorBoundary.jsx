@@ -1,4 +1,5 @@
 import { Component } from 'react'
+import PropTypes from 'prop-types'
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -12,6 +13,10 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo)
+  }
+
+  static propTypes = {
+    children: PropTypes.node,
   }
 
   render() {

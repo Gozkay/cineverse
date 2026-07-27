@@ -7,6 +7,7 @@ import {
 } from 'chart.js'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
+import PropTypes from 'prop-types'
 
 const COLORS = {
   movie: '#ef4444',
@@ -68,8 +69,8 @@ function CategoryPieChart({ data, loading }) {
   }
 
   return (
-    <div className="rounded-xl bg-slate-900/50 p-5 ring-1 ring-slate-800">
-      <h3 className="mb-4 text-sm font-semibold text-white">Revenue by Category</h3>
+    <div className="rounded-2xl bg-slate-900/50 p-5 ring-1 ring-white/5">
+      <h3 className="mb-4 text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Revenue by Category</h3>
       <div className="h-64 flex items-center justify-center">
         {values.every(v => v === 0) ? (
           <p className="text-sm text-gray-500">No data yet</p>
@@ -79,6 +80,16 @@ function CategoryPieChart({ data, loading }) {
       </div>
     </div>
   )
+}
+
+CategoryPieChart.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      value: PropTypes.number,
+    })
+  ),
+  loading: PropTypes.bool,
 }
 
 export default CategoryPieChart

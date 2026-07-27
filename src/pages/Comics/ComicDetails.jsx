@@ -29,7 +29,7 @@ function ComicDetails() {
         const found = results.find(r => r.id === id) || results[0]
         if (found) setComic(found)
         else setError('Comic not found')
-      } catch (err) {
+      } catch {
         setError('Failed to load comic details')
       } finally {
         setLoading(false)

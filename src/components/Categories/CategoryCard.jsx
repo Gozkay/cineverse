@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import PropTypes from 'prop-types'
 
 function CategoryCard({ category, index = 0 }) {
   const IconComponent = category.icon
@@ -63,6 +64,16 @@ function CategoryCard({ category, index = 0 }) {
       </Link>
     </motion.div>
   )
+}
+
+CategoryCard.propTypes = {
+  category: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    icon: PropTypes.elementType.isRequired,
+    count: PropTypes.number,
+  }).isRequired,
+  index: PropTypes.number,
 }
 
 export default CategoryCard
