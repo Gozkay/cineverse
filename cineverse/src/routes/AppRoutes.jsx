@@ -45,8 +45,12 @@ const StaffOrders = lazy(() => import("@/pages/dashboard/Staff/Orders"));
 
 function PageLoader() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 gap-4">
+      <div className="relative">
+        <div className="h-12 w-12 animate-spin rounded-full border-2 border-violet-500/30 border-t-violet-500" />
+        <div className="absolute inset-0 h-12 w-12 animate-spin rounded-full border-2 border-transparent border-r-fuchsia-500" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
+      </div>
+      <p className="text-sm text-gray-500 animate-pulse">Loading...</p>
     </div>
   )
 }

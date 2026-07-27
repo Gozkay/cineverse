@@ -1,14 +1,23 @@
+import { useScrollPosition } from '@/hooks/useScrollPosition'
 import Herobg from "@/assets/images/hero-bg.webp";
 
 function HeroBackground() {
+  const { scrollY } = useScrollPosition()
+  const parallaxY = scrollY * 0.15
+
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       <div className="absolute inset-0 bg-slate-950" />
-      <img
-        src={Herobg}
-        alt="Cinematic background"
-        className="absolute inset-0 h-full w-full object-cover object-center opacity-60"
-      />
+      <div
+        className="absolute inset-0 transition-transform duration-100 ease-out"
+        style={{ transform: `translateY(${parallaxY}px)` }}
+      >
+        <img
+          src={Herobg}
+          alt="Cinematic background"
+          className="h-full w-full object-cover object-center opacity-60"
+        />
+      </div>
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.80)' }} />
       <div
         className="absolute inset-0"

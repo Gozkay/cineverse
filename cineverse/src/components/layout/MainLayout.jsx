@@ -1,5 +1,6 @@
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import BackToTop from "@/components/ui/BackToTop";
 import PropTypes from "prop-types";
 
 function MainLayout({ children }) {
@@ -16,6 +17,7 @@ function MainLayout({ children }) {
         {children}
       </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }

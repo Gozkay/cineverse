@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants/routes'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { formatCurrency } from '@/utils/formatCurrency'
+import ImageWithFallback from '@/components/ui/ImageWithFallback'
 import PropTypes from 'prop-types'
 import toast from 'react-hot-toast'
 
@@ -24,12 +25,10 @@ function BookCard({ book, index = 0 }) {
       <Link to={ROUTES.BOOK_DETAIL(book.id)} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-slate-800">
           <div className="absolute inset-0 shimmer opacity-30 group-hover:opacity-0 transition-opacity duration-500" />
-          <img
+          <ImageWithFallback
             src={book.image}
             alt={book.title}
             className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-[1deg]"
-            loading="lazy"
-            onError={(e) => { e.target.src = 'https://placehold.co/300x400?text=No+Cover' }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-slate-900 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

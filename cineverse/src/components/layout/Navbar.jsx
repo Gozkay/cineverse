@@ -4,6 +4,7 @@ import { FaBars, FaShoppingCart, FaUser, FaSearch, FaTimes, FaSignOutAlt, FaTach
 import { ROUTES } from '@/constants/routes'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
+import { useScrollPosition } from '@/hooks/useScrollPosition'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -20,6 +21,7 @@ function Navbar() {
   const navigate = useNavigate()
   const { user, isAuthenticated, logout, role, isStaffOrAbove } = useAuth()
   const { itemCount } = useCart()
+  const { isScrolled } = useScrollPosition()
 
   const navLinks = [
     { name: 'Home', path: ROUTES.HOME },
@@ -46,8 +48,14 @@ function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl supports-[backdrop-filter]:bg-slate-950/60">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+    <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+        isScrolled
+          ? 'border-white/10 bg-slate-950/95 backdrop-blur-2xl shadow-lg shadow-black/10'
+          : 'border-white/5 bg-slate-950/80 backdrop-blur-xl'
+      } supports-[backdrop-filter]:bg-slate-950/60`}>
+      <nav className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-300 ${
+        isScrolled ? 'h-14' : 'h-16'
+      }`}>
         <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 text-transparent bg-clip-text hover:from-violet-300 hover:to-fuchsia-300 transition-all duration-300">
           CineVerse
         </Link>

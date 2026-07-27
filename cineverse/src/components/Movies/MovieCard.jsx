@@ -6,6 +6,7 @@ import { ROUTES } from "@/constants/routes";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { formatCurrency } from "@/utils/formatCurrency";
+import ImageWithFallback from "@/components/ui/ImageWithFallback";
 import { memo } from "react";
 import PropTypes from "prop-types";
 import toast from "react-hot-toast";
@@ -40,11 +41,10 @@ function MovieCard({ movie, index = 0 }) {
       <Link to={ROUTES.MOVIE_DETAIL(movie.id)} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-slate-800">
           <div className="absolute inset-0 shimmer opacity-30 group-hover:opacity-0 transition-opacity duration-500" />
-          <img
+          <ImageWithFallback
             src={poster}
             alt={movie.title}
             className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-[1deg]"
-            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute left-2 top-2 flex items-center gap-1 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500 px-2 py-0.5 text-xs font-bold text-black shadow-lg">

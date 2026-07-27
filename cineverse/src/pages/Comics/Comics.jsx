@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import ComicCard from '@/components/Comics/ComicCard'
+import ScrollReveal from '@/components/ui/ScrollReveal'
 import { useComics } from '@/hooks/useComics'
 import { FaMasksTheater } from 'react-icons/fa6'
 
@@ -80,11 +81,13 @@ function Comics() {
               <p className="text-lg text-gray-400">No comics found in this category.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {comics?.map((comic, i) => (
-                <ComicCard key={comic.id} comic={comic} index={i} />
-              ))}
-            </div>
+            <ScrollReveal>
+              <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {comics?.map((comic, i) => (
+                  <ComicCard key={comic.id} comic={comic} index={i} />
+                ))}
+              </div>
+            </ScrollReveal>
           )}
         </div>
       </div>

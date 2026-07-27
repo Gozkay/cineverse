@@ -1,8 +1,10 @@
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import PropTypes from 'prop-types'
 
 function CategoryCard({ category, index = 0 }) {
+  const cardRef = useRef(null)
   const IconComponent = category.icon
 
   const routeMap = {
@@ -13,40 +15,60 @@ function CategoryCard({ category, index = 0 }) {
   }
 
   const glowColors = {
-    movies: 'rgba(239, 68, 68, 0.2)',
-    books: 'rgba(59, 130, 246, 0.2)',
-    manga: 'rgba(236, 72, 153, 0.2)',
-    comics: 'rgba(16, 185, 129, 0.2)',
+    movies: 'rgba(239, 68, 68, 0.25)',
+    books: 'rgba(139, 92, 246, 0.25)',
+    manga: 'rgba(236, 72, 153, 0.25)',
+    comics: 'rgba(16, 185, 129, 0.25)',
   }
 
   const iconGradients = {
     movies: 'from-red-500 to-orange-500',
-    books: 'from-blue-500 to-cyan-500',
+    books: 'from-violet-500 to-fuchsia-500',
     manga: 'from-pink-500 to-purple-500',
-    comics: 'from-green-500 to-emerald-500',
+    comics: 'from-emerald-500 to-teal-500',
+  }
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    cardRef.current.style.setProperty('--mouse-x', `${x}%`)
+    cardRef.current.style.setProperty('--mouse-y', `${y}%`)
+    cardRef.current.style.boxShadow = `0 0 40px ${glowColors[category.id] || 'transparent'}`
+  }
+
+  const handleMouseLeave = (e) => {
+    if (!cardRef.current) return
+    cardRef.current.style.boxShadow = '0 0 0px transparent'
   }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
       <Link to={routeMap[category.id] || '/products'}>
         <motion.div
+          ref={cardRef}
           whileHover={{ scale: 1.04, y: -4 }}
           transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
           className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-800 bg-slate-900/80 p-6 md:p-8 transition-all duration-300 hover:border-transparent"
-          style={{
-            boxShadow: `0 0 0px ${glowColors[category.id] || 'transparent'}`,
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 0 30px ${glowColors[category.id] || 'transparent'}` }}
-          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = `0 0 0px transparent` }}
         >
+          <div
+            className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background: `radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 0%), ${glowColors[category.id]?.replace('0.25', '0.15') || 'transparent'}, transparent 60%)`,
+            }}
+          />
           <div
             className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-15"
             style={{
-              background: `radial-gradient(circle at 50% 0%, ${glowColors[category.id]?.replace('0.2', '0.4') || 'transparent'}, transparent 70%)`,
+              background: `radial-gradient(circle at 50% 0%, ${glowColors[category.id]?.replace('0.25', '0.4') || 'transparent'}, transparent 70%)`,
             }}
           />
 

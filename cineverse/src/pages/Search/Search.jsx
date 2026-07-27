@@ -4,6 +4,7 @@ import { FaSearch, FaFilm, FaBook, FaDragon } from 'react-icons/fa'
 import { FaMasksTheater } from 'react-icons/fa6'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
+import EmptyState from '@/components/ui/EmptyState'
 import { useMovieSearch } from '@/hooks/useSearch'
 import { useBookSearch } from '@/hooks/useBooks'
 import { useMangaSearch } from '@/hooks/useManga'
@@ -47,13 +48,7 @@ function Search() {
               ))}
             </div>
           ) : isEmpty ? (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center py-20 text-center">
-              <div className="mb-6 inline-flex rounded-2xl bg-slate-800/50 p-6 ring-1 ring-white/5">
-                <FaSearch className="text-4xl text-gray-600" />
-              </div>
-              <h2 className="mb-2 text-xl font-semibold text-white">No results found</h2>
-              <p className="text-gray-500">Try a different search term</p>
-            </motion.div>
+            <EmptyState type="search" title="No results found" message="Try a different search term" />
           ) : (
             <motion.div initial={{ opacity: 1 }} className="space-y-12">
               {movies?.length > 0 && (

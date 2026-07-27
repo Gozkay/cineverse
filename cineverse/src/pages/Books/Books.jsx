@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import BookCard from '@/components/Books/BookCard'
+import ScrollReveal from '@/components/ui/ScrollReveal'
 import { useBooks } from '@/hooks/useBooks'
 import { FaBook } from 'react-icons/fa'
 
@@ -80,11 +81,13 @@ function Books() {
               <p className="text-lg text-gray-400">No books found in this category.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {books?.map((book, i) => (
-                <BookCard key={book.id} book={book} index={i} />
-              ))}
-            </div>
+            <ScrollReveal>
+              <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {books?.map((book, i) => (
+                  <BookCard key={book.id} book={book} index={i} />
+                ))}
+              </div>
+            </ScrollReveal>
           )}
         </div>
       </div>

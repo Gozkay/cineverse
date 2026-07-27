@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { FaTrash, FaShoppingCart, FaArrowLeft, FaPlus, FaMinus } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
+import EmptyState from '@/components/ui/EmptyState'
 import { useCart } from '@/context/CartContext'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { ROUTES } from '@/constants/routes'
@@ -29,12 +30,7 @@ function Cart() {
           </div>
 
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <FaShoppingCart className="mb-4 text-6xl text-gray-700" />
-              <h2 className="mb-2 text-xl font-semibold text-white">Your cart is empty</h2>
-              <p className="mb-6 text-gray-500">Looks like you haven't added anything yet.</p>
-              <Link to={ROUTES.MOVIES} className="rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition-colors">Start Shopping</Link>
-            </div>
+            <EmptyState type="cart" title="Your cart is empty" message="Looks like you haven't added anything yet." actionLabel="Start Shopping" actionLink={ROUTES.MOVIES} />
           ) : (
             <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
               <div className="space-y-4">

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { FaHeart, FaShoppingCart, FaTrash, FaArrowLeft } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
+import EmptyState from '@/components/ui/EmptyState'
 import { useWishlist } from '@/context/WishlistContext'
 import { useCart } from '@/context/CartContext'
 import { formatCurrency } from '@/utils/formatCurrency'
@@ -49,14 +50,7 @@ function Wishlist() {
           </div>
 
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="mb-6 inline-flex rounded-2xl bg-slate-800/50 p-6 ring-1 ring-white/5">
-                <FaHeart className="text-4xl text-gray-600" />
-              </div>
-              <h2 className="mb-2 text-xl font-semibold text-white">Your wishlist is empty</h2>
-              <p className="mb-6 text-gray-500">Save items you love to your wishlist.</p>
-              <Link to={ROUTES.MOVIES} className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-fuchsia-500 transition-all duration-300">Browse Products</Link>
-            </div>
+            <EmptyState type="wishlist" title="Your wishlist is empty" message="Save items you love to your wishlist." actionLabel="Browse Products" actionLink={ROUTES.MOVIES} />
           ) : (
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {items.map((item, i) => (

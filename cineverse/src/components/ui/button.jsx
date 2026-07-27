@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva } from "class-variance-authority";
 
@@ -40,17 +41,51 @@ const buttonVariants = cva(
   }
 )
 
+function Ripple({ color = 'rgba(255,255,255,0.3)' }) {
+  return (
+    <span
+      className="absolute inset-0 rounded-lg pointer-events-none overflow-hidden"
+      aria-hidden
+    >
+      <span className="absolute inset-0 animate-ripple rounded-full" style={{ background: `radial-gradient(circle, ${color} 0%, transparent 60%)`, top: '50%', left: '50%', width: '50%', paddingBottom: '50%', transform: 'translate(-50%, -50%)' }} />
+    </span>
+  )
+}
+
 function Button({
   className,
   variant = "default",
   size = "default",
+  children,
+  onClick,
   ...props
 }) {
+  const ref = useRef(null)
+
+  const handleClick = (e) => {
+    const btn = ref.current
+    if (btn) {
+      const ripple = document.createElement('span')
+      const rect = btn.getBoundingClientRect()
+      const size = Math.max(rect.width, rect.height)
+      const x = e.clientX - rect.left - size / 2
+      const y = e.clientY - rect.top - size / 2
+      ripple.style.cssText = `position:absolute;width:${size}px;height:${size}px;left:${x}px;top:${y}px;border-radius:50%;background:rgba(255,255,255,0.2);transform:scale(0);animation:ripple 0.6s ease-out;pointer-events:none`
+      btn.appendChild(ripple)
+      ripple.addEventListener('animationend', () => ripple.remove())
+    }
+    onClick?.(e)
+  }
+
   return (
     <ButtonPrimitive
+      ref={ref}
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props} />
+      className={cn(buttonVariants({ variant, size, className }), "relative overflow-hidden")}
+      onClick={handleClick}
+      {...props}>
+      {children}
+    </ButtonPrimitive>
   );
 }
 

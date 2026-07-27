@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import MangaCard from '@/components/Manga/MangaCard'
+import ScrollReveal from '@/components/ui/ScrollReveal'
 import { useManga } from '@/hooks/useManga'
 import { FaDragon } from 'react-icons/fa'
 
@@ -63,11 +64,13 @@ function Manga() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {mangaList?.map((manga, i) => (
-                  <MangaCard key={manga.id} manga={manga} index={i} />
-                ))}
-              </div>
+              <ScrollReveal>
+                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {mangaList?.map((manga, i) => (
+                    <MangaCard key={manga.id} manga={manga} index={i} />
+                  ))}
+                </div>
+              </ScrollReveal>
               <div className="mt-10 flex items-center justify-center gap-4">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
