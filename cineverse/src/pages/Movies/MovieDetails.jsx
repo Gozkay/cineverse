@@ -121,7 +121,7 @@ function MovieDetails() {
 
       <MovieHero movie={movie} />
 
-      <div className="relative z-20 mx-auto -mt-44 max-w-7xl px-6 pb-20">
+      <div className="relative z-20 mx-auto -mt-20 max-w-7xl px-6 pb-20 sm:-mt-44">
 
         <MovieInfo movie={movie} videos={videos || []} />
 

@@ -11,7 +11,7 @@ function MovieCast({ cast }) {
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Cast</span>
       </h2>
 
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+      <div className="flex flex-wrap justify-center gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent sm:flex-nowrap sm:justify-start">
         {cast.slice(0, 10).map((member) => (
           <div
             key={member.id}

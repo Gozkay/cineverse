@@ -32,13 +32,14 @@ function MovieTrailer({ movie, videos }) {
             className="
               group
               relative
-              h-[420px]
+              h-[280px]
               cursor-pointer
               overflow-hidden
               rounded-3xl
               border
               border-slate-800
               shadow-[0_20px_80px_rgba(0,0,0,0.5)]
+              sm:h-[420px]
             "
           >
             {/* Background */}
@@ -68,23 +69,27 @@ function MovieTrailer({ movie, videos }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
             {/* Content */}
-            <div className="relative flex h-full flex-col items-center justify-center px-8 text-center">
+            <div className="relative flex h-full flex-col items-center justify-center px-6 text-center sm:px-8">
               {/* Badge */}
               <span
                 className="
-                  mb-6
+                  mb-4
                   rounded-full
                   border
                   border-red-500/40
                   bg-red-500/15
-                  px-5
-                  py-2
-                  text-sm
+                  px-4
+                  py-1.5
+                  text-[11px]
                   font-semibold
                   uppercase
                   tracking-widest
                   text-red-300
                   backdrop-blur-md
+                  sm:mb-6
+                  sm:px-5
+                  sm:py-2
+                  sm:text-sm
                 "
               >
                 Official Trailer
@@ -106,25 +111,28 @@ function MovieTrailer({ movie, videos }) {
                 }}
                 className="
                   flex
-                  h-28
-                  w-28
+                  h-20
+                  w-20
                   items-center
                   justify-center
                   rounded-full
                   bg-red-600
-                  text-5xl
+                  text-3xl
                   text-white
                   shadow-2xl
+                  sm:h-28
+                  sm:w-28
+                  sm:text-5xl
                 "
               >
-                <FaPlay className="ml-2" />
+                <FaPlay className="ml-1.5 sm:ml-2" />
               </motion.div>
 
-              <h2 className="mt-8 text-5xl font-black tracking-tight">
+              <h2 className="mt-5 text-2xl font-black tracking-tight sm:mt-8 sm:text-5xl">
                 Watch Trailer
               </h2>
 
-              <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:mt-4 sm:text-lg sm:leading-8">
                 Experience the official trailer for{" "}
                 <span className="font-bold text-white">
                   {movie.title}
@@ -134,19 +142,19 @@ function MovieTrailer({ movie, videos }) {
             </div>
 
             {/* Bottom Stats */}
-            <div className="absolute bottom-6 left-6 flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 rounded-full bg-black/40 px-4 py-2 backdrop-blur-lg">
-                <FaStar className="text-yellow-400" />
+            <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 sm:bottom-6 sm:left-6 sm:gap-3">
+              <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[11px] backdrop-blur-lg sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+                <FaStar className="text-yellow-400" size={12} />
                 <span>{movie.vote_average?.toFixed(1)}</span>
               </div>
 
-              <div className="flex items-center gap-2 rounded-full bg-black/40 px-4 py-2 backdrop-blur-lg">
-                <FaClock className="text-cyan-400" />
+              <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[11px] backdrop-blur-lg sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+                <FaClock className="text-cyan-400" size={12} />
                 <span>{movie.runtime} mins</span>
               </div>
 
-              <div className="flex items-center gap-2 rounded-full bg-black/40 px-4 py-2 backdrop-blur-lg">
-                <FaCalendarAlt className="text-green-400" />
+              <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[11px] backdrop-blur-lg sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+                <FaCalendarAlt className="text-green-400" size={12} />
                 <span>{movie.release_date?.slice(0, 4)}</span>
               </div>
             </div>
@@ -155,19 +163,26 @@ function MovieTrailer({ movie, videos }) {
             <div
               className="
                 absolute
-                bottom-6
-                right-6
+                bottom-4
+                right-4
+                hidden
                 rounded-full
                 bg-red-600
-                px-5
-                py-2
-                text-sm
+                px-4
+                py-1.5
+                text-xs
                 font-semibold
                 opacity-0
                 transition-all
                 duration-300
                 group-hover:opacity-100
                 group-hover:translate-y-0
+                sm:bottom-6
+                sm:right-6
+                sm:block
+                sm:px-5
+                sm:py-2
+                sm:text-sm
               "
             >
               ▶ Play Now
@@ -176,7 +191,7 @@ function MovieTrailer({ movie, videos }) {
         </DialogTrigger>
 
         {/* Trailer Modal */}
-        <DialogContent className="max-w-7xl overflow-hidden border-none bg-black p-0">
+        <DialogContent className="max-w-[calc(100%-1rem)] overflow-hidden border-none bg-black p-0 sm:max-w-7xl">
           <div className="aspect-video">
             <iframe
               className="h-full w-full"
