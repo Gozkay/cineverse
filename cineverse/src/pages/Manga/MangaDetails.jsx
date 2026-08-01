@@ -99,7 +99,7 @@ function MangaDetails() {
                       <FaStar className="text-yellow-500" size={14} />
                       <span className="text-sm font-medium text-white">{manga.score}</span>
                     </div>
-                    <span className="text-xs text-gray-500">({manga.scoredBy} votes)</span>
+                    <span className="text-xs text-gray-500">({manga.scoredBy} favourites)</span>
                   </div>
                 )}
               </div>
