@@ -20,14 +20,6 @@ export async function registerUser({ name, email, password, sellerType }) {
   if (error) return { success: false, error: error.message }
 
   if (data.user) {
-    const { error: profileError } = await supabase.from('profiles').insert({
-      id: data.user.id,
-      name,
-      email,
-      role: 'customer',
-    })
-    if (profileError) return { success: false, error: profileError.message }
-
     if (sellerType && sellerType !== 'none') {
       await supabase.from('seller_requests').insert({
         user_id: data.user.id,
