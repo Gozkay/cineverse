@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
-const MODEL = 'gemini-2.0-flash'
+const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash'
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
 
 const corsHeaders = {
