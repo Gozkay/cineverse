@@ -77,7 +77,7 @@ function DashboardLayout({ children }) {
               }
             >
               <link.icon size={16} />
-              <span>{link.label}</span>
+              <span className={sidebarOpen ? 'block' : 'hidden'}>{link.label}</span>
             </NavLink>
           ))}
         </nav>
@@ -89,7 +89,7 @@ function DashboardLayout({ children }) {
         </div>
       </aside>
 
-      <div className="flex-1 md:ml-16">
+      <div className={`flex-1 transition-[margin] duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-16'}`}>
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/5 bg-slate-950/80 backdrop-blur-xl px-4 md:px-6">
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(true)} className="text-gray-400 hover:text-white md:hidden">
