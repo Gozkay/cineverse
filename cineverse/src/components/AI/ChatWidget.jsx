@@ -34,7 +34,8 @@ function ChatDialog({ onClose }) {
       const reply = await aiChat(history)
       setMessages((m) => [...m, { role: 'model', content: reply }])
     } catch (e) {
-      setMessages((m) => [...m, { role: 'model', content: `Sorry, I couldn't reach the AI service right now. ${e.message}` }])
+      const busy = e?.message === 'ai_busy'
+      setMessages((m) => [...m, { role: 'model', content: busy ? "The AI is busy right now — try again in a minute." : `Sorry, I couldn't reach the AI service right now. ${e.message}` }])
     } finally {
       setLoading(false)
     }

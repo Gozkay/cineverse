@@ -123,18 +123,34 @@ serve(async (req) => {
   }
 
   try {
-    const res = await fetch(`${API_URL}?key=${apiKey}`, {
+    const doFetch = () => fetch(`${API_URL}?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
 
+    let res = await doFetch()
+
+    if (res.status === 429) {
+      await new Promise((r) => setTimeout(r, 2000))
+      res = await doFetch()
+    }
+
     if (!res.ok) {
       const errText = await res.text()
-      return new Response(JSON.stringify({ error: `Gemini API error: ${res.status} ${errText.slice(0, 300)}` }), {
-        status: 502,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      const isBusy = res.status === 429
+      const retryAfter = res.headers.get('retry-after')
+      return new Response(
+        JSON.stringify({ error: isBusy ? 'ai_busy' : `Gemini API error: ${res.status} ${errText.slice(0, 500)}` }),
+        {
+          status: isBusy ? 503 : 502,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+            ...(retryAfter ? { 'Retry-After': retryAfter } : {}),
+          },
+        },
+      )
     }
 
     const data = await res.json()
