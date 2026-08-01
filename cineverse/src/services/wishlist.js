@@ -19,8 +19,8 @@ export async function addWishlistItem(userId, item) {
   }
 }
 
-export async function removeWishlistItem(id) {
-  const { error } = await supabase.from('wishlist_items').delete().eq('id', id)
+export async function removeWishlistItem(userId, productSlug) {
+  const { error } = await supabase.from('wishlist_items').delete().eq('user_id', userId).eq('product_slug', productSlug)
   if (error) throw error
 }
 

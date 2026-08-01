@@ -25,13 +25,13 @@ export async function addCartItem(userId, item) {
   }
 }
 
-export async function updateCartItemQuantity(id, quantity) {
-  const { error } = await supabase.from('cart_items').update({ quantity }).eq('id', id)
+export async function updateCartItemQuantity(userId, productSlug, quantity) {
+  const { error } = await supabase.from('cart_items').update({ quantity }).eq('user_id', userId).eq('product_slug', productSlug)
   if (error) throw error
 }
 
-export async function removeCartItem(id) {
-  const { error } = await supabase.from('cart_items').delete().eq('id', id)
+export async function removeCartItem(userId, productSlug) {
+  const { error } = await supabase.from('cart_items').delete().eq('user_id', userId).eq('product_slug', productSlug)
   if (error) throw error
 }
 

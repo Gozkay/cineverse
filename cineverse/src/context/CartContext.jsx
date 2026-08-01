@@ -25,7 +25,7 @@ export function CartProvider({ children }) {
         if (serverItems.length > 0) {
           const localItems = items
           const merged = [...serverItems.map(i => ({
-            id: i.product_slug,
+            id: i.product_slug.split(':').slice(1).join(':'),
             product_slug: i.product_slug,
             title: i.title,
             price: i.price,
@@ -79,7 +79,7 @@ export function CartProvider({ children }) {
       if (existing) {
         toast.success(`Updated "${product.title}" quantity`)
         if (user) {
-          updateCartItemQuantity(existing.id, existing.quantity + quantity).catch(() => {})
+          updateCartItemQuantity(user.id, productSlug, existing.quantity + quantity).catch(() => {})
         }
         return prev.map(item =>
           (item.product_slug === productSlug || item.id === product.id)
@@ -89,7 +89,7 @@ export function CartProvider({ children }) {
       }
       toast.success(`Added "${product.title}" to cart`)
       const newItem = {
-        id: productSlug,
+        id: product.id,
         product_slug: productSlug,
         title: product.title,
         price: product.price,
@@ -115,8 +115,8 @@ export function CartProvider({ children }) {
     setItems(prev => {
       const item = prev.find(i => i.product_slug === slug || i.id === slug)
       if (item) toast.success(`Removed "${item.title}" from cart`)
-      if (user) {
-        removeCartItem(item?.id).catch(() => {})
+      if (user && item) {
+        removeCartItem(user.id, item.product_slug).catch(() => {})
       }
       return prev.filter(i => i.product_slug !== slug && i.id !== slug)
     })
@@ -131,7 +131,7 @@ export function CartProvider({ children }) {
     )
     if (user) {
       const item = items.find(i => i.product_slug === slug || i.id === slug)
-      if (item?.id) updateCartItemQuantity(item.id, quantity).catch(() => {})
+      if (item?.product_slug) updateCartItemQuantity(user.id, item.product_slug, quantity).catch(() => {})
     }
   }, [user, items, removeItem])
 

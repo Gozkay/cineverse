@@ -24,7 +24,7 @@ export function WishlistProvider({ children }) {
       getWishlistItems(user.id).then(serverItems => {
         if (serverItems.length > 0) {
           const merged = [...serverItems.map(i => ({
-            id: i.product_slug,
+            id: i.product_slug.split(':').slice(1).join(':'),
             product_slug: i.product_slug,
             title: i.title,
             price: i.price,
@@ -77,7 +77,7 @@ export function WishlistProvider({ children }) {
       }
       toast.success(`Added "${product.title}" to wishlist`)
       const newItem = {
-        id: productSlug,
+        id: product.id,
         product_slug: productSlug,
         title: product.title,
         price: product.price,
@@ -101,8 +101,8 @@ export function WishlistProvider({ children }) {
     setItems(prev => {
       const item = prev.find(i => i.product_slug === slug || i.id === slug)
       if (item) toast.success(`Removed "${item.title}" from wishlist`)
-      if (user) {
-        removeWishlistItem(item?.id).catch(() => {})
+      if (user && item) {
+        removeWishlistItem(user.id, item.product_slug).catch(() => {})
       }
       return prev.filter(i => i.product_slug !== slug && i.id !== slug)
     })

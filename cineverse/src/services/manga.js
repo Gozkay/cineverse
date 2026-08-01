@@ -25,7 +25,7 @@ export async function searchManga(query, page = 1) {
 
 function normalizeManga(item) {
   return {
-    id: `manga_${item.mal_id}`,
+    id: item.mal_id,
     malId: item.mal_id,
     title: item.title || item.title_english || 'Unknown Title',
     titleJapanese: item.title_japanese || '',

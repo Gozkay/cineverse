@@ -19,7 +19,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 function LocalMovieDetails() {
   const { id } = useParams()
   const { addItem } = useCart()
-  const { wishlist, addWishlist, removeWishlist } = useWishlist()
+  const { items: wishlist, addItem: addWishlist, removeItem: removeWishlist } = useWishlist()
   const [movie, setMovie] = useState(null)
   const [seller, setSeller] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -76,7 +76,7 @@ function LocalMovieDetails() {
       category: 'movie',
       title: movie.title,
       price: movie.price,
-      image: movie.image,
+      image: getPublicImageUrl(movie.image),
     })
   }
 
@@ -98,7 +98,7 @@ function LocalMovieDetails() {
                 <button onClick={handleAddToCart} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-3 text-sm font-semibold text-slate-950 hover:opacity-90 transition-opacity">
                   <FaShoppingCart /> Add to Cart
                 </button>
-                <button onClick={() => inWishlist ? removeWishlist(movie.id) : addWishlist({ id: movie.id, category: 'movie', title: movie.title, price: movie.price, image: movie.image })} className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors ${inWishlist ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-slate-700 text-gray-300 hover:border-red-500/50 hover:text-red-400'}`}>
+                <button onClick={() => inWishlist ? removeWishlist(movie.id) : addWishlist({ id: movie.id, category: 'movie', title: movie.title, price: movie.price, image: getPublicImageUrl(movie.image) })} className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors ${inWishlist ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-slate-700 text-gray-300 hover:border-red-500/50 hover:text-red-400'}`}>
                   <FaHeart />
                 </button>
               </div>

@@ -98,7 +98,7 @@ describe('CartContext', () => {
     act(() => result.current.addItem(sampleProduct))
     const stored = JSON.parse(localStorage.getItem('cineverse_cart'))
     expect(stored).toHaveLength(1)
-    expect(stored[0].id).toBe('movie:1')
+    expect(stored[0].id).toBe('1')
   })
 
   it('loads cart from localStorage on mount', () => {

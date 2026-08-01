@@ -80,7 +80,7 @@ describe('WishlistContext', () => {
     act(() => result.current.addItem(sampleProduct))
     const stored = JSON.parse(localStorage.getItem('cineverse_wishlist'))
     expect(stored).toHaveLength(1)
-    expect(stored[0].id).toBe('movie:1')
+    expect(stored[0].id).toBe('1')
   })
 
   it('loads wishlist from localStorage on mount', () => {
