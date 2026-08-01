@@ -12,6 +12,7 @@ const mockSupabase = {
     select: vi.fn(() => ({
       eq: vi.fn(() => ({
         single: vi.fn(),
+        maybeSingle: vi.fn(),
         order: vi.fn(() => ({
           order: vi.fn(),
         })),
@@ -52,6 +53,7 @@ describe('auth service', () => {
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           single: vi.fn(() => ({ data: { id: '1', name: 'Test', role: 'customer' }, error: null })),
+          maybeSingle: vi.fn(() => ({ data: { id: '1', name: 'Test', role: 'customer' }, error: null })),
         })),
       })),
       insert: vi.fn(() => ({ error: null })),
@@ -92,6 +94,7 @@ describe('auth service', () => {
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           single: vi.fn(() => ({ data: { id: '2', name: 'New User', role: 'customer' }, error: null })),
+          maybeSingle: vi.fn(() => ({ data: { id: '2', name: 'New User', role: 'customer' }, error: null })),
         })),
       })),
       insert: vi.fn(() => ({ error: null })),

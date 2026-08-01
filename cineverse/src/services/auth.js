@@ -53,7 +53,7 @@ export async function logoutUser() {
 }
 
 async function getProfile(userId) {
-  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+  const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
   return data || {}
 }
 
@@ -158,7 +158,11 @@ export async function rejectSellerRequest(requestId) {
 }
 
 export async function updateProfile(userId, updates) {
-  const { data, error } = await supabase.from('profiles').update(updates).eq('id', userId).select().single()
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert({ id: userId, ...updates }, { onConflict: 'id' })
+    .select()
+    .single()
   if (error) return { success: false, error: error.message }
   return { success: true, data }
 }
