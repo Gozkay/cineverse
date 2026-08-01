@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FaArrowLeft, FaClipboardList, FaUndo, FaDownload, FaSpinner } from 'react-icons/fa'
+import { FaArrowLeft, FaUndo, FaDownload, FaSpinner } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
-import { useAuth } from '@/context/AuthContext'
 import { getOrderById } from '@/services/orders'
 import { getRefundRequests, createRefundRequest } from '@/services/refunds'
 import { getProductBySlug } from '@/services/products'
@@ -40,7 +39,6 @@ const timeline = [
 function OrderDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [refunds, setRefunds] = useState([])
@@ -70,6 +68,7 @@ function OrderDetail() {
     if (!paid || !order.items?.length) return
 
     let cancelled = false
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loading flag for async work kicked off by this effect
     setDownloadsLoading(true)
 
     ;(async () => {

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FaSearch, FaFilm, FaBook, FaDragon } from 'react-icons/fa'
+import { FaFilm, FaBook, FaDragon } from 'react-icons/fa'
 import { FaMasksTheater, FaWandMagicSparkles } from 'react-icons/fa6'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
@@ -46,6 +46,7 @@ function Search() {
   }, [query])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset stale AI results whenever the query changes
     setAiResult(null)
     if (isEmpty) runAiSearch()
   }, [query, isEmpty, runAiSearch])

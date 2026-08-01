@@ -15,7 +15,6 @@ import { supabase } from '@/lib/supabase'
 import { getPublicImageUrl } from '@/services/seller'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
-import toast from 'react-hot-toast'
 
 function LocalMovieDetails() {
   const { id } = useParams()

@@ -6,7 +6,6 @@ import CountUp from '@/components/ui/CountUp'
 import { useAuth } from '@/context/AuthContext'
 import { getSellerStats } from '@/services/seller'
 import { ROUTES } from '@/constants/routes'
-import { formatCurrency } from '@/utils/formatCurrency'
 
 function SellerOverview() {
   const { user, profile } = useAuth()

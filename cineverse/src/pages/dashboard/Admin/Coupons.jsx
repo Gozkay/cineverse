@@ -15,13 +15,12 @@ function AdminCoupons() {
   const [form, setForm] = useState({ code: '', discount_percent: 10, discount_amount: 0, min_amount: 0, max_uses: 0, expires_at: '' })
 
   const load = async () => {
-    setLoading(true)
     const data = await getCoupons()
     setCoupons(data || [])
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/set-state-in-effect
 
   const resetForm = () => {
     setForm({ code: '', discount_percent: 10, discount_amount: 0, min_amount: 0, max_uses: 0, expires_at: '' })

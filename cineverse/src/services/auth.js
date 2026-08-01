@@ -20,9 +20,6 @@ export async function registerUser({ name, email, password, sellerType }) {
   if (error) return { success: false, error: error.message }
 
   if (data.user) {
-    if (!data.user.identities?.length) {
-      return { success: false, error: 'This email is already registered. Please sign in.' }
-    }
     const { error: profileError } = await supabase.from('profiles').insert({
       id: data.user.id,
       name,

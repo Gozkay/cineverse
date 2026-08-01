@@ -16,7 +16,7 @@ function AISummary({ item, title = 'AI Summary', className = '' }) {
     try {
       const text = await aiSummarize(item)
       setSummary(text)
-    } catch (e) {
+    } catch {
       setError("Couldn't generate a summary right now. Try again in a moment.")
     } finally {
       setLoading(false)

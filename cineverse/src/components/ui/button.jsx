@@ -41,17 +41,6 @@ const buttonVariants = cva(
   }
 )
 
-function Ripple({ color = 'rgba(255,255,255,0.3)' }) {
-  return (
-    <span
-      className="absolute inset-0 rounded-lg pointer-events-none overflow-hidden"
-      aria-hidden
-    >
-      <span className="absolute inset-0 animate-ripple rounded-full" style={{ background: `radial-gradient(circle, ${color} 0%, transparent 60%)`, top: '50%', left: '50%', width: '50%', paddingBottom: '50%', transform: 'translate(-50%, -50%)' }} />
-    </span>
-  )
-}
-
 function Button({
   className,
   variant = "default",

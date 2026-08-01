@@ -1,8 +1,26 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { CartProvider, useCart } from '@/context/CartContext'
+import { AuthProvider } from '@/context/AuthContext'
 
-const wrapper = ({ children }) => <CartProvider>{children}</CartProvider>
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(() => Promise.resolve({ data: { session: null }, error: null })),
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+    },
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({ eq: vi.fn(() => ({ single: vi.fn(() => ({ data: null, error: null })) })) })),
+      insert: vi.fn(() => ({ error: null })),
+    })),
+  },
+}))
+
+const wrapper = ({ children }) => (
+  <AuthProvider>
+    <CartProvider>{children}</CartProvider>
+  </AuthProvider>
+)
 
 const sampleProduct = {
   id: '1',
@@ -43,21 +61,21 @@ describe('CartContext', () => {
   it('removes an item from the cart', () => {
     const { result } = renderHook(() => useCart(), { wrapper })
     act(() => result.current.addItem(sampleProduct))
-    act(() => result.current.removeItem('1'))
+    act(() => result.current.removeItem('movie:1'))
     expect(result.current.items).toHaveLength(0)
   })
 
   it('updates item quantity', () => {
     const { result } = renderHook(() => useCart(), { wrapper })
     act(() => result.current.addItem(sampleProduct))
-    act(() => result.current.updateQuantity('1', 5))
+    act(() => result.current.updateQuantity('movie:1', 5))
     expect(result.current.items[0].quantity).toBe(5)
   })
 
   it('removes item when quantity drops below 1', () => {
     const { result } = renderHook(() => useCart(), { wrapper })
     act(() => result.current.addItem(sampleProduct))
-    act(() => result.current.updateQuantity('1', 0))
+    act(() => result.current.updateQuantity('movie:1', 0))
     expect(result.current.items).toHaveLength(0)
   })
 
@@ -80,7 +98,7 @@ describe('CartContext', () => {
     act(() => result.current.addItem(sampleProduct))
     const stored = JSON.parse(localStorage.getItem('cineverse_cart'))
     expect(stored).toHaveLength(1)
-    expect(stored[0].id).toBe('1')
+    expect(stored[0].id).toBe('movie:1')
   })
 
   it('loads cart from localStorage on mount', () => {

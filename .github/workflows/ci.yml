@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cineverse
 
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +20,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: cineverse/package-lock.json
 
       - run: npm ci
 

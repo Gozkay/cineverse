@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FaHeart, FaShoppingCart, FaTrash, FaArrowLeft } from 'react-icons/fa'
+import { FaShoppingCart, FaTrash, FaArrowLeft } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import EmptyState from '@/components/ui/EmptyState'

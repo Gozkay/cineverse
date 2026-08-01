@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { FaPlus, FaEdit, FaTrash, FaFilm, FaBook, FaDragon } from 'react-icons/fa'
-import { FaMasksTheater } from 'react-icons/fa6'
+import { FaPlus, FaEdit, FaTrash, FaFilm } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,7 +31,6 @@ function SellerProducts() {
 
   const loadProducts = useCallback(async () => {
     if (!user) return
-    setLoading(true)
     try {
       setProducts(await getSellerProducts(user.id))
     } catch {
@@ -42,7 +40,7 @@ function SellerProducts() {
     }
   }, [user])
 
-  useEffect(() => { loadProducts() }, [loadProducts])
+  useEffect(() => { loadProducts() }, [loadProducts]) // eslint-disable-line react-hooks/set-state-in-effect
 
   const openAdd = () => {
     setEditingProduct(null)

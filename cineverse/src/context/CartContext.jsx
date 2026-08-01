@@ -62,6 +62,7 @@ export function CartProvider({ children }) {
         setLoaded(true)
       }).catch(() => { setLoaded(true) })
     } else if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset sync flag when the user logs out
       setLoaded(false)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

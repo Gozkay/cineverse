@@ -23,6 +23,17 @@ function ComicDetails() {
   const { addItem } = useCart()
   const { addItem: addWishlist, removeItem: removeWishlist, isInWishlist } = useWishlist()
 
+  useSyncProduct({
+    id,
+    external_id: id,
+    title: comic?.title,
+    description: comic?.description,
+    category: 'comic',
+    image: comic?.image,
+    rating: 0,
+    rating_count: 0,
+  })
+
   useEffect(() => {
     async function fetchComic() {
       try {
@@ -76,17 +87,6 @@ function ComicDetails() {
   }
 
   const inWishlist = isInWishlist(comic.id)
-
-  useSyncProduct({
-    id,
-    external_id: id,
-    title: comic.title,
-    description: comic.description,
-    category: 'comic',
-    image: comic.image,
-    rating: 0,
-    rating_count: 0,
-  })
 
   return (
     <MainLayout>

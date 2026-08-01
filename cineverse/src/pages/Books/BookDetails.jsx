@@ -21,6 +21,17 @@ function BookDetails() {
   const { addItem } = useCart()
   const { addItem: addWishlist, removeItem: removeWishlist, isInWishlist } = useWishlist()
 
+  useSyncProduct({
+    id,
+    external_id: id,
+    title: book?.title,
+    description: book?.description,
+    category: 'book',
+    image: book?.image,
+    rating: book?.averageRating,
+    rating_count: book?.ratingsCount,
+  })
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -58,17 +69,6 @@ function BookDetails() {
   }
 
   const inWishlist = isInWishlist(book.id)
-
-  useSyncProduct({
-    id,
-    external_id: id,
-    title: book.title,
-    description: book.description,
-    category: 'book',
-    image: book.image,
-    rating: book.averageRating,
-    rating_count: book.ratingsCount,
-  })
 
   return (
     <MainLayout>

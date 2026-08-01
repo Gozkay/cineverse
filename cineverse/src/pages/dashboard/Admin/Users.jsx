@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FaBan, FaCheck, FaPause, FaPlay, FaTrash, FaShieldAlt } from 'react-icons/fa'
+import { FaBan, FaCheck, FaPause, FaPlay, FaTrash } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -15,7 +15,6 @@ function AdminUsers() {
   const [loading, setLoading] = useState(true)
 
   const loadUsers = async () => {
-    setLoading(true)
     try {
       const data = await getUsers()
       setUsers(data || [])
@@ -26,7 +25,7 @@ function AdminUsers() {
     }
   }
 
-  useEffect(() => { loadUsers() }, [])
+  useEffect(() => { loadUsers() }, []) // eslint-disable-line react-hooks/set-state-in-effect
 
   const handleBan = async (id, isBanned) => {
     try {

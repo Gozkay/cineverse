@@ -21,6 +21,17 @@ function MangaDetails() {
   const { addItem } = useCart()
   const { addItem: addWishlist, removeItem: removeWishlist, isInWishlist } = useWishlist()
 
+  useSyncProduct({
+    id,
+    external_id: manga?.mal_id?.toString() || id,
+    title: manga?.title,
+    description: manga?.description,
+    category: 'manga',
+    image: manga?.image,
+    rating: manga?.score,
+    rating_count: manga?.scoredBy,
+  })
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -58,17 +69,6 @@ function MangaDetails() {
   }
 
   const inWishlist = isInWishlist(manga.id)
-
-  useSyncProduct({
-    id,
-    external_id: manga.mal_id?.toString() || id,
-    title: manga.title,
-    description: manga.description,
-    category: 'manga',
-    image: manga.image,
-    rating: manga.score,
-    rating_count: manga.scoredBy,
-  })
 
   return (
     <MainLayout>

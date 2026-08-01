@@ -13,7 +13,6 @@ import { getPublicImageUrl } from '@/services/seller'
 import { aiGenerateDescription } from '@/services/ai'
 import toast from 'react-hot-toast'
 
-const categoryColors = { movie: 'text-red-400', book: 'text-blue-400', manga: 'text-pink-400', comic: 'text-emerald-400' }
 const categoryLabels = { movie: 'Movies', book: 'Books', manga: 'Manga', comic: 'Comics' }
 
 const defaultPrices = { movie: 2500, book: 2000, manga: 1800, comic: 2200 }
@@ -45,7 +44,6 @@ function AdminProducts() {
   const [generatingDescription, setGeneratingDescription] = useState(false)
 
   const loadProducts = useCallback(async () => {
-    setLoading(true)
     try {
       const { data, count } = await getProducts({
         category: activeCategory,
@@ -63,7 +61,7 @@ function AdminProducts() {
     }
   }, [activeCategory, activeStatus, search, page])
 
-  useEffect(() => { loadProducts() }, [loadProducts])
+  useEffect(() => { loadProducts() }, [loadProducts]) // eslint-disable-line react-hooks/set-state-in-effect
 
   const openAdd = () => {
     setEditingProduct(null)

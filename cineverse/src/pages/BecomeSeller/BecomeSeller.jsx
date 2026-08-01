@@ -14,10 +14,10 @@ function BecomeSeller() {
   const [type, setType] = useState('seller')
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => !!user)
 
   useEffect(() => {
-    if (!user) { setLoading(false); return }
+    if (!user) return
     supabase.from('seller_requests').select('*').eq('user_id', user.id).maybeSingle().then(({ data }) => {
       setRequest(data)
       setLoading(false)

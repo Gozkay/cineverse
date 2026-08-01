@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { FaEye } from 'react-icons/fa'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
@@ -26,7 +25,6 @@ const statuses = ['all', 'pending', 'paid', 'processing', 'shipped', 'delivered'
 function AdminOrders() {
   const [orders, setOrders] = useState([])
   const [filter, setFilter] = useState('all')
-  const [selectedOrder, setSelectedOrder] = useState(null)
 
   const loadOrders = async () => {
     const data = await getOrders()
@@ -123,39 +121,6 @@ function AdminOrders() {
             </TableBody>
           </Table>
         </div>
-
-        {selectedOrder && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl bg-slate-900/50 p-5 ring-1 ring-slate-800">
-            <h3 className="mb-4 text-lg font-semibold text-white">Order Details #{selectedOrder.id?.slice(0, 10)}</h3>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-400">Shipping Info</h4>
-                <div className="space-y-1 text-sm text-white">
-                  <p>{selectedOrder.shipping_info?.fullName}</p>
-                  <p className="text-gray-400">{selectedOrder.shipping_info?.address}</p>
-                  <p className="text-gray-400">{selectedOrder.shipping_info?.city}, {selectedOrder.shipping_info?.state}</p>
-                  <p className="text-gray-400">{selectedOrder.shipping_info?.phone}</p>
-                </div>
-              </div>
-              <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-400">Items</h4>
-                <div className="space-y-2">
-                  {selectedOrder.items?.map((item, i) => (
-                    <div key={i} className="flex justify-between text-sm">
-                      <span className="text-white">{item.title} <span className="text-gray-500">×{item.quantity}</span></span>
-                      <span className="text-gray-300">{formatCurrency(item.price * item.quantity)}</span>
-                    </div>
-                  ))}
-                </div>
-                <hr className="my-2 border-slate-700" />
-                <div className="flex justify-between font-semibold">
-                  <span className="text-white">Total</span>
-                  <span className="text-violet-400">{formatCurrency(selectedOrder.total_amount)}</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
     </DashboardLayout>
   )

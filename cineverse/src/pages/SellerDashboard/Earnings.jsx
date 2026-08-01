@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import CountUp from '@/components/ui/CountUp'
 import { useAuth } from '@/context/AuthContext'
-import { getEarnings, getAvailableBalance, getSellerStats } from '@/services/seller'
+import { getEarnings, getAvailableBalance } from '@/services/seller'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { formatDateTime } from '@/utils/formatDate'
 
@@ -20,7 +20,6 @@ function SellerEarnings() {
   const { user } = useAuth()
   const [earnings, setEarnings] = useState([])
   const [balance, setBalance] = useState(0)
-  const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -28,12 +27,10 @@ function SellerEarnings() {
     Promise.all([
       getEarnings(user.id),
       getAvailableBalance(user.id),
-      getSellerStats(user.id).catch(() => null),
     ])
-      .then(([e, b, s]) => {
+      .then(([e, b]) => {
         setEarnings(e)
         setBalance(b)
-        setStats(s)
       })
       .catch(() => {})
       .finally(() => setLoading(false))

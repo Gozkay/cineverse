@@ -77,6 +77,17 @@ function MovieDetails() {
     enabled: !!id,
   });
 
+  useSyncProduct({
+    id,
+    external_id: id,
+    title: movieQuery.data?.title || movieQuery.data?.name,
+    description: movieQuery.data?.overview,
+    category: 'movie',
+    image: movieQuery.data?.poster_path ? `https://image.tmdb.org/t/p/w500${movieQuery.data.poster_path}` : null,
+    rating: movieQuery.data?.vote_average,
+    rating_count: movieQuery.data?.vote_count,
+  })
+
   if (movieQuery.isLoading) {
     return (
       <div className="min-h-screen bg-slate-950">
@@ -105,17 +116,6 @@ function MovieDetails() {
   const images = imagesQuery.data;
   const reviews = reviewsQuery.data;
   const watchProviders = providersQuery.data;
-
-  useSyncProduct({
-    id,
-    external_id: id,
-    title: movie.title || movie.name,
-    description: movie.overview,
-    category: 'movie',
-    image: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
-    rating: movie.vote_average,
-    rating_count: movie.vote_count,
-  })
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">

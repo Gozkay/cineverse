@@ -29,13 +29,6 @@ const categoryGradients = {
   comic: 'from-emerald-500 to-teal-500',
 }
 
-const categoryLinks = {
-  movie: '/movies',
-  book: '/books',
-  manga: '/manga',
-  comic: '/comics',
-}
-
 function matchItem(item, catalog) {
   if (!item || !catalog) return null
   const title = String(item.title || '').toLowerCase()
@@ -124,7 +117,6 @@ function Recommendations() {
               const matched = matchItem(pick, catalogByCategory[pick.category] || [])
               const Icon = categoryIcons[pick.category] || categoryIcons.movie
               const gradient = categoryGradients[pick.category] || categoryGradients.movie
-              const link = categoryLinks[pick.category] || '/movies'
 
               if (matched && pick.category === 'movie') return <MovieCard key={pick.title + i} movie={matched} />
               if (matched && pick.category === 'book') return <BookCard key={pick.title + i} book={matched} index={i} />

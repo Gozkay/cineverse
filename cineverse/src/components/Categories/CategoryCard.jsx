@@ -38,7 +38,7 @@ function CategoryCard({ category, index = 0 }) {
     cardRef.current.style.boxShadow = `0 0 40px ${glowColors[category.id] || 'transparent'}`
   }
 
-  const handleMouseLeave = (e) => {
+  const handleMouseLeave = () => {
     if (!cardRef.current) return
     cardRef.current.style.boxShadow = '0 0 0px transparent'
   }

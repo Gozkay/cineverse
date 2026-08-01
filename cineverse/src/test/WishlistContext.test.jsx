@@ -1,8 +1,26 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { WishlistProvider, useWishlist } from '@/context/WishlistContext'
+import { AuthProvider } from '@/context/AuthContext'
 
-const wrapper = ({ children }) => <WishlistProvider>{children}</WishlistProvider>
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(() => Promise.resolve({ data: { session: null }, error: null })),
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+    },
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({ eq: vi.fn(() => ({ single: vi.fn(() => ({ data: null, error: null })) })) })),
+      insert: vi.fn(() => ({ error: null })),
+    })),
+  },
+}))
+
+const wrapper = ({ children }) => (
+  <AuthProvider>
+    <WishlistProvider>{children}</WishlistProvider>
+  </AuthProvider>
+)
 
 const sampleProduct = {
   id: '1',
@@ -39,14 +57,14 @@ describe('WishlistContext', () => {
   it('removes an item from the wishlist', () => {
     const { result } = renderHook(() => useWishlist(), { wrapper })
     act(() => result.current.addItem(sampleProduct))
-    act(() => result.current.removeItem('1'))
+    act(() => result.current.removeItem('movie:1'))
     expect(result.current.items).toHaveLength(0)
   })
 
   it('checks if an item is in the wishlist', () => {
     const { result } = renderHook(() => useWishlist(), { wrapper })
     act(() => result.current.addItem(sampleProduct))
-    expect(result.current.isInWishlist('1')).toBe(true)
+    expect(result.current.isInWishlist('movie:1')).toBe(true)
     expect(result.current.isInWishlist('2')).toBe(false)
   })
 
@@ -62,7 +80,7 @@ describe('WishlistContext', () => {
     act(() => result.current.addItem(sampleProduct))
     const stored = JSON.parse(localStorage.getItem('cineverse_wishlist'))
     expect(stored).toHaveLength(1)
-    expect(stored[0].id).toBe('1')
+    expect(stored[0].id).toBe('movie:1')
   })
 
   it('loads wishlist from localStorage on mount', () => {

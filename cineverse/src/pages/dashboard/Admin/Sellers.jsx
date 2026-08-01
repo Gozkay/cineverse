@@ -42,6 +42,7 @@ function AdminSellers() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial mount fetch
     Promise.all([loadRequests(), loadPayouts()]).finally(() => setLoading(false))
   }, [])
 
@@ -69,7 +70,7 @@ function AdminSellers() {
     if (!confirm(`Transfer ${formatCurrency(payout.amount)} to ${payout.seller?.name || 'seller'}?`)) return
     setTransferringId(payout.id)
     try {
-      const result = await adminTransferPayout(payout.id)
+      await adminTransferPayout(payout.id)
       toast.success('Transfer initiated!')
       loadPayouts()
     } catch (e) {

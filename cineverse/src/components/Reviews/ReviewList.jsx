@@ -20,11 +20,11 @@ function ReviewList({ productSlug, refreshKey }) {
       .order('created_at', { ascending: false })
     setReviews(data || [])
     setLoading(false)
-  }, [productSlug, refreshKey])
+  }, [productSlug])
 
   useEffect(() => {
     loadReviews() // eslint-disable-line react-hooks/set-state-in-effect
-  }, [loadReviews])
+  }, [loadReviews, refreshKey])
 
   const handleDelete = async (reviewId) => {
     const { error } = await supabase.from('reviews').delete().eq('id', reviewId)
