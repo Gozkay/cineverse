@@ -102,7 +102,7 @@ Fetches from `TMDB_BASE_URL/search/movie` with the query and page number. Maps r
 
 ## `useManga.js`
 
-**Purpose:** Manga data fetching from Jikan API (MyAnimeList).
+**Purpose:** Manga data fetching from AniList GraphQL API (keyless, 90 req/min).
 
 **`useManga(page = 1)`:**
 - Query key: `['manga', page]`
@@ -218,8 +218,8 @@ Aggregates revenue by product category across all orders. Iterates through each 
 | `useMovieSearch` | TMDB | Search results | `['movieSearch', query, page]` | 2 min | Yes (page) |
 | `useBooks` | Google Books | By category | `['books', category]` | 5 min | No |
 | `useBookDetails` | Google Books | Single book | `['book', id]` | 5 min | No |
-| `useManga` | Jikan | Top manga | `['manga', page]` | 5 min | Yes (page) |
-| `useMangaDetails` | Jikan | Single manga | `['manga', id]` | 5 min | No |
+| `useManga` | AniList | Top manga | `['manga', page]` | 5 min | Yes (page) |
+| `useMangaDetails` | AniList | Single manga | `['manga', id]` | 5 min | No |
 | `useComics` | Open Library | By subject | `['comics', subject]` | 5 min | No |
 | `useDashboardStats` | Supabase | Admin stats | `['dashboardStats']` | 1 min | No |
 | `useRevenueData` | Supabase | 30-day revenue | `['revenueData']` | 1 min | No |

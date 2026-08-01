@@ -93,33 +93,41 @@ export { default as Hero } from './Hero'
 export { default as HeroBackground } from './HeroBackground'
 export { default as HeroContent } from './HeroContent'
 export { default as HeroButtons } from './HeroButtons'
-export { default as HeroFloatingCards } from './HeroFloatingCards'
 export { default as HeroStats } from './HeroStats'
+export { default as Hero3D } from './Hero3D'
 ```
 This allows `import { Hero, HeroBackground } from '@/components/Hero'` instead of individual paths.
 
 ### `Hero.jsx`
 
-**Purpose:** The main Hero component for the home page. Composes all sub-components. Handles the "Explore Movies" button click by navigating to `/movies`.
+**Purpose:** The main Hero component for the home page. Composes all sub-components. Lazy-loads the 3D scene (`React.lazy` + `Suspense` → own ~255KB gzip WebGL chunk, main bundle untouched) with a pulsing gradient orb fallback.
+
+**Responsive layout:**
+- `lg+` — 3D scene sits as a static 460px block on the right, full opacity, mouse parallax enabled.
+- Below `lg` — the 3D scene becomes a full-bleed, `opacity-25`, `pointer-events-none` background layer behind the content (subtle ambience, no layout shift, no parallax). The canvas is exactly one instance per viewport (same element, CSS breakpoints).
 
 ### `HeroBackground.jsx`
 
-**Purpose:** Renders the animated background for the hero section. Uses CSS animations/transitions for a gradient or particle effect.
+**Purpose:** Renders the animated background for the hero section: parallax hero image, dark overlay, radial gradient washes, three animated gradient blobs (`animate-blob` / `animate-blob-slow` — keyframes defined in `index.css`), and a subtle star-grid SVG overlay.
 
 ### `HeroContent.jsx`
 
-**Purpose:** Displays the hero headline, subtitle, and descriptive text. Typically includes:
-- A large heading like "Discover Your Next Adventure"
-- A subheading about CineVerse's marketplace
-- "Explore Movies" CTA button
+**Purpose:** Displays the hero badge, headline, description, CTA buttons, stats, and — since the 3D hero replaced the floating cards — a row of **category chips** (Movies / Books / Manga / Comics) with gradient icon badges that link to each catalog route. All elements animate in with a staggered fade-up via Framer Motion variants.
 
 ### `HeroButtons.jsx`
 
-**Purpose:** Renders the call-to-action buttons in the hero (e.g., "Explore Movies", "Browse Books"). Uses Framer Motion for hover effects.
+**Purpose:** Renders the call-to-action buttons in the hero. The primary CTA has a radial glow on hover plus a **shine-sweep** (diagonal white gradient sweeping across on hover via `skew-x-12` + `translate-x` transition).
 
-### `HeroFloatingCards.jsx`
+### `Hero3D.jsx`
 
-**Purpose:** Animated floating cards that showcase product categories (movie poster, book cover, manga panel, comic cover) with parallax-like floating animations using Framer Motion.
+**Purpose:** WebGL 3D sculpture for the hero (react-three-fiber v9 + drei, lazy-loaded). Procedural scene — no external model files or CDN fetches:
+- **Torus-knot core** with `MeshDistortMaterial` (violet, metallic) that slowly deforms
+- Two thin metallic rings (fuchsia `#d946ef`, cyan `#22d3ee`) rotating on different axes
+- `Sparkles` particle field (lavender)
+- **Environment lighting built from `Lightformer`s** (`resolution={64}`, `frames={1}` — baked once, no network HDR download)
+- Slow auto-rotation (`useFrame`) + mouse-parallax lerp toward the pointer
+- `prefers-reduced-motion` → static render (no rotation, no `Float` wrapper)
+- Performance: `dpr={[1, 1.5]}`, `powerPreference: 'high-performance'`, alpha canvas
 
 ### `HeroStats.jsx`
 
@@ -279,6 +287,24 @@ A slide-over panel (drawer) component based on `@base-ui-components/react/drawer
 
 ### `table.jsx`
 A table component with `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`. Used in the admin dashboard for displaying users, products, and orders.
+
+### `TiltCard.jsx`
+A mouse-tracking **3D tilt wrapper** (Framer Motion only — no extra deps). Applies spring-smoothed `rotateX`/`rotateY` (`stiffness: 180, damping: 22`) with `transformPerspective: 1000`, a cursor-following radial **glare** overlay (set directly via `style.background` in `onMouseMove`, no re-renders), and scales the card on hover. **Guardrails:**
+- `prefers-reduced-motion` → tilt disabled
+- Touch devices (`(hover: hover) and (pointer: fine)` check) → tilt disabled
+- Accepts `initial` / `animate` / `transition` (forwarded to the motion element) so cards keep their entrance animations
+
+**Used by:** `MovieCard`, `BookCard`, `MangaCard`, `ComicCard`, `LocalMovieCard` (all with `maxTilt={8}`). The old `hover:-translate-y-1` lift was removed from those cards — the tilt provides the depth.
+
+### `SectionHeader.jsx`
+Shared section heading used by the five home-page sections (`TrendingMovies`, `TrendingBooks`, `TrendingManga`, `TrendingComics`, `LocalMoviesSection`).
+
+| Prop | Purpose |
+|------|---------|
+| `eyebrow` / `eyebrowClass` | Small uppercase gradient label (e.g. "Popular Right Now") |
+| `title` / `accent` / `accentClass` | Title split into a white word + gradient word (e.g. "Trending **Movies**") |
+| `subtitle` | Optional description line (used by Local Movies) |
+| `viewAll` | Optional route for the "View All →" button |
 
 All UI components use the `cn()` utility from `@/lib/utils` for className merging (combines `clsx` and `twMerge`).
 

@@ -110,34 +110,46 @@ An Axios instance for the Google Books API. No auth key needed for the volumes e
 
 ## `src/services/manga.js`
 
-**Purpose:** Jikan API v4 (MyAnimeList unofficial) integration.
+**Purpose:** AniList GraphQL API integration (free, no API key required). POSTs GraphQL queries to `https://graphql.anilist.co` with `Content-Type: application/json`.
 
 ```js
-const jikan = axios.create({
-  baseURL: 'https://api.jikan.moe/v4',
-})
+const ANILIST_URL = 'https://graphql.anilist.co'
+// axios.post(ANILIST_URL, { query, variables }, { headers })
 ```
 
-| Function | Endpoint | Returns |
-|----------|----------|---------|
-| `getTopManga(page=1, limit=20)` | `/top/manga` | Normalized manga array |
-| `getMangaById(id)` | `/manga/{id}/full` | Single normalized manga |
-| `searchManga(query, page=1)` | `/manga?q={query}` | Normalized manga array |
+Throws on `data.errors` (GraphQL returns HTTP 200 + `errors` array) so React Query error states work.
 
-**`normalizeManga(item)`:** Transforms Jikan API response:
+| Function | GraphQL | Returns |
+|----------|---------|---------|
+| `getTopManga(page=1, limit=20)` | `Page.media(type: MANGA, sort: [POPULARITY_DESC], isAdult: false)` | Normalized manga array |
+| `getMangaById(id)` | `Media(id, type: MANGA)` + popularity-rank count | Single normalized manga (with `rank`) |
+| `searchManga(query, page=1)` | `Page.media(type: MANGA, search, sort: [SEARCH_MATCH], isAdult: false)` | Normalized manga array |
 
-| App Field | Jikan Source |
-|-----------|-------------|
-| `id` | `manga_{mal_id}` (prefixed to avoid ID collisions) |
-| `malId` | `mal_id` (raw MyAnimeList ID) |
-| `title` | `title` or `title_english` |
-| `description` | `synopsis` |
-| `image` | `images.jpg.large_image_url` or `image_url` |
-| `score`, `rank`, `popularity` | Direct from API |
-| `genres`, `themes` | Mapped arrays of name strings |
-| `chapters`, `volumes`, `status`, `published` | Direct |
-| `price` | Derived from `mal_id`: `(mal_id % 2000) + 1000` |
+**`normalizeManga(item)`:** Transforms AniList response:
+
+| App Field | AniList Source |
+|-----------|---------------|
+| `id` / `malId` | `id` (AniList media ID; used in routes `/manga/{id}` and cart slug `manga:{id}`) |
+| `title` | `title.romaji` or `title.english` |
+| `titleJapanese` | `title.native` |
+| `authors` | `staff.edges` filtered to roles matching `/story\|art/i` → `node.name.full` |
+| `description` | `description` with HTML tags and `~!…!~` spoilers stripped |
+| `image` | `coverImage.extraLarge` or `large` |
+| `score` | `averageScore / 10` (AniList is 0–100, app UI expects 0–10) |
+| `scoredBy` | `favourites` (AniList has no vote count) |
+| `rank` | Computed (see below), `null` if beyond top 200 → UI shows `#200+` |
+| `popularity` | `popularity` |
+| `genres`, `chapters`, `volumes` | Direct |
+| `status` | Mapped: `RELEASING → 'publishing'` (drives green styling), others lowercase |
+| `published` | `startDate` formatted "Mon DD, YYYY" |
+| `type` | `format` mapped: `MANGA/MANHWA/MANHUA/NOVEL/ONE_SHOT` → title case |
+| `price` | Derived from `id`: `(id % 2000) + 1000` |
 | `category` | Always `'manga'` |
+
+**Popularity rank algorithm** (AniList has no rank field, and `pageInfo.total` ignores filters / caps at 5000):
+`getMangaById` counts manga with `popularity_greater` than the title's, 50 per page sorted `[POPULARITY]` (ascending). Page 1 is fetched first; if it fills up, pages 2–4 run in parallel (`Promise.all`). The first under-full page gives `rank = 50·(page−1) + length + 1`. If all 4 pages fill → `rank = null` → UI renders `#200+`. Verified live: Chainsaw Man #1, Jujutsu Kaisen #3, Berserk #4, One Piece #5.
+
+**Rate limits:** 90 requests/minute (no auth needed for public reads).
 
 ---
 
@@ -222,6 +234,63 @@ const openLibrary = axios.create({
 
 ---
 
+## `src/services/cart.js`
+
+**Purpose:** Server-side cart sync (logged-in users).
+
+| Function | Supabase Action | Description |
+|----------|-----------------|-------------|
+| `getCartItems(userId)` | `select('*').eq('user_id', userId)` | Cart rows for a user |
+| `addCartItem(userId, productSlug, quantity)` | `insert({ user_id, product_slug, quantity })` | New cart row |
+| `updateCartItemQuantity(userId, productSlug, quantity)` | `update({ quantity }).eq('user_id', userId).eq('product_slug', productSlug)` | Quantity change |
+| `removeCartItem(userId, productSlug)` | `delete().eq('user_id', userId).eq('product_slug', productSlug)` | Remove row |
+| `clearCartItems(userId)` | `delete().eq('user_id', userId)` | Clear all rows |
+
+All operations key on `user_id + product_slug` (the client never knows DB row ids). `product_slug` format: `category:externalId` (e.g. `movie:550`, `manga:105778`).
+
+## `src/services/wishlist.js`
+
+**Purpose:** Server-side wishlist sync (logged-in users). Same shape as `cart.js`:
+
+| Function | Description |
+|----------|-------------|
+| `getWishlistItems(userId)` | Fetch user's wishlist rows |
+| `addWishlistItem(userId, productSlug)` | Insert row |
+| `removeWishlistItem(userId, productSlug)` | Delete by `user_id + product_slug` |
+| `clearWishlistItems(userId)` | Delete all user rows |
+
+## `src/services/seller.js`
+
+**Purpose:** Seller marketplace — product listing, uploads, earnings, payouts.
+
+| Function | Description |
+|----------|-------------|
+| `createProduct(data)` | Insert product row (trigger forces `status: 'pending'` for non-admins) |
+| `getSellerProducts(sellerId)` | Products owned by the seller |
+| `updateProduct(id, updates)` | Edit product (admin can set `status` to approve) |
+| `deleteProduct(id)` | Remove product + storage files |
+| `getPublicImageUrl(path)` | Public URL for `product-images` bucket |
+| `getSignedVideoUrl(path)` | 1-hour signed URL for `product-files` bucket (buyers/downloads) |
+| `getSellerEarnings(sellerId)` | Earnings rows (`available`/`pending_transfer`/`paid`) |
+| `requestPayout(sellerId, amount, bankDetails)` | Insert `seller_payouts` row (min ₦100) |
+| `getSellerPayouts(sellerId)` | Payout history |
+| `resolveBank(code)` | Paystack `/bank/resolve` for bank account lookup |
+| `getAllPayouts()` / `adminTransferPayout(id)` / `adminCancelPayout(id)` | Admin payout management |
+
+## `src/services/ai.js`
+
+**Purpose:** Client wrapper for the `ai-proxy` Supabase Edge Function (`{SUPABASE_URL}/functions/v1/ai-proxy`).
+
+| Function | Action | Description |
+|----------|--------|-------------|
+| `aiChat(messages)` | `chat` | Store assistant chat (Gemini, <120 words) |
+| `aiRecommend(interests)` | `recommend` | 5 product recommendations as JSON |
+| `aiSummarize(item)` | `summarize` | 3–4 sentence product blurb |
+| `aiSearch(query)` | `search` | Parse natural language into `{ category, keywords }` |
+| `aiGenerate(product)` | `generate` | Copywriting for product descriptions |
+
+---
+
 ## Data Flow Diagram
 
 ```
@@ -229,9 +298,9 @@ const openLibrary = axios.create({
     ↓ (calls hook)
 📄 Custom Hook (useBooks, useTrendingMovies, etc.)
     ↓ (calls service function)
-📄 Service File (books.js, tmdb.js, etc.)
+📄 Service File (books.js, tmdb.js, manga.js, etc.)
     ↓ (makes HTTP request)
-🌐 External API (Google Books, TMDB, Jikan, Open Library)
+🌐 External API (Google Books, TMDB, AniList GraphQL, Open Library)
     ↓ (returns raw data)
 📄 Service File (normalizes data, derives prices)
     ↓ (returns clean data)

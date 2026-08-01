@@ -234,6 +234,23 @@ The `background-clip: text` clips the gradient to the text shape. The `-webkit-t
 
 **Purpose:** Pulsing violet glow. Used on CTA buttons to attract attention.
 
+### `animate-blob` / `animate-blob-slow` (via `@theme`)
+
+```css
+@theme {
+  --animate-blob: blob 16s ease-in-out infinite;
+  --animate-blob-slow: blob 22s ease-in-out infinite reverse;
+}
+
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(40px, -30px) scale(1.15); }
+  66%      { transform: translate(-30px, 25px) scale(0.92); }
+}
+```
+
+**Purpose:** Organic drifting "aurora blob" motion for the hero background (`HeroBackground.jsx`). Registered as `@theme` custom animations in `index.css` (Tailwind v4 style — the `--animate-*` variable generates the `animate-blob` / `animate-blob-slow` utilities automatically). Three gradient blobs (violet/fuchsia/cyan) drift at different speeds; the slow variant runs the same keyframes reversed.
+
 ---
 
 ## Key Animation Definitions
@@ -243,6 +260,7 @@ The `background-clip: text` clips the gradient to the text shape. The `-webkit-t
 | `shimmer` | Loading skeleton sweep | 2s infinite |
 | `float` | Gentle vertical bob | 3s infinite |
 | `pulse-glow` | Box shadow breathing | 3s infinite |
+| `blob` | Hero aurora blob drift | 16s / 22s (reverse) infinite |
 
 ---
 

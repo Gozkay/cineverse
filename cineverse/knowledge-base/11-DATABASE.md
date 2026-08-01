@@ -1,12 +1,12 @@
 # 11 — Database
 
-This section covers the PostgreSQL schema (`supabase-schema.sql`) and the seed script (`scripts/seed-products.mjs`).
+This section covers the PostgreSQL schema (`supabase-schema.sql`), the seller marketplace migration (`migration-sellers.sql`), and the seed script (`scripts/seed-products.mjs`).
 
 ---
 
 ## Schema Overview
 
-The database has 5 tables: `profiles`, `products`, `orders`, `reviews`, `coupons`. All tables have Row Level Security (RLS) enabled.
+Core tables: `profiles`, `products`, `orders`, `reviews`, `coupons` — plus the seller marketplace tables added by `migration-sellers.sql`: `seller_earnings`, `seller_payouts` (and `seller_requests.type`). All tables have Row Level Security (RLS) enabled.
 
 ---
 
@@ -271,3 +271,42 @@ See `POST_SETUP.md` for instructions.
 │ value   │
 └─────────┘
 ```
+
+---
+
+## Seller Marketplace Schema (`migration-sellers.sql`)
+
+Idempotent migration (`IF NOT EXISTS` / `DROP POLICY IF EXISTS`); run in the Supabase SQL Editor. Applies:
+
+**Profiles & requests:**
+- `profiles.role` check constraint extended: `customer, seller, staff, manager, admin`
+- `seller_requests.type` added (`seller` | `producer`)
+
+**Products additions:**
+- `seller_id UUID REFERENCES profiles(id)` — owning seller
+- `video_url TEXT` — local movie file (private bucket)
+- `status TEXT DEFAULT 'active'` — `pending | active | rejected`; moderation gate
+- `sales_count INT DEFAULT 0` — incremented by the payment webhook
+- Indexes on `seller_id`, `status`
+
+**Product RLS:** sellers can insert/update/delete only their own rows (`seller_id = auth.uid()`).
+
+**Trigger `enforce_product_status()`** (BEFORE INSERT OR UPDATE on `products`): if the acting user is the row's seller and NOT an admin, force `status = 'pending'`. Non-admin sellers can never self-publish; admins (and the service role / webhook, where `auth.uid()` is NULL) bypass. Customer product syncs (`seller_id` NULL) are untouched.
+
+**Function `increment_product_sales(p_slug TEXT)`** — SECURITY DEFINER; called by the payment webhook on every paid order line.
+
+**Storage buckets:**
+- `product-images` — **public**; sellers write under `{auth.uid()}/`, anyone reads
+- `product-files` — **private**; sellers write under `{auth.uid()}/`, only authenticated users read (downloads use 1-hour signed URLs)
+
+**Table `seller_payouts`:** `id`, `seller_id`, `amount NUMERIC(10,2)`, `bank_details JSONB`, `status ('pending','processing','paid','failed','cancelled')`, `transfer_code`, `admin_note`, timestamps. RLS: sellers see their own; admins manage all.
+
+**Table `seller_earnings`:** per order line — `seller_id`, `order_id → orders(id)`, `product_slug`, `title`, `gross`, `commission`, `net`, `status ('available','pending_transfer','paid','failed')`, `payout_id → seller_payouts(id)`, `paid_at`. RLS: sellers view own; admins manage all.
+
+### Seller money flow
+
+1. Paystack `charge.success` webhook → `paystack-webhook` edge function
+2. Marks order paid; for each line with a seller-owned product: inserts `seller_earnings` (gross / 5% commission / net) and calls `increment_product_sales(slug)`
+3. Seller requests payout (min ₦100, bank resolved via Paystack `/bank/resolve`) → `seller_payouts` row `pending`
+4. Admin initiates transfer → `seller-payout` edge function calls Paystack Transfers → `transfer_code` saved, earnings → `pending_transfer`
+5. Paystack transfer webhook (`transfer.success` / `transfer.failed` / `transfer.reversed`) → same `seller-payout` function matches by `transfer_code`, updates the payout row and marks linked earnings `paid` (or `available` again on failure)
