@@ -57,6 +57,14 @@ const BY_ID_QUERY = `
   }
 `
 
+const RANK_QUERY = `
+  query ($page: Int, $perPage: Int, $pop: Int) {
+    Page(page: $page, perPage: $perPage) {
+      media(popularity_greater: $pop, type: MANGA, isAdult: false, sort: [POPULARITY]) { id }
+    }
+  }
+`
+
 async function anilist(query, variables) {
   const { data } = await axios.post(ANILIST_URL, { query, variables }, {
     headers: {
@@ -81,7 +89,27 @@ export async function getTopManga(page = 1, limit = 20) {
 
 export async function getMangaById(id) {
   const data = await anilist(BY_ID_QUERY, { id: Number(id) })
-  return normalizeManga(data.data?.Media)
+  const manga = normalizeManga(data.data?.Media)
+  if (manga && manga.popularity) {
+    manga.rank = await computePopularityRank(manga.popularity)
+  }
+  return manga
+}
+
+async function rankPage(page, popularity) {
+  const data = await anilist(RANK_QUERY, { page, perPage: 50, pop: popularity })
+  return data.data?.Page?.media || []
+}
+
+async function computePopularityRank(popularity) {
+  const pages = [await rankPage(1, popularity)]
+  if (pages[0].length === 50) {
+    pages.push(...(await Promise.all([2, 3, 4].map(p => rankPage(p, popularity)))))
+  }
+  for (let i = 0; i < pages.length; i++) {
+    if (pages[i].length < 50) return 50 * i + pages[i].length + 1
+  }
+  return null
 }
 
 export async function searchManga(query, page = 1) {

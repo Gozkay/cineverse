@@ -125,7 +125,7 @@ function MangaDetails() {
                 </div>
                 <div className="flex items-center gap-3 rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800">
                   <FaStarSolid className="text-yellow-400" />
-                  <div><p className="text-xs text-gray-500">Rank</p><p className="text-sm text-white">#{manga.rank || 'N/A'}</p></div>
+                  <div><p className="text-xs text-gray-500">Rank</p><p className="text-sm text-white">{manga.rank ? '#' + manga.rank : '#200+'}</p></div>
                 </div>
               </div>
 
