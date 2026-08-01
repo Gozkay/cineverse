@@ -120,13 +120,13 @@ This allows `import { Hero, HeroBackground } from '@/components/Hero'` instead o
 
 ### `Hero3D.jsx`
 
-**Purpose:** WebGL 3D sculpture for the hero (react-three-fiber v9 + drei, lazy-loaded). Procedural scene — no external model files or CDN fetches:
-- **Torus-knot core** with `MeshDistortMaterial` (violet, metallic) that slowly deforms
-- Two thin metallic rings (fuchsia `#d946ef`, cyan `#22d3ee`) rotating on different axes
+**Purpose:** WebGL 3D scene for the hero (react-three-fiber v9 + drei, lazy-loaded). Procedural scene — no external model files or runtime CDN fetches:
+- **Floating "CineVerse" wordmark** rendered with drei `<Text>` (troika-three-text) using a local font — `public/fonts/sora-800.woff` (Sora ExtraBold, ~19KB, committed to the repo; **no** CDN font load at runtime)
+- Text styling: violet→pink gradient via troika `colorRanges` (`#8b5cf6` → `#f0abfc`), fuchsia outline (`outlineWidth 0.05`), `letterSpacing 0.06`, centered anchors, `fontSize 0.95` (fits both the desktop 460px and mobile 256px canvas layers)
 - `Sparkles` particle field (lavender)
-- **Environment lighting built from `Lightformer`s** (`resolution={64}`, `frames={1}` — baked once, no network HDR download)
-- Slow auto-rotation (`useFrame`) + mouse-parallax lerp toward the pointer
-- `prefers-reduced-motion` → static render (no rotation, no `Float` wrapper)
+- Gentle **sway** animation (`useFrame`): `rotation.y` oscillates ±0.25 rad on a sine wave (readable, "floating" — not a 360° spin) + mouse-parallax lerp toward the pointer
+- `prefers-reduced-motion` → static render (no sway, no `Float` wrapper)
+- **No lights or environment maps needed** — troika text is unlit; the old `Environment`/`Lightformer` setup was removed with the torus-knot sculpture
 - Performance: `dpr={[1, 1.5]}`, `powerPreference: 'high-performance'`, alpha canvas
 
 ### `HeroStats.jsx`
