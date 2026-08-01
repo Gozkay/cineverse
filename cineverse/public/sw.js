@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cineverse-v1'
+const CACHE_NAME = 'cineverse-v2'
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -28,7 +28,7 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('/api/') || event.request.url.includes('supabase')) {
+  if (event.request.mode === 'navigate' || event.request.url.includes('/api/') || event.request.url.includes('supabase')) {
     event.respondWith(networkFirst(event.request))
   } else {
     event.respondWith(cacheFirst(event.request))
