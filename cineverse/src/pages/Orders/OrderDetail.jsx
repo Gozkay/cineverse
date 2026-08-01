@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FaArrowLeft, FaClipboardList, FaUndo } from 'react-icons/fa'
+import { FaArrowLeft, FaClipboardList, FaUndo, FaDownload, FaSpinner } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
 import { getOrderById } from '@/services/orders'
 import { getRefundRequests, createRefundRequest } from '@/services/refunds'
+import { getProductBySlug } from '@/services/products'
+import { getSignedVideoUrl } from '@/services/seller'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { formatDateTime } from '@/utils/formatDate'
 import { ROUTES } from '@/constants/routes'
@@ -45,6 +47,8 @@ function OrderDetail() {
   const [showRefundForm, setShowRefundForm] = useState(false)
   const [refundReason, setRefundReason] = useState('')
   const [submittingRefund, setSubmittingRefund] = useState(false)
+  const [downloads, setDownloads] = useState([])
+  const [downloadsLoading, setDownloadsLoading] = useState(false)
 
   useEffect(() => {
     getOrderById(id).then(data => {
@@ -59,6 +63,37 @@ function OrderDetail() {
   useEffect(() => {
     if (id) getRefundRequests(id).then(setRefunds)
   }, [id])
+
+  useEffect(() => {
+    if (!order) return
+    const paid = ['paid', 'processing', 'shipped', 'delivered'].includes(order.status)
+    if (!paid || !order.items?.length) return
+
+    let cancelled = false
+    setDownloadsLoading(true)
+
+    ;(async () => {
+      const results = []
+      for (const item of order.items) {
+        const slug = item.product_slug || item.slug || item.productId
+        if (!slug) continue
+        try {
+          const product = await getProductBySlug(slug)
+          if (!product?.video_url) continue
+          const url = await getSignedVideoUrl(product.video_url)
+          if (url) results.push({ title: item.title, url })
+        } catch {
+          // skip items that fail to resolve
+        }
+      }
+      if (!cancelled) {
+        setDownloads(results)
+        setDownloadsLoading(false)
+      }
+    })()
+
+    return () => { cancelled = true }
+  }, [order])
 
   if (loading) {
     return (
@@ -161,6 +196,35 @@ function OrderDetail() {
                 <p className="text-sm text-gray-400">{order.shipping_info.city}, {order.shipping_info.state} {order.shipping_info.zip}</p>
                 <p className="text-sm text-gray-400">{order.shipping_info.country}</p>
                 <p className="text-sm text-gray-400">{order.shipping_info.phone}</p>
+              </div>
+            </div>
+          )}
+
+          {(downloadsLoading || downloads.length > 0) && (
+            <div className="mb-8">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500">Digital Downloads</h2>
+              <div className="space-y-3">
+                {downloadsLoading && (
+                  <div className="flex items-center gap-2 rounded-xl bg-slate-900/50 p-4 text-sm text-gray-400 ring-1 ring-slate-800">
+                    <FaSpinner className="animate-spin text-violet-400" size={14} /> Preparing your downloads...
+                  </div>
+                )}
+                {downloads.map((d, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/5 p-4 ring-1 ring-emerald-500/20">
+                    <div>
+                      <p className="text-sm font-medium text-white">{d.title}</p>
+                      <p className="text-xs text-gray-500">Digital movie — link valid for 1 hour</p>
+                    </div>
+                    <a
+                      href={d.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500 transition-colors"
+                    >
+                      <FaDownload size={12} /> Download
+                    </a>
+                  </div>
+                ))}
               </div>
             </div>
           )}

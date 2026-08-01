@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 function BecomeSeller() {
   const { user, isAuthenticated, role } = useAuth()
   const [request, setRequest] = useState(null)
+  const [type, setType] = useState('seller')
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -24,14 +25,18 @@ function BecomeSeller() {
   }, [user])
 
   const handleSubmit = async () => {
-    if (!reason.trim()) return toast.error('Please tell us why you want to become a seller')
+    if (!reason.trim()) return toast.error('Please tell us why you want to sell')
     setSubmitting(true)
-    const { error } = await supabase.from('seller_requests').insert({ user_id: user.id, reason: reason.trim() })
+    const { error } = await supabase.from('seller_requests').insert({
+      user_id: user.id,
+      type,
+      reason: reason.trim(),
+    })
     if (error) {
       toast.error(error.message)
     } else {
       toast.success('Request submitted! An admin will review it.')
-      setRequest({ status: 'pending', reason: reason.trim() })
+      setRequest({ status: 'pending', reason: reason.trim(), type })
     }
     setSubmitting(false)
   }
@@ -41,6 +46,24 @@ function BecomeSeller() {
       <MainLayout>
         <div className="flex min-h-screen items-center justify-center bg-slate-950">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
+        </div>
+      </MainLayout>
+    )
+  }
+
+  if (role === 'seller') {
+    return (
+      <MainLayout>
+        <Seo title="Become a Seller" noIndex />
+        <div className="min-h-screen bg-slate-950">
+          <div className="mx-auto max-w-xl px-6 py-16 text-center">
+            <FaCheck className="mx-auto mb-6 text-6xl text-emerald-400" />
+            <h1 className="mb-2 text-2xl font-bold text-white">You are a seller</h1>
+            <p className="text-gray-500">Start posting your local movies and products.</p>
+            <Link to={ROUTES.DASHBOARD_SELLER} className="mt-6 inline-block rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-500">
+              Go to Seller Dashboard
+            </Link>
+          </div>
         </div>
       </MainLayout>
     )
@@ -72,7 +95,7 @@ function BecomeSeller() {
               <span className="text-white">Become a</span>{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Seller</span>
             </h1>
-            <p className="mt-2 text-sm text-gray-500">Sell your products on CineVerse marketplace</p>
+            <p className="mt-2 text-sm text-gray-500">Sell your local movies and products on CineVerse and make money</p>
           </div>
 
           {!isAuthenticated ? (
@@ -90,7 +113,10 @@ function BecomeSeller() {
             <div className="rounded-xl bg-slate-900/50 p-8 text-center ring-1 ring-slate-800">
               <FaCheck className="mx-auto mb-4 text-4xl text-emerald-400" />
               <h2 className="mb-2 text-lg font-semibold text-white">Approved!</h2>
-              <p className="text-sm text-gray-400">You are now a seller. Start listing your products.</p>
+              <p className="text-sm text-gray-400">You are now a seller. Start listing your local movies and products.</p>
+              <Link to={ROUTES.DASHBOARD_SELLER} className="mt-6 inline-block rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-500">
+                Go to Seller Dashboard
+              </Link>
             </div>
           ) : request?.status === 'rejected' ? (
             <div className="rounded-xl bg-slate-900/50 p-8 text-center ring-1 ring-slate-800">
@@ -101,13 +127,27 @@ function BecomeSeller() {
           ) : (
             <div className="space-y-4 rounded-xl bg-slate-900/50 p-6 ring-1 ring-slate-800">
               <h2 className="text-lg font-semibold text-white">Apply to Sell</h2>
-              <p className="text-sm text-gray-400">Tell us why you'd like to become a seller on CineVerse.</p>
+              <p className="text-sm text-gray-400">Tell us who you are — sellers can list products, producers can post their local movies.</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setType('seller')}
+                  className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${type === 'seller' ? 'border-violet-500 bg-violet-500/15 text-violet-300' : 'border-slate-700 text-gray-400 hover:border-slate-600'}`}
+                >
+                  🛍️ Seller
+                </button>
+                <button
+                  onClick={() => setType('producer')}
+                  className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${type === 'producer' ? 'border-violet-500 bg-violet-500/15 text-violet-300' : 'border-slate-700 text-gray-400 hover:border-slate-600'}`}
+                >
+                  🎬 Movie Producer
+                </button>
+              </div>
               <textarea
                 value={reason}
                 onChange={e => setReason(e.target.value)}
                 className="w-full rounded-lg bg-slate-800 p-3 text-sm text-white ring-1 ring-slate-700 outline-none focus:ring-violet-500"
                 rows={4}
-                placeholder="I have a collection of rare manga and comics I'd like to sell..."
+                placeholder={type === 'producer' ? "I produce local movies and I'd like to sell them on CineVerse..." : "I have a collection of products I'd like to sell..."}
               />
               <button onClick={handleSubmit} disabled={submitting} className="w-full rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-500 disabled:opacity-50">
                 {submitting ? 'Submitting...' : 'Submit Request'}

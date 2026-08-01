@@ -52,6 +52,46 @@ serve(async (req) => {
     if (error) {
       return new Response('Failed to update order', { status: 500 })
     }
+
+    // Credit seller earnings for any seller-owned products in this order
+    const commissionPct = Number(Deno.env.get('PLATFORM_COMMISSION_PERCENT') || 5)
+
+    const { data: order } = await supabase
+      .from('orders')
+      .select('id, items')
+      .eq('payment_ref', reference)
+      .maybeSingle()
+
+    if (order?.items) {
+      for (const item of order.items) {
+        const slug = item.product_slug || item.slug || item.productId
+        if (!slug) continue
+
+        const { data: product } = await supabase
+          .from('products')
+          .select('id, slug, title, seller_id')
+          .eq('slug', slug)
+          .maybeSingle()
+
+        if (!product?.seller_id) continue
+
+        const qty = Number(item.quantity) || 1
+        const gross = Number(item.price) * qty
+        const commission = Math.round(gross * commissionPct) / 100
+        const net = gross - commission
+
+        await supabase.from('seller_earnings').insert({
+          seller_id: product.seller_id,
+          order_id: order.id,
+          product_slug: product.slug,
+          title: product.title,
+          gross,
+          commission,
+          net,
+        })
+        await supabase.rpc('increment_product_sales', { p_slug: product.slug })
+      }
+    }
   }
 
   return new Response('OK', { status: 200 })

@@ -89,6 +89,7 @@ function Checkout() {
     const orderData = {
       user_id: user.id,
       items: items.map(item => ({
+        product_slug: item.product_slug || item.id,
         productId: item.id,
         title: item.title,
         price: item.price,

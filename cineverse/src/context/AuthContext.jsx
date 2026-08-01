@@ -68,6 +68,7 @@ export function AuthProvider({ children }) {
   const isAdmin = role === 'admin'
   const isManager = role === 'manager'
   const isStaff = role === 'staff'
+  const isSeller = role === 'seller'
   const isCustomer = role === 'customer'
   const isStaffOrAbove = isStaff || isManager || isAdmin
 
@@ -78,7 +79,7 @@ export function AuthProvider({ children }) {
   const refreshProfile = refreshUser
 
   return (
-    <AuthContext.Provider value={{ user, profile, login, register, logout, loading, isAuthenticated, role, isAdmin, isManager, isStaff, isCustomer, isStaffOrAbove, refreshUser, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, login, register, logout, loading, isAuthenticated, role, isAdmin, isManager, isStaff, isSeller, isCustomer, isStaffOrAbove, refreshUser, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   )

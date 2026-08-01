@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FaTachometerAlt, FaBox, FaShoppingBag, FaUsers, FaUserTie, FaSignOutAlt, FaBars, FaTimes, FaHome, FaTag } from 'react-icons/fa'
+import { FaTachometerAlt, FaBox, FaShoppingBag, FaUsers, FaUserTie, FaSignOutAlt, FaBars, FaTimes, FaHome, FaTag, FaCoins, FaMoneyBillWave, FaStore } from 'react-icons/fa'
 import { useAuth } from '@/context/AuthContext'
 import { ROUTES } from '@/constants/routes'
 import PropTypes from 'prop-types'
@@ -15,6 +15,7 @@ function DashboardLayout({ children }) {
     { to: ROUTES.DASHBOARD_ADMIN_PRODUCTS, label: 'Products', icon: FaBox },
     { to: ROUTES.DASHBOARD_ADMIN_ORDERS, label: 'Orders', icon: FaShoppingBag },
     { to: ROUTES.DASHBOARD_ADMIN_USERS, label: 'Users', icon: FaUsers },
+    { to: ROUTES.DASHBOARD_ADMIN_SELLERS, label: 'Sellers', icon: FaStore },
     { to: ROUTES.DASHBOARD_ADMIN_COUPONS, label: 'Coupons', icon: FaTag },
   ]
 
@@ -29,8 +30,15 @@ function DashboardLayout({ children }) {
     { to: ROUTES.DASHBOARD_STAFF_ORDERS, label: 'Orders', icon: FaShoppingBag },
   ]
 
+  const sellerLinks = [
+    { to: ROUTES.DASHBOARD_SELLER, label: 'Overview', icon: FaTachometerAlt },
+    { to: ROUTES.DASHBOARD_SELLER_PRODUCTS, label: 'My Products', icon: FaBox },
+    { to: ROUTES.DASHBOARD_SELLER_EARNINGS, label: 'Earnings', icon: FaCoins },
+    { to: ROUTES.DASHBOARD_SELLER_PAYOUTS, label: 'Withdraw', icon: FaMoneyBillWave },
+  ]
+
   const role = user?.role || profile?.role || 'customer'
-  const links = role === 'admin' ? adminLinks : role === 'manager' ? managerLinks : staffLinks
+  const links = role === 'admin' ? adminLinks : role === 'manager' ? managerLinks : role === 'seller' ? sellerLinks : staffLinks
   const userName = profile?.name || user?.user_metadata?.name || user?.email || 'User'
 
   return (
@@ -62,7 +70,7 @@ function DashboardLayout({ children }) {
             <NavLink
               key={link.to}
               to={link.to}
-              end={link.to === (role === 'admin' ? ROUTES.DASHBOARD_ADMIN : role === 'manager' ? ROUTES.DASHBOARD_MANAGER : ROUTES.DASHBOARD_STAFF)}
+              end={link.to === (role === 'admin' ? ROUTES.DASHBOARD_ADMIN : role === 'manager' ? ROUTES.DASHBOARD_MANAGER : role === 'seller' ? ROUTES.DASHBOARD_SELLER : ROUTES.DASHBOARD_STAFF)}
               onClick={() => setSidebarOpen(false)}
                className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${isActive ? 'bg-gradient-to-r from-violet-600/20 to-fuchsia-600/10 text-violet-400 ring-1 ring-violet-500/20' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`

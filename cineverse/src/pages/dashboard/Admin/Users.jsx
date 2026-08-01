@@ -8,7 +8,7 @@ import { getUsers, banUser, unbanUser, suspendUser, unsuspendUser, removeStaff, 
 import { formatDateTime } from '@/utils/formatDate'
 import toast from 'react-hot-toast'
 
-const roles = ['customer', 'staff', 'manager', 'admin']
+const roles = ['customer', 'seller', 'staff', 'manager', 'admin']
 
 function AdminUsers() {
   const [users, setUsers] = useState([])

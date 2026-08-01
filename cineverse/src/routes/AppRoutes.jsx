@@ -31,11 +31,20 @@ const MangaDetails = lazy(() => import("@/pages/Manga/MangaDetails"));
 const Comics = lazy(() => import("@/pages/Comics/Comics"));
 const ComicDetails = lazy(() => import("@/pages/Comics/ComicDetails"));
 
+const LocalMovies = lazy(() => import("@/pages/LocalMovies/LocalMovies"));
+const LocalMovieDetails = lazy(() => import("@/pages/LocalMovies/LocalMovieDetails"));
+
+const SellerDashboard = lazy(() => import("@/pages/SellerDashboard/Overview"));
+const SellerProducts = lazy(() => import("@/pages/SellerDashboard/Products"));
+const SellerEarnings = lazy(() => import("@/pages/SellerDashboard/Earnings"));
+const SellerPayouts = lazy(() => import("@/pages/SellerDashboard/Payouts"));
+
 const AdminDashboard = lazy(() => import("@/pages/dashboard/Admin/Dashboard"));
 const AdminProducts = lazy(() => import("@/pages/dashboard/Admin/Products"));
 const AdminOrders = lazy(() => import("@/pages/dashboard/Admin/Orders"));
 const AdminUsers = lazy(() => import("@/pages/dashboard/Admin/Users"));
 const AdminCoupons = lazy(() => import("@/pages/dashboard/Admin/Coupons"));
+const AdminSellers = lazy(() => import("@/pages/dashboard/Admin/Sellers"));
 
 const ManagerDashboard = lazy(() => import("@/pages/dashboard/Manager/Dashboard"));
 const StaffManagement = lazy(() => import("@/pages/dashboard/Manager/StaffManagement"));
@@ -72,6 +81,8 @@ function AppRoutes() {
         <Route path={ROUTES.MANGA_DETAIL(":id")} element={<PageBoundary><MangaDetails /></PageBoundary>} />
         <Route path={ROUTES.COMICS} element={<PageBoundary><Comics /></PageBoundary>} />
         <Route path={ROUTES.COMIC_DETAIL(":id")} element={<PageBoundary><ComicDetails /></PageBoundary>} />
+        <Route path={ROUTES.LOCAL_MOVIES} element={<PageBoundary><LocalMovies /></PageBoundary>} />
+        <Route path={ROUTES.LOCAL_MOVIE_DETAIL(":id")} element={<PageBoundary><LocalMovieDetails /></PageBoundary>} />
         <Route path={ROUTES.CART} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><Cart /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.CHECKOUT} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><Checkout /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.WISHLIST} element={<ProtectedRoute redirectTo={ROUTES.REGISTER}><PageBoundary><Wishlist /></PageBoundary></ProtectedRoute>} />
@@ -90,6 +101,12 @@ function AppRoutes() {
         <Route path={ROUTES.DASHBOARD_ADMIN_COUPONS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminCoupons /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.DASHBOARD_ADMIN_ORDERS} element={<ProtectedRoute roles={['admin', 'manager']}><PageBoundary><AdminOrders /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.DASHBOARD_ADMIN_USERS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminUsers /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_ADMIN_SELLERS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminSellers /></PageBoundary></ProtectedRoute>} />
+
+        <Route path={ROUTES.DASHBOARD_SELLER} element={<ProtectedRoute roles={['seller']}><PageBoundary><SellerDashboard /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_SELLER_PRODUCTS} element={<ProtectedRoute roles={['seller']}><PageBoundary><SellerProducts /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_SELLER_EARNINGS} element={<ProtectedRoute roles={['seller']}><PageBoundary><SellerEarnings /></PageBoundary></ProtectedRoute>} />
+        <Route path={ROUTES.DASHBOARD_SELLER_PAYOUTS} element={<ProtectedRoute roles={['seller']}><PageBoundary><SellerPayouts /></PageBoundary></ProtectedRoute>} />
 
         <Route path={ROUTES.DASHBOARD_MANAGER} element={<ProtectedRoute roles={['manager']}><PageBoundary><ManagerDashboard /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.DASHBOARD_MANAGER_STAFF} element={<ProtectedRoute roles={['manager']}><PageBoundary><StaffManagement /></PageBoundary></ProtectedRoute>} />

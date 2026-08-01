@@ -8,7 +8,7 @@ export async function loginUser(email, password) {
   return { success: true, user: safeUser }
 }
 
-export async function registerUser({ name, email, password }) {
+export async function registerUser({ name, email, password, sellerType }) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -30,6 +30,16 @@ export async function registerUser({ name, email, password }) {
       role: 'customer',
     })
     if (profileError) return { success: false, error: profileError.message }
+
+    if (sellerType && sellerType !== 'none') {
+      await supabase.from('seller_requests').insert({
+        user_id: data.user.id,
+        type: sellerType,
+        reason: sellerType === 'producer'
+          ? 'Signed up as a movie producer to sell local movies.'
+          : 'Signed up as a seller to list products.',
+      }).catch(() => {})
+    }
   }
 
   const profile = data.user ? await getProfile(data.user.id) : null
@@ -121,6 +131,39 @@ export async function updatePassword(newPassword) {
 
 export async function changeUserRole(id, role) {
   const { error } = await supabase.from('profiles').update({ role }).eq('id', id)
+  if (error) throw new Error(error.message)
+  return { success: true }
+}
+
+export async function getSellerRequests() {
+  const { data, error } = await supabase
+    .from('seller_requests')
+    .select('*, user:profiles(name, email, role)')
+    .order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
+  return data || []
+}
+
+export async function approveSellerRequest(userId, requestId) {
+  const { error: reqError } = await supabase
+    .from('seller_requests')
+    .update({ status: 'approved' })
+    .eq('id', requestId)
+  if (reqError) throw new Error(reqError.message)
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .update({ role: 'seller' })
+    .eq('id', userId)
+  if (profileError) throw new Error(profileError.message)
+  return { success: true }
+}
+
+export async function rejectSellerRequest(requestId) {
+  const { error } = await supabase
+    .from('seller_requests')
+    .update({ status: 'rejected' })
+    .eq('id', requestId)
   if (error) throw new Error(error.message)
   return { success: true }
 }

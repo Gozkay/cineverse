@@ -1,9 +1,11 @@
 import { supabase } from '@/lib/supabase'
 
-export async function getProducts({ category, search, page = 1, limit = 20 } = {}) {
+export async function getProducts({ category, search, page = 1, limit = 20, status, includeAll } = {}) {
   let query = supabase.from('products').select('*', { count: 'exact' })
 
   if (category) query = query.eq('category', category)
+  if (status) query = query.eq('status', status)
+  else if (!includeAll) query = query.eq('status', 'active')
   if (search) query = query.ilike('title', `%${search}%`)
 
   const from = (page - 1) * limit

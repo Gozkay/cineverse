@@ -1,22 +1,27 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaFilm, FaSearch, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { FaClapperboard } from 'react-icons/fa6'
+import { Link, useNavigate } from 'react-router-dom'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { TrendingMovies } from '@/components/Movies'
+import LocalMovieCard from '@/components/Seller/LocalMovieCard'
 import { useMovieSearch } from '@/hooks/useSearch'
-import { useNavigate } from 'react-router-dom'
+import { useLocalMovies } from '@/hooks/useLocalMovies'
 import { ROUTES } from '@/constants/routes'
 import { IMAGE_BASE_URL } from '@/constants/tmdb'
 
 function Movies() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
+  const [showLocal, setShowLocal] = useState(false)
   const [page, setPage] = useState(1)
   const { data: searchData, isLoading: searchLoading } = useMovieSearch(searchQuery, page)
   const searchResults = searchData?.results || []
   const totalPages = searchData?.totalPages || 0
   const navigate = useNavigate()
+  const { data: localMovies, isLoading: localLoading } = useLocalMovies(50)
 
   return (
     <MainLayout>
@@ -64,10 +69,51 @@ function Movies() {
         </div>
 
         <div className="mx-auto max-w-7xl px-6 py-8">
-          {showSearch && searchQuery ? (
+          <div className="mb-8 flex items-center gap-2">
+            <button
+              onClick={() => { setShowLocal(false); setShowSearch(false) }}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${!showLocal ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white' : 'bg-slate-900/50 text-gray-400 ring-1 ring-slate-800 hover:text-white'}`}
+            >
+              <FaFilm size={13} /> Trending
+            </button>
+            <button
+              onClick={() => { setShowLocal(true); setShowSearch(false) }}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${showLocal ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950' : 'bg-slate-900/50 text-gray-400 ring-1 ring-slate-800 hover:text-white'}`}
+            >
+              <FaClapperboard size={13} /> Local Movies
+            </button>
+          </div>
+
+          {showLocal ? (
             <div>
-              <h2 className="mb-6 text-xl font-semibold text-white">Search Results for "{searchQuery}"</h2>
-              {searchLoading ? (
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-white">Local Movies from Creators</h2>
+                <Link to={ROUTES.BECOME_SELLER} className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">
+                  Sell your movie
+                </Link>
+              </div>
+              {localLoading ? (
+                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <div key={i} className="animate-pulse rounded-2xl bg-slate-900/40 ring-1 ring-white/5">
+                      <div className="aspect-[3/4] rounded-t-2xl bg-slate-800/80 shimmer" />
+                      <div className="space-y-2 p-4"><div className="h-3 w-3/4 rounded-full bg-slate-800/80 shimmer" /><div className="h-2 w-1/2 rounded-full bg-slate-800/80 shimmer" /></div>
+                    </div>
+                  ))}
+                </div>
+              ) : localMovies?.length > 0 ? (
+                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {localMovies.map((movie, i) => (
+                    <LocalMovieCard key={movie.id} movie={movie} index={i} />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-10">No local movies yet — be the first creator to sell on CineVerse!</p>
+              )}
+            </div>
+          ) : showSearch && searchQuery ? (
+            <div>
+              <h2 className="mb-6 text-xl font-semibold text-white">Search Results for "{searchQuery}"</h2>              {searchLoading ? (
                 <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                   {Array.from({ length: 10 }).map((_, i) => (
                     <div key={i} className="animate-pulse rounded-2xl bg-slate-900/40 ring-1 ring-white/5">

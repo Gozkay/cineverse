@@ -26,6 +26,7 @@ function Navbar() {
   const navLinks = [
     { name: 'Home', path: ROUTES.HOME },
     { name: 'Movies', path: ROUTES.MOVIES },
+    { name: 'Local Movies', path: ROUTES.LOCAL_MOVIES },
     { name: 'Books', path: ROUTES.BOOKS },
     { name: 'Manga', path: ROUTES.MANGA },
     { name: 'Comics', path: ROUTES.COMICS },
@@ -44,6 +45,7 @@ function Navbar() {
     if (role === 'admin') return ROUTES.DASHBOARD_ADMIN
     if (role === 'manager') return ROUTES.DASHBOARD_MANAGER
     if (role === 'staff') return ROUTES.DASHBOARD_STAFF
+    if (role === 'seller') return ROUTES.DASHBOARD_SELLER
     return ROUTES.PROFILE
   }
 

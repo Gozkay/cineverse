@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
-import { FaPlus, FaEdit, FaTrash, FaFilm, FaBook, FaDragon, FaSearch } from 'react-icons/fa'
+import { FaPlus, FaEdit, FaTrash, FaFilm, FaBook, FaDragon, FaSearch, FaCheck, FaTimes } from 'react-icons/fa'
 import { FaMasksTheater, FaWandMagicSparkles } from 'react-icons/fa6'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { formatCurrency } from '@/utils/formatCurrency'
-import { getProducts, upsertProduct, deleteProduct } from '@/services/products'
+import { getProducts, upsertProduct, updateProduct, deleteProduct } from '@/services/products'
+import { getPublicImageUrl } from '@/services/seller'
 import { aiGenerateDescription } from '@/services/ai'
 import toast from 'react-hot-toast'
 
@@ -16,8 +18,22 @@ const categoryLabels = { movie: 'Movies', book: 'Books', manga: 'Manga', comic: 
 
 const defaultPrices = { movie: 2500, book: 2000, manga: 1800, comic: 2200 }
 
+const statusBadge = {
+  pending: <Badge variant="warning">Pending</Badge>,
+  active: <Badge variant="success">Active</Badge>,
+  rejected: <Badge variant="destructive">Rejected</Badge>,
+}
+
+const statusTabs = [
+  { id: 'all', label: 'All' },
+  { id: 'pending', label: 'Pending' },
+  { id: 'active', label: 'Active' },
+  { id: 'rejected', label: 'Rejected' },
+]
+
 function AdminProducts() {
   const [activeCategory, setActiveCategory] = useState('movie')
+  const [activeStatus, setActiveStatus] = useState('all')
   const [products, setProducts] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [page, setPage] = useState(1)
@@ -31,7 +47,13 @@ function AdminProducts() {
   const loadProducts = useCallback(async () => {
     setLoading(true)
     try {
-      const { data, count } = await getProducts({ category: activeCategory, search: search || undefined, page })
+      const { data, count } = await getProducts({
+        category: activeCategory,
+        search: search || undefined,
+        page,
+        status: activeStatus === 'all' ? undefined : activeStatus,
+        includeAll: activeStatus === 'all',
+      })
       setProducts(data)
       setTotalCount(count)
     } catch {
@@ -39,7 +61,7 @@ function AdminProducts() {
     } finally {
       setLoading(false)
     }
-  }, [activeCategory, search, page])
+  }, [activeCategory, activeStatus, search, page])
 
   useEffect(() => { loadProducts() }, [loadProducts])
 
@@ -106,6 +128,16 @@ function AdminProducts() {
     }
   }
 
+  const setProductStatus = async (id, status) => {
+    try {
+      await updateProduct(id, { status })
+      toast.success(status === 'active' ? 'Product approved and published' : 'Product rejected')
+      loadProducts()
+    } catch {
+      toast.error('Failed to update status')
+    }
+  }
+
   const categories = [
     { id: 'movie', label: 'Movies', icon: FaFilm, color: 'red' },
     { id: 'book', label: 'Books', icon: FaBook, color: 'blue' },
@@ -141,14 +173,25 @@ function AdminProducts() {
               <cat.icon size={14} /> {cat.label}
             </button>
           ))}
-          <div className="relative ml-auto">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={12} />
-            <input
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-              placeholder="Search..."
-              className="h-8 w-48 rounded-lg border border-slate-700 bg-slate-800 pl-8 pr-3 text-xs text-white outline-none focus:border-violet-500"
-            />
+          <div className="ml-auto flex items-center gap-1">
+            {statusTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => { setActiveStatus(tab.id); setPage(1) }}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${activeStatus === tab.id ? 'bg-violet-600 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+            <div className="relative ml-2">
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={12} />
+              <input
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+                placeholder="Search..."
+                className="h-8 w-48 rounded-lg border border-slate-700 bg-slate-800 pl-8 pr-3 text-xs text-white outline-none focus:border-violet-500"
+              />
+            </div>
           </div>
         </div>
 
@@ -167,13 +210,14 @@ function AdminProducts() {
                 <TableHead className="text-gray-400">Price</TableHead>
                 <TableHead className="text-gray-400">Stock</TableHead>
                 <TableHead className="text-gray-400">Rating</TableHead>
+                <TableHead className="text-gray-400">Status</TableHead>
                 <TableHead className="text-right text-gray-400">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {products.length === 0 ? (
                 <TableRow className="border-slate-800">
-                  <TableCell colSpan={5} className="text-center text-gray-500 py-10">No products found. Add your first product!</TableCell>
+                  <TableCell colSpan={6} className="text-center text-gray-500 py-10">No products found. Add your first product!</TableCell>
                 </TableRow>
               ) : (
                 products.map((product) => (
@@ -182,12 +226,15 @@ function AdminProducts() {
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-8 shrink-0 overflow-hidden rounded bg-slate-800">
                           {product.image ? (
-                            <img src={product.image} alt={product.title} className="h-full w-full object-cover" onError={(e) => { e.target.src = '' }} />
+                            <img src={getPublicImageUrl(product.image)} alt={product.title} className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center text-[8px] text-gray-600">N/A</div>
                           )}
                         </div>
-                        <span className="text-sm text-white line-clamp-1">{product.title}</span>
+                        <div>
+                          <span className="text-sm text-white line-clamp-1">{product.title}</span>
+                          {product.seller_id && <p className="text-[10px] text-amber-400/80">Seller listing</p>}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-white font-medium">{formatCurrency(product.price)}</TableCell>
@@ -198,6 +245,21 @@ function AdminProducts() {
                     </TableCell>
                     <TableCell>
                       <span className="text-yellow-400 text-xs">{product.rating ? product.rating.toFixed(1) : 'N/A'}</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        {statusBadge[product.status] || statusBadge.active}
+                        {product.status === 'pending' && (
+                          <button onClick={() => setProductStatus(product.id, 'active')} className="rounded-md bg-emerald-500/15 p-1 text-emerald-400 ring-1 ring-emerald-500/30 hover:bg-emerald-500/25" title="Approve">
+                            <FaCheck size={10} />
+                          </button>
+                        )}
+                        {product.status === 'pending' && (
+                          <button onClick={() => setProductStatus(product.id, 'rejected')} className="rounded-md bg-red-500/15 p-1 text-red-400 ring-1 ring-red-500/30 hover:bg-red-500/25" title="Reject">
+                            <FaTimes size={10} />
+                          </button>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

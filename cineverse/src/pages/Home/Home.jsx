@@ -6,6 +6,7 @@ import { TrendingMovies } from "@/components/Movies";
 import { TrendingBooks } from "@/components/Books";
 import { TrendingManga } from "@/components/Manga";
 import { TrendingComics } from "@/components/Comics";
+import LocalMoviesSection from "@/components/Movies/LocalMoviesSection";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import SectionDivider from "@/components/ui/SectionDivider";
 import Recommendations from "@/components/AI/Recommendations";
@@ -26,6 +27,10 @@ function Home() {
       <SectionDivider />
       <ScrollReveal>
         <TrendingMovies />
+      </ScrollReveal>
+      <SectionDivider />
+      <ScrollReveal delay={0.1}>
+        <LocalMoviesSection />
       </ScrollReveal>
       <SectionDivider />
       <ScrollReveal delay={0.1}>
