@@ -1,6 +1,7 @@
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import BackToTop from "@/components/ui/BackToTop";
+import ChatWidget from "@/components/AI/ChatWidget";
 import PropTypes from "prop-types";
 
 function MainLayout({ children }) {
@@ -18,6 +19,7 @@ function MainLayout({ children }) {
       </main>
       <Footer />
       <BackToTop />
+      <ChatWidget />
     </div>
   );
 }

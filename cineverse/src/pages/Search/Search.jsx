@@ -1,10 +1,12 @@
+import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaSearch, FaFilm, FaBook, FaDragon } from 'react-icons/fa'
-import { FaMasksTheater } from 'react-icons/fa6'
+import { FaMasksTheater, FaWandMagicSparkles } from 'react-icons/fa6'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import EmptyState from '@/components/ui/EmptyState'
+import { aiSearchQuery } from '@/services/ai'
 import { useMovieSearch } from '@/hooks/useSearch'
 import { useBookSearch } from '@/hooks/useBooks'
 import { useMangaSearch } from '@/hooks/useManga'
@@ -14,7 +16,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { IMAGE_BASE_URL } from '@/constants/tmdb'
 
 function Search() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q') || ''
 
   const { data: movies, isLoading: moviesLoading } = useMovieSearch(query)
@@ -24,6 +26,33 @@ function Search() {
 
   const isLoading = moviesLoading || booksLoading || mangaLoading || comicsLoading
   const isEmpty = query && !isLoading && !movies?.length && !books?.length && !manga?.length && !comics?.length
+
+  const [aiResult, setAiResult] = useState(null)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState(false)
+
+  const runAiSearch = useCallback(async () => {
+    if (!query) return
+    setAiLoading(true)
+    setAiError(false)
+    try {
+      const data = await aiSearchQuery(query)
+      setAiResult(data)
+    } catch {
+      setAiError(true)
+    } finally {
+      setAiLoading(false)
+    }
+  }, [query])
+
+  useEffect(() => {
+    setAiResult(null)
+    if (isEmpty) runAiSearch()
+  }, [query, isEmpty, runAiSearch])
+
+  const applyKeyword = (keyword) => setSearchParams({ q: keyword })
+
+  const categoryRoutes = { movie: ROUTES.MOVIES, book: ROUTES.BOOKS, manga: ROUTES.MANGA, comic: ROUTES.COMICS }
 
   return (
     <MainLayout>
@@ -37,6 +66,45 @@ function Search() {
             </h1>
             <p className="mt-2 text-sm text-gray-500">{query ? `Showing results for "${query}"` : 'Enter a search term to find products'}</p>
           </div>
+
+          {(aiLoading || aiResult || aiError) && query && (
+            <div className="mb-8 overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 via-slate-900/50 to-fuchsia-500/10 p-5">
+              <div className="flex items-center gap-2">
+                <FaWandMagicSparkles className="text-violet-400" />
+                <span className="text-sm font-semibold text-white">AI Search Assistant</span>
+              </div>
+              {aiLoading ? (
+                <div className="mt-3 flex items-center gap-2 text-sm text-gray-400">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+                  Interpreting your query...
+                </div>
+              ) : aiError ? (
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-sm text-gray-400">AI search is unavailable right now.</p>
+                  <button onClick={runAiSearch} className="text-xs font-medium text-violet-400 hover:text-violet-300">Retry</button>
+                </div>
+              ) : aiResult ? (
+                <>
+                  {aiResult.explanation && <p className="mt-3 text-sm text-gray-300">{aiResult.explanation}</p>}
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    {aiResult.keywords?.filter(Boolean).map((k) => (
+                      <button key={k} onClick={() => applyKeyword(k)} className="rounded-full bg-violet-500/15 px-3 py-1 text-xs text-violet-300 ring-1 ring-violet-500/30 hover:bg-violet-500/25 transition-colors">
+                        {k}
+                      </button>
+                    ))}
+                    {aiResult.category && categoryRoutes[aiResult.category] && (
+                      <Link
+                        to={categoryRoutes[aiResult.category]}
+                        className="ml-auto rounded-full bg-slate-800 px-3 py-1 text-xs text-gray-400 ring-1 ring-slate-700 hover:text-white transition-colors"
+                      >
+                        Browse {aiResult.category}s
+                      </Link>
+                    )}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          )}
 
           {isLoading ? (
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">

@@ -12,10 +12,10 @@ import { ROUTES } from '@/constants/routes'
 import toast from 'react-hot-toast'
 
 const registerSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
+  name: z.string().min(1, { message: 'Name is required' }),
+  email: z.string().email({ message: 'Enter a valid email' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  confirmPassword: z.string().min(1, { message: 'Please confirm your password' }),
 }).refine(data => data.password === data.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],

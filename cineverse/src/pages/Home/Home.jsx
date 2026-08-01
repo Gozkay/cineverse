@@ -8,6 +8,7 @@ import { TrendingManga } from "@/components/Manga";
 import { TrendingComics } from "@/components/Comics";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import SectionDivider from "@/components/ui/SectionDivider";
+import Recommendations from "@/components/AI/Recommendations";
 
 function Home() {
   return (
@@ -17,6 +18,10 @@ function Home() {
       <SectionDivider />
       <ScrollReveal>
         <Categories />
+      </ScrollReveal>
+      <SectionDivider />
+      <ScrollReveal>
+        <Recommendations />
       </ScrollReveal>
       <SectionDivider />
       <ScrollReveal>

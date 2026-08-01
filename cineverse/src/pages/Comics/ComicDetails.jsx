@@ -11,6 +11,7 @@ import ReviewForm from '@/components/Reviews/ReviewForm'
 import ReviewList from '@/components/Reviews/ReviewList'
 import { useSyncProduct } from '@/hooks/useSyncProduct'
 import { searchComics } from '@/services/comics'
+import AISummary from '@/components/AI/AISummary'
 import toast from 'react-hot-toast'
 
 function ComicDetails() {
@@ -139,6 +140,9 @@ function ComicDetails() {
               <div className="mt-6">
                 <h2 className="mb-3 text-lg font-semibold text-white">Description</h2>
                 <p className="leading-relaxed text-gray-400">{comic.description}</p>
+                <div className="mt-4">
+                  <AISummary item={{ title: comic.title, category: 'comic', author: comic.authors?.[0], description: comic.description }} />
+                </div>
               </div>
 
               <div className="mt-12 border-t border-slate-800 pt-8">

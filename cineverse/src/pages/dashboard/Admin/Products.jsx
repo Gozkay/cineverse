@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { FaPlus, FaEdit, FaTrash, FaFilm, FaBook, FaDragon, FaSearch } from 'react-icons/fa'
-import { FaMasksTheater } from 'react-icons/fa6'
+import { FaMasksTheater, FaWandMagicSparkles } from 'react-icons/fa6'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { getProducts, upsertProduct, deleteProduct } from '@/services/products'
+import { aiGenerateDescription } from '@/services/ai'
 import toast from 'react-hot-toast'
 
 const categoryColors = { movie: 'text-red-400', book: 'text-blue-400', manga: 'text-pink-400', comic: 'text-emerald-400' }
@@ -24,7 +25,8 @@ function AdminProducts() {
   const [loading, setLoading] = useState(true)
   const [editingProduct, setEditingProduct] = useState(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [form, setForm] = useState({ title: '', price: '', category: 'movie', image: '', stock: 0 })
+  const [form, setForm] = useState({ title: '', price: '', category: 'movie', image: '', stock: 0, description: '' })
+  const [generatingDescription, setGeneratingDescription] = useState(false)
 
   const loadProducts = useCallback(async () => {
     setLoading(true)
@@ -43,14 +45,28 @@ function AdminProducts() {
 
   const openAdd = () => {
     setEditingProduct(null)
-    setForm({ title: '', price: defaultPrices[activeCategory].toString(), category: activeCategory, image: '', stock: 0 })
+    setForm({ title: '', price: defaultPrices[activeCategory].toString(), category: activeCategory, image: '', stock: 0, description: '' })
     setDialogOpen(true)
   }
 
   const openEdit = (product) => {
     setEditingProduct(product)
-    setForm({ title: product.title, price: product.price.toString(), category: product.category, image: product.image || '', stock: product.stock || 0 })
+    setForm({ title: product.title, price: product.price.toString(), category: product.category, image: product.image || '', stock: product.stock || 0, description: product.description || '' })
     setDialogOpen(true)
+  }
+
+  const handleGenerateDescription = async () => {
+    if (!form.title.trim()) { toast.error('Enter a title first'); return }
+    setGeneratingDescription(true)
+    try {
+      const text = await aiGenerateDescription({ title: form.title.trim(), category: form.category })
+      setForm(f => ({ ...f, description: text }))
+      toast.success('Description generated')
+    } catch {
+      toast.error('Failed to generate description')
+    } finally {
+      setGeneratingDescription(false)
+    }
   }
 
   const handleSave = async () => {
@@ -66,7 +82,7 @@ function AdminProducts() {
         image: form.image || null,
         stock: parseInt(form.stock) || 0,
         slug: editingProduct?.slug || `${form.category}:${Date.now()}`,
-        description: editingProduct?.description || '',
+        description: form.description.trim() || editingProduct?.description || '',
         external_id: editingProduct?.external_id || null,
       }
       if (editingProduct) payload.id = editingProduct.id
@@ -254,6 +270,26 @@ function AdminProducts() {
             <div>
               <label className="mb-1 block text-xs text-gray-400">Image URL</label>
               <Input value={form.image} onChange={(e) => setForm(f => ({ ...f, image: e.target.value }))} className="border-slate-700 bg-slate-800 text-white" placeholder="https://..." />
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <label className="text-xs text-gray-400">Description</label>
+                <button
+                  type="button"
+                  onClick={handleGenerateDescription}
+                  disabled={generatingDescription || !form.title.trim()}
+                  className="flex items-center gap-1 rounded-md bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 px-2 py-1 text-[11px] font-medium text-violet-300 ring-1 ring-violet-500/30 transition-colors hover:bg-violet-600/30 disabled:opacity-40"
+                >
+                  <FaWandMagicSparkles size={10} /> {generatingDescription ? 'Generating...' : 'Generate with AI'}
+                </button>
+              </div>
+              <textarea
+                value={form.description}
+                onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
+                rows={4}
+                className="w-full resize-none rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-violet-500"
+                placeholder="Product description (or generate with AI)"
+              />
             </div>
             <Button onClick={handleSave} className="w-full bg-violet-600 hover:bg-violet-500 text-white">
               {editingProduct ? 'Update' : 'Add'} Product

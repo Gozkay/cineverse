@@ -12,8 +12,8 @@ import { ROUTES } from '@/constants/routes'
 import toast from 'react-hot-toast'
 
 const loginSchema = z.object({
-  email: z.string().email('Enter a valid email'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email({ message: 'Enter a valid email' }),
+  password: z.string().min(1, { message: 'Password is required' }),
 })
 
 function Login() {

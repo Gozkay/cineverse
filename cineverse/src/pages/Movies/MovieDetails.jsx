@@ -22,6 +22,7 @@ import MovieReviews from "@/components/Movies/MovieReviews";
 import ReviewForm from "@/components/Reviews/ReviewForm";
 import ReviewList from "@/components/Reviews/ReviewList";
 import { WatchProviders } from "@/components/Movies";
+import AISummary from "@/components/AI/AISummary";
 import { useSyncProduct } from "@/hooks/useSyncProduct";
 
 function SectionSkeleton({ height = "h-48" }) {
@@ -124,6 +125,13 @@ function MovieDetails() {
       <div className="relative z-20 mx-auto -mt-20 max-w-7xl px-6 pb-20 sm:-mt-44">
 
         <MovieInfo movie={movie} videos={videos || []} />
+
+        <div className="mt-6">
+          <AISummary
+            item={{ title: movie.title, category: 'movie', description: movie.overview, year: movie.release_date?.slice(0, 4) }}
+            className=""
+          />
+        </div>
 
         {videosQuery.isLoading ? <SectionSkeleton height="h-48" /> : <MovieTrailer movie={movie} videos={videos || []} />}
 

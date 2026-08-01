@@ -11,6 +11,7 @@ import { ROUTES } from '@/constants/routes'
 import ReviewForm from '@/components/Reviews/ReviewForm'
 import ReviewList from '@/components/Reviews/ReviewList'
 import { useSyncProduct } from '@/hooks/useSyncProduct'
+import AISummary from '@/components/AI/AISummary'
 import toast from 'react-hot-toast'
 
 function MangaDetails() {
@@ -142,6 +143,9 @@ function MangaDetails() {
               <div className="mt-6">
                 <h2 className="mb-3 text-lg font-semibold text-white">Synopsis</h2>
                 <p className="leading-relaxed text-gray-400">{manga.description}</p>
+                <div className="mt-4">
+                  <AISummary item={{ title: manga.title, category: 'manga', author: manga.authors?.[0], description: manga.description }} />
+                </div>
               </div>
 
               {manga.status && (
