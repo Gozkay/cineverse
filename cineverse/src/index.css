@@ -46,6 +46,20 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --animate-blob: blob 16s ease-in-out infinite;
+    --animate-blob-slow: blob 22s ease-in-out infinite reverse;
+}
+
+@keyframes blob {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(40px, -30px) scale(1.15);
+    }
+    66% {
+        transform: translate(-30px, 25px) scale(0.92);
+    }
 }
 
 :root {

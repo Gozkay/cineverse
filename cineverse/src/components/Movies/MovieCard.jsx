@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
@@ -7,6 +6,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { formatCurrency } from "@/utils/formatCurrency";
 import ImageWithFallback from "@/components/ui/ImageWithFallback";
+import TiltCard from "@/components/ui/TiltCard";
 import { memo } from "react";
 import PropTypes from "prop-types";
 import toast from "react-hot-toast";
@@ -32,11 +32,12 @@ function MovieCard({ movie, index = 0 }) {
   const inWishlist = isInWishlist(movie.id);
 
   return (
-    <motion.div
+    <TiltCard
+      maxTilt={8}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index || 0) * 0.05 }}
-      className="group relative overflow-hidden rounded-2xl bg-slate-900/40 ring-1 ring-white/5 transition-all duration-500 hover:ring-red-500/40 hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-1"
+      className="group relative overflow-hidden rounded-2xl bg-slate-900/40 ring-1 ring-white/5 transition-all duration-500 hover:ring-red-500/40 hover:shadow-2xl hover:shadow-red-500/10"
     >
       <Link to={ROUTES.MOVIE_DETAIL(movie.id)} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-slate-800">
@@ -92,7 +93,7 @@ function MovieCard({ movie, index = 0 }) {
           </button>
         </div>
       </div>
-    </motion.div>
+    </TiltCard>
   );
 }
 

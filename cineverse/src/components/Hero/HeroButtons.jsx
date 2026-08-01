@@ -12,6 +12,7 @@ function HeroButtons() {
           className="group relative px-8 py-6 text-lg font-semibold text-white border-none cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 transition-all duration-300 shadow-lg shadow-violet-600/25 hover:shadow-violet-500/40"
         >
           <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.15),transparent_60%)]" />
+          <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12" />
           <span className="relative">{heroData.buttons.primary}</span>
         </Button>
       </Link>

@@ -1,12 +1,12 @@
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { FaHeart, FaShoppingCart, FaStar } from 'react-icons/fa'
 import { ROUTES } from '@/constants/routes'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { formatCurrency } from '@/utils/formatCurrency'
 import ImageWithFallback from '@/components/ui/ImageWithFallback'
+import TiltCard from '@/components/ui/TiltCard'
 import PropTypes from 'prop-types'
 import toast from 'react-hot-toast'
 
@@ -16,11 +16,12 @@ function BookCard({ book, index = 0 }) {
   const inWishlist = isInWishlist(book.id)
 
   return (
-    <motion.div
+    <TiltCard
+      maxTilt={8}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
-      className="group relative overflow-hidden rounded-2xl bg-slate-900/40 ring-1 ring-white/5 transition-all duration-500 hover:ring-violet-500/40 hover:shadow-2xl hover:shadow-violet-500/10 hover:-translate-y-1"
+      className="group relative overflow-hidden rounded-2xl bg-slate-900/40 ring-1 ring-white/5 transition-all duration-500 hover:ring-violet-500/40 hover:shadow-2xl hover:shadow-violet-500/10"
     >
       <Link to={ROUTES.BOOK_DETAIL(book.id)} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-slate-800">
@@ -74,7 +75,7 @@ function BookCard({ book, index = 0 }) {
           Add to Cart
         </button>
       </div>
-    </motion.div>
+    </TiltCard>
   )
 }
 

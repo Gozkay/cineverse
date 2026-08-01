@@ -29,6 +29,9 @@ function HeroBackground() {
           `
         }}
       />
+      <div className="absolute -left-24 top-1/4 h-96 w-96 rounded-full bg-violet-600/15 blur-[120px] animate-blob" />
+      <div className="absolute right-0 top-0 h-80 w-80 rounded-full bg-fuchsia-600/10 blur-[110px] animate-blob-slow" />
+      <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-pink-600/10 blur-[100px] animate-blob" />
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
