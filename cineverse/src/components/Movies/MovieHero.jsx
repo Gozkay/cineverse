@@ -26,11 +26,11 @@ function MovieHero({ movie }) {
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 to-transparent" />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-end gap-10 px-6 pb-16">
+      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-end gap-10 px-6 pb-40 sm:pb-56">
         <img
           src={movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : heroBg}
           alt={movie.title}
-          className="hidden h-[420px] w-[280px] rounded-2xl object-cover shadow-2xl ring-1 ring-white/10 md:block"
+          className="hidden h-[420px] w-[280px] self-start rounded-2xl object-cover shadow-2xl ring-1 ring-white/10 md:block"
         />
 
         <div className="max-w-3xl">
