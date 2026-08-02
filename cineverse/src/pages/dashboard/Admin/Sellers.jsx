@@ -147,7 +147,7 @@ function AdminSellers() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">
-                          {req.user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                          {req.user?.name?.charAt(0)?.toUpperCase() || req.user?.email?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div>
                           <p className="text-sm text-white">{req.user?.name}</p>

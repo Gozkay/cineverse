@@ -148,7 +148,8 @@ export async function rejectSellerRequest(requestId) {
 export async function updateProfile(userId, updates) {
   const { data, error } = await supabase
     .from('profiles')
-    .upsert({ id: userId, ...updates }, { onConflict: 'id' })
+    .update(updates)
+    .eq('id', userId)
     .select()
     .single()
   if (error) return { success: false, error: error.message }

@@ -101,7 +101,8 @@ function Profile() {
     setUploadingAvatar(true)
     try {
       const url = await uploadAvatar(file)
-      await updateProfile(user.id, { avatar: url })
+      const result = await updateProfile(user.id, { avatar: url })
+      if (!result.success) throw new Error(result.error)
       refreshProfile()
       toast.success('Profile picture updated')
     } catch (err) {
@@ -123,7 +124,7 @@ function Profile() {
                 <img src={profile.avatar} alt="Profile" referrerPolicy="no-referrer" className="h-16 w-16 rounded-full object-cover ring-2 ring-white/10" />
               ) : (
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-2xl font-bold text-white shadow-lg shadow-violet-500/25">
-                  {(profile?.name || user?.user_metadata?.name || 'U')?.charAt(0)?.toUpperCase() || 'U'}
+                  {(profile?.name || user?.user_metadata?.name)?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
               )}
               <label className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-violet-600 text-white shadow-lg ring-2 ring-slate-950 transition-colors hover:bg-violet-500" title="Upload profile picture">

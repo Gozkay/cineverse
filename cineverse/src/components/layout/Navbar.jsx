@@ -133,14 +133,14 @@ function Navbar() {
                       <AvatarImage src={profile.avatar} alt="Avatar" referrerPolicy="no-referrer" />
                     ) : (
                       <AvatarFallback className="bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white text-xs">
-                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                        {(profile?.name || user?.user_metadata?.name)?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                       </AvatarFallback>
                     )}
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-slate-900/95 backdrop-blur-xl border-slate-800 text-white">
-                <div className="px-2 py-1.5 text-sm text-gray-400">{user?.name}</div>
+                <div className="px-2 py-1.5 text-sm text-gray-400">{profile?.name || user?.user_metadata?.name || user?.email}</div>
                 <DropdownMenuSeparator className="bg-slate-800" />
                 <DropdownMenuItem onClick={() => navigate(ROUTES.PROFILE)} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">
                   <FaUser className="mr-2" size={14} /> Profile

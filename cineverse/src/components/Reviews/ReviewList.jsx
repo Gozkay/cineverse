@@ -15,7 +15,7 @@ function ReviewList({ productSlug, refreshKey }) {
     setLoading(true)
     const { data } = await supabase
       .from('reviews')
-      .select('*, profiles:user_id(name, avatar)')
+      .select('*, profiles:user_id(name, email, avatar)')
       .eq('product_slug', productSlug)
       .order('created_at', { ascending: false })
     setReviews(data || [])
@@ -62,7 +62,7 @@ function ReviewList({ productSlug, refreshKey }) {
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
-                    {review.profiles?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    {review.profiles?.name?.charAt(0)?.toUpperCase() || review.profiles?.email?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                   <span className="text-sm font-medium text-white">
                     {review.profiles?.name || 'Anonymous'}
