@@ -37,7 +37,7 @@ function DashboardLayout({ children }) {
     { to: ROUTES.DASHBOARD_SELLER_PAYOUTS, label: 'Withdraw', icon: FaMoneyBillWave },
   ]
 
-  const role = user?.role || profile?.role || 'customer'
+  const role = profile?.role || user?.user_metadata?.role || 'customer'
   const links = role === 'admin' ? adminLinks : role === 'manager' ? managerLinks : role === 'seller' ? sellerLinks : staffLinks
   const userName = profile?.name || user?.user_metadata?.name || user?.email || 'User'
 
