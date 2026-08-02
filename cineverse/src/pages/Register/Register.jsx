@@ -8,6 +8,7 @@ import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle } from 'react-i
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
+import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/constants/routes'
 import toast from 'react-hot-toast'
 
@@ -27,6 +28,7 @@ function Register() {
   const [registered, setRegistered] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState('')
   const [sellerType, setSellerType] = useState('none')
+  const [resending, setResending] = useState(false)
   const { register: registerUser, isAuthenticated, signInWithGoogle } = useAuth()
   const navigate = useNavigate()
 
@@ -54,6 +56,18 @@ function Register() {
   const handleGoogle = async () => {
     const result = await signInWithGoogle()
     if (!result.success) toast.error(result.error)
+  }
+
+  const handleResend = async () => {
+    if (!registeredEmail) return
+    setResending(true)
+    const { error } = await supabase.auth.resend({ type: 'signup', email: registeredEmail })
+    setResending(false)
+    if (error) {
+      toast.error(error.message)
+    } else {
+      toast.success('Confirmation email sent! Check your inbox.')
+    }
   }
 
   return (
@@ -87,6 +101,14 @@ function Register() {
                 <p className="text-xs text-gray-500">
                   Didn't receive it? Check your spam folder or try signing up again.
                 </p>
+                <button
+                  onClick={handleResend}
+                  disabled={resending}
+                  className="mt-4 inline-flex items-center justify-center rounded-xl border border-violet-500/30 bg-violet-500/10 px-5 py-2.5 text-sm font-medium text-violet-300 transition-all hover:bg-violet-500/20 disabled:opacity-50"
+                >
+                  {resending ? 'Sending...' : 'Resend confirmation email'}
+                </button>
+                <p className="mt-3 text-xs text-gray-600">Links expire after a while — if the old link says it failed, resend and use the newest email.</p>
                 <p className="mt-6 text-center text-sm text-gray-500">
                   Already have an account? <Link to={ROUTES.LOGIN} className="text-violet-400 hover:underline">Sign in</Link>
                 </p>
