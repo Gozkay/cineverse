@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa'
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
@@ -18,7 +18,7 @@ const loginSchema = z.object({
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
-  const { login, signInWithGoogle } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || ROUTES.HOME
@@ -37,11 +37,6 @@ function Login() {
     }
   }
 
-  const handleGoogle = async () => {
-    const result = await signInWithGoogle()
-    if (!result.success) toast.error(result.error)
-  }
-
   return (
     <MainLayout>
       <Seo title="Sign In" noIndex />
@@ -54,17 +49,6 @@ function Login() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Back</span>
               </h1>
               <p className="mt-2 text-sm text-gray-500">Sign in to your CineVerse account</p>
-            </div>
-
-            <button onClick={handleGoogle} className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/50 text-sm font-semibold text-white transition-colors hover:bg-slate-800">
-              <FaGoogle size={15} />
-              Continue with Google
-            </button>
-
-            <div className="my-5 flex items-center gap-3 text-xs text-gray-500">
-              <span className="h-px flex-1 bg-slate-800" />
-              or
-              <span className="h-px flex-1 bg-slate-800" />
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

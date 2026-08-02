@@ -113,8 +113,8 @@ function Checkout() {
       clearCart()
       setStep(4)
       toast.success('Order placed successfully!')
-    } catch {
-      toast.error('Failed to place order. Please try again.')
+    } catch (e) {
+      toast.error(e?.message || 'Failed to place order. Please try again.')
     }
   }
 

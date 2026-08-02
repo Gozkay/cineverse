@@ -52,13 +52,16 @@ function StaffManagement() {
     const { error } = await supabase.auth.signUp({
       email: newStaff.email,
       password: newStaff.password,
-      options: { data: { name: newStaff.name } },
+      options: {
+        data: { name: newStaff.name, role: 'staff' },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
     if (error) { toast.error(error.message); return }
     await loadStaff()
     setDialogOpen(false)
+    toast.success(`Staff added. Temporary password: ${newStaff.password}`)
     setNewStaff({ name: '', email: '', password: Math.random().toString(36).slice(-10) })
-    toast.success('Staff member added')
   }
 
   return (
@@ -88,6 +91,11 @@ function StaffManagement() {
                 <div>
                   <label className="mb-1 block text-xs text-gray-400">Email</label>
                   <Input type="email" value={newStaff.email} onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })} className="border-slate-700 bg-slate-800 text-white" placeholder="staff@cineverse.com" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs text-gray-400">Temporary password</label>
+                  <Input readOnly value={newStaff.password} onClick={(e) => { e.target.select(); navigator.clipboard?.writeText(newStaff.password) }} className="border-slate-700 bg-slate-800 font-mono text-white" />
+                  <p className="mt-1 text-[11px] text-gray-500">Copy this — the staff member will confirm their email, then sign in with this password.</p>
                 </div>
                 <Button onClick={handleAddStaff} className="w-full bg-violet-600 hover:bg-violet-500 text-white">Add Staff</Button>
               </div>

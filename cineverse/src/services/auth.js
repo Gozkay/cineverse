@@ -8,39 +8,16 @@ export async function loginUser(email, password) {
   return { success: true, user: safeUser }
 }
 
-export async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
-    },
-  })
-  if (error) return { success: false, error: error.message }
-  return { success: true }
-}
-
 export async function registerUser({ name, email, password, sellerType }) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { name },
+      data: { name, sellerType: sellerType || 'none' },
       emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   })
   if (error) return { success: false, error: error.message }
-
-  if (data.user) {
-    if (sellerType && sellerType !== 'none') {
-      await supabase.from('seller_requests').insert({
-        user_id: data.user.id,
-        type: sellerType,
-        reason: sellerType === 'producer'
-          ? 'Signed up as a movie producer to sell local movies.'
-          : 'Signed up as a seller to list products.',
-      }).catch(() => {})
-    }
-  }
 
   const profile = data.user ? await getProfile(data.user.id) : null
   const safeUser = data.user ? { ...data.user, ...profile } : data.user

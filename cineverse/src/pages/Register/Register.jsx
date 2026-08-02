@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa'
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
@@ -29,7 +29,7 @@ function Register() {
   const [registeredEmail, setRegisteredEmail] = useState('')
   const [sellerType, setSellerType] = useState('none')
   const [resending, setResending] = useState(false)
-  const { register: registerUser, isAuthenticated, signInWithGoogle } = useAuth()
+  const { register: registerUser, isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -51,11 +51,6 @@ function Register() {
     } else {
       toast.error(result.error)
     }
-  }
-
-  const handleGoogle = async () => {
-    const result = await signInWithGoogle()
-    if (!result.success) toast.error(result.error)
   }
 
   const handleResend = async () => {
@@ -115,17 +110,6 @@ function Register() {
               </div>
             ) : (
             <>
-            <button onClick={handleGoogle} className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/50 text-sm font-semibold text-white transition-colors hover:bg-slate-800">
-              <FaGoogle size={15} />
-              Continue with Google
-            </button>
-
-            <div className="my-5 flex items-center gap-3 text-xs text-gray-500">
-              <span className="h-px flex-1 bg-slate-800" />
-              or
-              <span className="h-px flex-1 bg-slate-800" />
-            </div>
-
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-sm text-gray-400">Full Name</label>
