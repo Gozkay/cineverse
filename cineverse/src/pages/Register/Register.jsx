@@ -152,7 +152,7 @@ function Register() {
 
               <div>
                 <label className="mb-1.5 block text-sm text-gray-400">Are you a seller or movie producer?</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {[
                     { value: 'none', label: 'No, just shopping' },
                     { value: 'seller', label: "I'm a seller" },

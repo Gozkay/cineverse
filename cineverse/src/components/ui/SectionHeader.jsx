@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 function SectionHeader({ eyebrow, eyebrowClass, title, accent, accentClass, subtitle, viewAll }) {
   return (
-    <div className="mb-12 flex items-end justify-between">
+    <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
       <div>
         <p className={`font-semibold uppercase tracking-wider text-sm bg-gradient-to-r ${eyebrowClass} text-transparent bg-clip-text`}>
           {eyebrow}

@@ -21,7 +21,7 @@ Quick reference for demoing CineVerse live. Everything here is verified to work 
 - **Live URL:** https://cineverse-blush.vercel.app
 - **Paystack test mode** — use test card `4084 0840 8408 4081`, any future expiry, any CVV, OTP `123456` (or `0000`).
 - **Coupon:** `TEST10` (10% off) — create/disable it under Admin → Coupon Management.
-- **DB orders present:** two `pending` test orders (₦3531, ₦3424, both with TEST10) and one `shipped` order (₦10800).
+- **DB orders present:** two `pending` test orders (₦3531, ₦3424, both with TEST10) and one `shipped` order (₦10800). Order `e653d47f` was flipped to `paid` (webhook path verified working).
 
 ---
 
@@ -54,10 +54,11 @@ Approved seller uploads a product → it appears as `pending` → Admin approves
 
 | Limitation | Explanation |
 |------------|-------------|
-| Orders stay `pending` after test payment | Paystack webhook must be re-simulated in the dashboard (or order flipped manually in SQL). Webhook code updates are deployed via `supabase functions deploy paystack-webhook --project-ref lkcdoylwdjgruyccetcl` |
 | Product sync writes fail silently for customers | `syncProduct` upserts are RLS-gated to admins/sellers (products INSERT requires `seller_id = auth.uid()`); the hook now only runs for admins |
 | `product-files` downloads need auth | Private bucket — signed URLs expire after 1h |
 | Movie details from TMDB may be missing for some titles | External API data — pages now show `N/A` instead of crashing |
+
+**Responsive pass (2026-08-02):** full mobile audit done — no high-severity issues; 10 polish fixes shipped (Register role cards stack, detail-page meta grids stack, footer overflow-hidden, section headers wrap, checkout buttons stack, product-form dialogs stack, order-detail title truncates).
 
 ---
 

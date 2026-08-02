@@ -122,7 +122,7 @@ function ComicDetails() {
               <h1 className="text-3xl font-bold text-white">{comic.title}</h1>
               <p className="mt-2 text-gray-400">{comic.authors?.join(', ')}</p>
 
-              <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex items-center gap-3 rounded-xl bg-slate-900/50 p-4 ring-1 ring-slate-800">
                   <FaUser className="text-emerald-400" />
                   <div><p className="text-xs text-gray-500">Author/Artist</p><p className="text-sm text-white">{comic.authors?.[0] || 'Unknown'}</p></div>

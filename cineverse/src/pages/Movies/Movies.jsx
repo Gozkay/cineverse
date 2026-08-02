@@ -86,7 +86,7 @@ function Movies() {
 
           {showLocal ? (
             <div>
-              <div className="mb-6 flex items-center justify-between">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-xl font-semibold text-white">Local Movies from Creators</h2>
                 <Link to={ROUTES.BECOME_SELLER} className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">
                   Sell your movie

@@ -3,7 +3,7 @@ import { ROUTES } from '@/constants/routes'
 
 function Footer() {
   return (
-    <footer className="relative mt-20 border-t border-white/5 bg-slate-950/70 backdrop-blur-xl">
+    <footer className="relative mt-20 overflow-hidden border-t border-white/5 bg-slate-950/70 backdrop-blur-xl">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/60 to-transparent" />
       <div className="absolute -top-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-violet-600/10 blur-[100px] pointer-events-none" />
       <div className="mx-auto max-w-7xl px-6 py-12">

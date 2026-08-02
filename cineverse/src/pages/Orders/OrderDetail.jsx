@@ -209,9 +209,9 @@ function OrderDetail() {
                   </div>
                 )}
                 {downloads.map((d, i) => (
-                  <div key={i} className="flex items-center justify-between rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/5 p-4 ring-1 ring-emerald-500/20">
-                    <div>
-                      <p className="text-sm font-medium text-white">{d.title}</p>
+                  <div key={i} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/5 p-4 ring-1 ring-emerald-500/20">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-white">{d.title}</p>
                       <p className="text-xs text-gray-500">Digital movie — link valid for 1 hour</p>
                     </div>
                     <a

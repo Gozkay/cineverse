@@ -360,9 +360,9 @@ function Checkout() {
                     <span className="text-violet-400">{formatCurrency(total)}</span>
                   </div>
                 </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setStep(2)} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-medium text-gray-300 hover:bg-slate-800 transition-colors">Back</button>
-                  <button onClick={handlePlaceOrder} disabled={paying} className="flex-1 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-50 transition-colors">{paying ? 'Processing...' : `Place Order — ${formatCurrency(total)}`}</button>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button onClick={() => setStep(2)} className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-slate-800 transition-colors sm:flex-1">Back</button>
+                  <button onClick={handlePlaceOrder} disabled={paying} className="rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-50 transition-colors sm:flex-1 sm:whitespace-nowrap">{paying ? 'Processing...' : `Place Order — ${formatCurrency(total)}`}</button>
                 </div>
               </motion.div>
             )}

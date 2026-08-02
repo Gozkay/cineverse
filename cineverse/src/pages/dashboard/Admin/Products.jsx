@@ -308,7 +308,7 @@ function AdminProducts() {
               <label className="mb-1 block text-xs text-gray-400">Title *</label>
               <Input value={form.title} onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} className="border-slate-700 bg-slate-800 text-white" placeholder="Product title" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs text-gray-400">Price (NGN) *</label>
                 <Input type="number" value={form.price} onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} className="border-slate-700 bg-slate-800 text-white" placeholder="0" />
