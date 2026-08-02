@@ -2,6 +2,25 @@
 
 ---
 
+## Actual Release Flow (used during development)
+
+The app is deployed manually with the Vercel CLI (not Git-connected auto-deploy):
+
+```
+npm run lint        # ESLint — 0 errors, 0 warnings
+npm run test        # Vitest — 42 tests / 6 files pass
+npm run build       # Vite production build
+vercel --prod --yes # Deploys to https://cineverse-blush.vercel.app
+git commit + push   # Push to github.com/Gozkay/cineverse (master)
+```
+
+**Live URL:** https://cineverse-blush.vercel.app  
+**Vercel project:** `gozkays-projects/cineverse`
+
+**Database/edge-function changes are NOT deployed by Vercel.** They ship as migration `.sql` files at the repo root (e.g. `migration-presentation-fixes.sql`) that the developer pastes into the Supabase SQL Editor, and the Deno edge functions (`supabase/functions/paystack-webhook`, `seller-payout`) are updated by pasting the new `index.ts` into the Supabase dashboard Functions editor.
+
+---
+
 ## Docker
 
 ### `Dockerfile`

@@ -7,7 +7,7 @@ CineVerse is a **single-page application (SPA)** e-commerce marketplace for ente
 - **Product catalog** populated from external APIs (TMDB, Google Books, Jikan, Open Library)
 - **Shopping cart & wishlist** persisted to localStorage
 - **Multi-step checkout** with Paystack payment integration (NGN currency)
-- **Role-based dashboards**: Admin (full control), Manager (staff oversight), Staff (order management)
+- **Role-based dashboards**: Admin (full control), Manager (staff oversight), Staff (order management), Seller (own products, earnings, payouts)
 - **Authentication**: Supabase Auth (email/password + Google OAuth)
 - **Reviews system**: Star ratings per product with user review forms
 
@@ -176,14 +176,14 @@ User submits login form
 
 ```
 User completes checkout step 3 (payment)
-  → Checkout calls usePaystack.initializePayment()
-  → usePaystack injects Paystack script (if not loaded)
-  → Paystack popup opens
-  → User completes payment
-  → onSuccess callback creates order via services/orders.js
-  → Order stored in Supabase
-  → Cart cleared
-  → Confirmation screen shown
+  → Checkout sets paying=true (prevents duplicate orders)
+  → Card: usePaystack.initializePayment() injects Paystack script,
+    Paystack popup opens, onSuccess → placeOrder(reference)
+  → Transfer/Cash: placeOrder(null) directly
+  → placeOrder: createOrder() first, THEN incrementCouponUsage() (if coupon)
+  → Paystack charge.success webhook marks order 'paid'
+    (webhook is idempotent: replays for already-paid orders are ignored)
+  → Cart cleared, confirmation screen shown
 ```
 
 ---

@@ -36,7 +36,9 @@ CREATE TABLE profiles (
 - `banned` / `suspended` — Account status flags for moderation.
 - `created_at` / `updated_at` — Auto-set timestamps. `updated_at` is maintained by the `update_updated_at` trigger.
 
-**How it's created:** When a user registers via `registerUser()` in `auth.js`, after Supabase creates the auth user, a profile row is inserted with `role: 'customer'`. The id matches the auth user's id.
+**How it's created:** When a user registers, the `handle_new_user()` trigger (AFTER INSERT on `auth.users`) inserts the profile row. The trigger is SECURITY DEFINER — it runs even before email confirmation (no client session yet). **It never trusts `raw_user_meta_data.role`** — every new account is `customer`. Staff/manager/admin promotions happen in Admin → Users (or via `manage_staff` for staff lifecycle actions).
+
+**Security guard:** `guard_profile_role()` trigger (BEFORE UPDATE OF role) — only an admin may change a profile's role. This closes the self-escalation path through the "Users can update own profile" RLS policy (`auth.uid() = id`).
 
 ---
 
@@ -88,7 +90,7 @@ CREATE TABLE orders (
   user_id UUID REFERENCES profiles(id) NOT NULL,
   items JSONB NOT NULL,
   total_amount NUMERIC(10,2) NOT NULL,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending','processing','shipped','delivered','cancelled')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending','paid','processing','shipped','delivered','cancelled')),
   shipping_info JSONB,
   payment_method TEXT,
   payment_ref TEXT,
@@ -102,11 +104,11 @@ CREATE TABLE orders (
 **Column details:**
 - `user_id` — Foreign key to profiles. NOT NULL — every order belongs to a user.
 - `items` — JSONB array storing the cart snapshot at time of purchase. Each item has: `productId`, `title`, `price`, `quantity`, `image`, `category`. Stored as JSON rather than a normalized table because order history should not change if product data changes.
-- `status` — Lifecycle: `pending` → `processing` → `shipped` → `delivered`, or → `cancelled`.
+- `status` — Lifecycle: `pending` → `paid` (Paystack webhook) → `processing` → `shipped` → `delivered`, or → `cancelled`.
 - `shipping_info` — JSONB object with shipping address (name, address, city, state, phone).
 - `payment_ref` — Paystack transaction reference for card payments.
-- `coupon_id` — Foreign key to coupons (nullable, coupon system not yet implemented in UI).
-- `discount` — Discount amount applied (future use).
+- `coupon_id` — Foreign key to coupons (nullable).
+- `discount` — Discount amount applied.
 
 **Order creation flow:** See Checkout in [06-PAGES.md](./06-PAGES.md#checkoutjsx).
 
@@ -151,7 +153,7 @@ CREATE TABLE coupons (
 );
 ```
 
-**Note:** Coupon system is not currently implemented in the frontend UI. The checkout page doesn't include a coupon input. This is a future feature with the schema ready.
+**Note:** Fully implemented in the UI — Admin → Coupon Management (create/edit/activate/delete) and the checkout coupon input with `increment_coupon_usage()` (SECURITY DEFINER, see below).
 
 ---
 
@@ -299,14 +301,26 @@ Idempotent migration (`IF NOT EXISTS` / `DROP POLICY IF EXISTS`); run in the Sup
 - `product-images` — **public**; sellers write under `{auth.uid()}/`, anyone reads
 - `product-files` — **private**; sellers write under `{auth.uid()}/`, only authenticated users read (downloads use 1-hour signed URLs)
 
-**Table `seller_payouts`:** `id`, `seller_id`, `amount NUMERIC(10,2)`, `bank_details JSONB`, `status ('pending','processing','paid','failed','cancelled')`, `transfer_code`, `admin_note`, timestamps. RLS: sellers see their own; admins manage all.
+**Table `seller_payouts`:** `id`, `seller_id`, `amount NUMERIC(10,2)`, `bank_details JSONB`, `status ('pending','processing','paid','failed','cancelled')`, `transfer_code`, `recipient_code` (added in `migration-presentation-fixes.sql` — lets the transfer action reuse the Paystack recipient instead of re-creating it), `admin_note`, timestamps. RLS: sellers see their own; admins manage all.
 
-**Table `seller_earnings`:** per order line — `seller_id`, `order_id → orders(id)`, `product_slug`, `title`, `gross`, `commission`, `net`, `status ('available','pending_transfer','paid','failed')`, `payout_id → seller_payouts(id)`, `paid_at`. RLS: sellers view own; admins manage all.
+**Table `seller_earnings`:** per order line — `seller_id`, `order_id → orders(id)`, `product_slug`, `title`, `gross`, `commission`, `net`, `status ('available','pending_transfer','paid','failed')`, `payout_id → seller_payouts(id)`, `paid_at`. RLS: sellers view own; admins manage all. **UNIQUE(`order_id`, `product_slug`)** — one earning row per order line; the webhook upserts with `ON CONFLICT DO NOTHING` so replays can't double-credit.
 
 ### Seller money flow
 
 1. Paystack `charge.success` webhook → `paystack-webhook` edge function
-2. Marks order paid; for each line with a seller-owned product: inserts `seller_earnings` (gross / 5% commission / net) and calls `increment_product_sales(slug)`
+2. Loads the order by `payment_ref` first; **if already `paid`, returns early** (webhook replays are idempotent). Otherwise marks it `paid` and upserts `seller_earnings` per seller-owned line (gross / 5% commission / net) + calls `increment_product_sales(slug)`
 3. Seller requests payout (min ₦100, bank resolved via Paystack `/bank/resolve`) → `seller_payouts` row `pending`
-4. Admin initiates transfer → `seller-payout` edge function calls Paystack Transfers → `transfer_code` saved, earnings → `pending_transfer`
+4. Admin initiates transfer → `seller-payout` edge function: reuses `recipient_code` if stored, calls Paystack Transfers → `transfer_code` saved, earnings → `pending_transfer`. Retrying a `processing` payout with a `transfer_code` returns the existing transfer (idempotent)
 5. Paystack transfer webhook (`transfer.success` / `transfer.failed` / `transfer.reversed`) → same `seller-payout` function matches by `transfer_code`, updates the payout row and marks linked earnings `paid` (or `available` again on failure)
+
+### `manage_staff(action, target_id)` RPC
+
+SECURITY DEFINER function added in `migration-presentation-fixes.sql`. Managers (and admins) can ban/unban/suspend/unsuspend/remove staff members — the direct UPDATE/DELETE on `profiles` is blocked by RLS for managers, so Staff Management in the manager dashboard goes through this RPC (`services/auth.js` → `manageStaff()`).
+
+### Migration files (run in the Supabase SQL Editor, all idempotent)
+
+| File | Adds |
+|------|------|
+| `migration-sellers.sql` | Seller role, products `seller_id`/`video_url`/`status`/`sales_count`, `seller_requests`, `seller_payouts`, `seller_earnings`, product-files storage |
+| `migration-fix-all.sql` | Storage buckets + policies, `increment_coupon_usage()`, `handle_new_user()` trigger, `delete_user()` |
+| `migration-presentation-fixes.sql` | `manage_staff()` RPC, hardened signup trigger (no metadata role), `guard_profile_role()` trigger, earnings unique index, payouts `recipient_code` |

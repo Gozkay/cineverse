@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-CineVerse is a modern dark-themed e-commerce marketplace for entertainment media — **Movies, Books, Manga, and Comics**. Built as a single-page application (SPA) with React 19, Vite 8, Tailwind CSS 4, and Supabase, it features Paystack payment integration, role-based dashboards (Admin, Manager, Staff), and external API integrations for product data. Targeting Nigerian users (NGN currency).
+CineVerse is a modern dark-themed e-commerce marketplace for entertainment media — **Movies, Books, Manga, and Comics**. Built as a single-page application (SPA) with React 19, Vite 8, Tailwind CSS 4, and Supabase, it features Paystack payment integration, role-based dashboards (Admin, Manager, Staff, Seller), and external API integrations for product data. Targeting Nigerian users (NGN currency).
 
 **Live URL:** https://cineverse-blush.vercel.app  
 **Repository:** https://github.com/Gozkay/cineverse
@@ -25,8 +25,9 @@ CineVerse is a modern dark-themed e-commerce marketplace for entertainment media
 | 10 | [10-STYLING.md](./10-STYLING.md) | `src/index.css` — Tailwind imports, design tokens, custom animations, dark theme variables |
 | 11 | [11-DATABASE.md](./11-DATABASE.md) | `supabase-schema.sql` — all tables, RLS policies, triggers; `scripts/seed-products.mjs` |
 | 12 | [12-CONFIG-BUILD.md](./12-CONFIG-BUILD.md) | `vite.config.js`, `eslint.config.js`, `package.json`, `jsconfig.json`, `components.json`, `.env.example` |
-| 13 | [13-DEPLOYMENT.md](./13-DEPLOYMENT.md) | `Dockerfile`, `nginx.conf`, `.dockerignore`, `.github/workflows/ci.yml`, `public/sw.js`, `public/manifest.json`, `public/robots.txt`, `public/sitemap.xml`, `POST_SETUP.md` |
+| 13 | [13-DEPLOYMENT.md](./13-DEPLOYMENT.md) | `Dockerfile`, `nginx.conf`, `.dockerignore`, `.github/workflows/ci.yml`, `public/sw.js`, `public/manifest.json`, `public/robots.txt`, `public/sitemap.xml`, `POST_SETUP.md` — plus the actual release flow (lint → test → build → `vercel --prod`) |
 | 14 | [14-TESTING.md](./14-TESTING.md) | All test files — `setup.js`, `utils.test.jsx`, `ProtectedRoute.test.jsx`, `CartContext.test.jsx`, `WishlistContext.test.jsx`, `usePaystack.test.jsx`, `auth.test.jsx` |
+| 15 | [15-PRESENTATION-GUIDE.md](./15-PRESENTATION-GUIDE.md) | Demo accounts, live URL, Paystack test card, demo script per role, known limitations, presenter cheat sheet |
 
 ---
 
