@@ -188,7 +188,7 @@ serve(async (req) => {
     }
 
     case 'banks': {
-      if (!isAdmin) return json({ error: 'Admin only' }, 403)
+      if (!isSeller && !isAdmin) return json({ error: 'Seller or Admin only' }, 403)
       const banks = await paystack('/bank?currency=NGN', paystackSecret)
       return json({ banks: banks?.data || [] })
     }
@@ -203,25 +203,35 @@ serve(async (req) => {
         .maybeSingle()
 
       if (loadError || !payout) return json({ error: 'Payout not found' }, 404)
-      if (payout.status !== 'pending') return json({ error: 'Payout is not pending' }, 400)
+      if (payout.status !== 'pending') {
+        if (payout.status === 'processing' && payout.transfer_code) {
+          return json({ success: true, transfer: { transfer_code: payout.transfer_code }, idempotent: true })
+        }
+        return json({ error: 'Payout is not pending' }, 400)
+      }
 
       const details = payout.bank_details || {}
-      const recipient = await paystack('/transferrecipient', paystackSecret, 'POST', {
-        type: 'nuban',
-        name: details.account_name || `CineVerse Seller ${payout.seller_id.slice(0, 8)}`,
-        account_number: details.account_number,
-        bank_code: details.bank_code,
-        currency: 'NGN',
-      })
 
-      if (!recipient?.status || !recipient?.data?.recipient_code) {
-        return json({ error: `Could not create recipient: ${recipient?.message || 'unknown error'}` }, 502)
+      let recipientCode = payout.recipient_code
+      if (!recipientCode) {
+        const recipient = await paystack('/transferrecipient', paystackSecret, 'POST', {
+          type: 'nuban',
+          name: details.account_name || `CineVerse Seller ${payout.seller_id.slice(0, 8)}`,
+          account_number: details.account_number,
+          bank_code: details.bank_code,
+          currency: 'NGN',
+        })
+
+        if (!recipient?.status || !recipient?.data?.recipient_code) {
+          return json({ error: `Could not create recipient: ${recipient?.message || 'unknown error'}` }, 502)
+        }
+        recipientCode = recipient.data.recipient_code
       }
 
       const transfer = await paystack('/transfer', paystackSecret, 'POST', {
         source: 'balance',
         amount: Math.round(Number(payout.amount) * 100),
-        recipient: recipient.data.recipient_code,
+        recipient: recipientCode,
         reason: `CineVerse seller payout (${payout.id.slice(0, 8)})`,
       })
 
@@ -234,6 +244,7 @@ serve(async (req) => {
         .update({
           status: 'processing',
           transfer_code: transfer.data.transfer_code,
+          recipient_code: recipientCode,
           updated_at: new Date().toISOString(),
         })
         .eq('id', payout.id)

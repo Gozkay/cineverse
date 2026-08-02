@@ -92,6 +92,12 @@ export async function removeStaff(id) {
   return { success: true }
 }
 
+export async function manageStaff(action, targetId) {
+  const { error } = await supabase.rpc('manage_staff', { p_action: action, p_target: targetId })
+  if (error) throw new Error(error.message)
+  return { success: true }
+}
+
 export async function resetPassword(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/update-password`,

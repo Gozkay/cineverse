@@ -38,8 +38,12 @@ function ComicDetails() {
     async function fetchComic() {
       try {
         setLoading(true)
+        if (!id) {
+          setError('Comic not found')
+          return
+        }
         const results = await searchComics(id.replace('comic_', ''))
-        const found = results.find(r => r.id === id) || results[0]
+        const found = results.find(r => r.id === id)
         if (found) setComic(found)
         else setError('Comic not found')
       } catch {

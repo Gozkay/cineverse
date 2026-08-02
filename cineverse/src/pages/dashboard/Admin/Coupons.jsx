@@ -15,9 +15,14 @@ function AdminCoupons() {
   const [form, setForm] = useState({ code: '', discount_percent: 10, discount_amount: 0, min_amount: 0, max_uses: 0, expires_at: '' })
 
   const load = async () => {
-    const data = await getCoupons()
-    setCoupons(data || [])
-    setLoading(false)
+    try {
+      const data = await getCoupons()
+      setCoupons(data || [])
+    } catch {
+      toast.error('Failed to load coupons')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/set-state-in-effect
@@ -68,16 +73,24 @@ function AdminCoupons() {
   }
 
   const handleToggle = async (coupon) => {
-    await updateCoupon(coupon.id, { active: !coupon.active })
-    toast.success(coupon.active ? 'Coupon deactivated' : 'Coupon activated')
-    await load()
+    try {
+      await updateCoupon(coupon.id, { active: !coupon.active })
+      toast.success(coupon.active ? 'Coupon deactivated' : 'Coupon activated')
+      await load()
+    } catch (e) {
+      toast.error(e?.message || 'Action failed')
+    }
   }
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this coupon?')) return
-    await deleteCoupon(id)
-    toast.success('Coupon deleted')
-    await load()
+    try {
+      await deleteCoupon(id)
+      toast.success('Coupon deleted')
+      await load()
+    } catch (e) {
+      toast.error(e?.message || 'Action failed')
+    }
   }
 
   return (

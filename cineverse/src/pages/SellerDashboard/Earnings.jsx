@@ -38,9 +38,9 @@ function SellerEarnings() {
 
   const totals = earnings.reduce(
     (acc, e) => {
-      acc.gross += Number(e.gross)
-      acc.commission += Number(e.commission)
-      acc.net += Number(e.net)
+      acc.gross += Number(e.gross) || 0
+      acc.commission += Number(e.commission) || 0
+      acc.net += Number(e.net) || 0
       return acc
     },
     { gross: 0, commission: 0, net: 0 }

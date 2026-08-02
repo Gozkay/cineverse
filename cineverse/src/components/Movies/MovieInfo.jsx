@@ -35,7 +35,7 @@ function MovieInfo({ movie, videos }) {
         <div className="space-y-5 rounded-2xl bg-slate-900/50 ring-1 ring-white/5 p-6">
           <div>
             <h3 className="text-sm text-slate-500">Original Language</h3>
-            <p className="text-lg font-semibold text-white">{movie.original_language.toUpperCase()}</p>
+            <p className="text-lg font-semibold text-white">{movie.original_language?.toUpperCase() || 'N/A'}</p>
           </div>
           <div>
             <h3 className="text-sm text-slate-500">Status</h3>
@@ -43,15 +43,15 @@ function MovieInfo({ movie, videos }) {
           </div>
           <div>
             <h3 className="text-sm text-slate-500">Runtime</h3>
-            <p className="text-lg font-semibold text-white">{movie.runtime} mins</p>
+            <p className="text-lg font-semibold text-white">{movie.runtime ? `${movie.runtime} mins` : 'N/A'}</p>
           </div>
           <div>
             <h3 className="text-sm text-slate-500">Budget</h3>
-            <p className="text-lg font-semibold text-white">${movie.budget.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-white">${Number(movie.budget || 0).toLocaleString()}</p>
           </div>
           <div>
             <h3 className="text-sm text-slate-500">Revenue</h3>
-            <p className="text-lg font-semibold text-white">${movie.revenue.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-white">${Number(movie.revenue || 0).toLocaleString()}</p>
           </div>
           <div>
             <h3 className="text-sm text-slate-500">Genres</h3>
@@ -65,7 +65,7 @@ function MovieInfo({ movie, videos }) {
           </div>
           <div>
             <h3 className="text-sm text-slate-500">Rating</h3>
-            <p className="text-lg font-semibold text-yellow-400">&#11088; {movie.vote_average.toFixed(1)} / 10</p>
+            <p className="text-lg font-semibold text-yellow-400">&#11088; {(movie.vote_average || 0).toFixed(1)} / 10</p>
           </div>
         </div>
       </div>

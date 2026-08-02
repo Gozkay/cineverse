@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { getCartItems, addCartItem, updateCartItemQuantity, removeCartItem, clearCart as clearCartApi } from '@/services/cart'
 import toast from 'react-hot-toast'
@@ -18,14 +18,17 @@ export function CartProvider({ children }) {
     }
   })
   const [loaded, setLoaded] = useState(false)
+  const prevUserIdRef = useRef(null)
 
   useEffect(() => {
+    const prevUserId = prevUserIdRef.current
+    prevUserIdRef.current = user?.id || null
     if (user && !loaded) {
       getCartItems(user.id).then(serverItems => {
         if (serverItems.length > 0) {
           const localItems = items
           const merged = [...serverItems.map(i => ({
-            id: i.product_slug.split(':').slice(1).join(':'),
+            id: (i.product_slug || '').split(':').slice(1).join(':'),
             product_slug: i.product_slug,
             title: i.title,
             price: i.price,
@@ -62,6 +65,10 @@ export function CartProvider({ children }) {
         setLoaded(true)
       }).catch(() => { setLoaded(true) })
     } else if (!user) {
+      if (prevUserId) {
+        setItems([])
+        localStorage.removeItem(CART_KEY)
+      }
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset sync flag when the user logs out
       setLoaded(false)
     }

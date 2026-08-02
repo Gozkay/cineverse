@@ -44,6 +44,21 @@ serve(async (req) => {
 
     // Update order status
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id, status, items')
+      .eq('payment_ref', reference)
+      .maybeSingle()
+
+    if (!existingOrder) {
+      return new Response('Order not found', { status: 404 })
+    }
+
+    // Idempotency: already-paid order → webhook replay, do nothing
+    if (existingOrder.status === 'paid') {
+      return new Response('OK', { status: 200 })
+    }
+
     const { error } = await supabase
       .from('orders')
       .update({ status: 'paid', updated_at: new Date().toISOString() })
@@ -56,12 +71,7 @@ serve(async (req) => {
     // Credit seller earnings for any seller-owned products in this order
     const commissionPct = Number(Deno.env.get('PLATFORM_COMMISSION_PERCENT') || 5)
 
-    const { data: order } = await supabase
-      .from('orders')
-      .select('id, items')
-      .eq('payment_ref', reference)
-      .maybeSingle()
-
+    const order = existingOrder
     if (order?.items) {
       for (const item of order.items) {
         const slug = item.product_slug || item.slug || item.productId
@@ -80,15 +90,18 @@ serve(async (req) => {
         const commission = Math.round(gross * commissionPct) / 100
         const net = gross - commission
 
-        await supabase.from('seller_earnings').insert({
-          seller_id: product.seller_id,
-          order_id: order.id,
-          product_slug: product.slug,
-          title: product.title,
-          gross,
-          commission,
-          net,
-        })
+        await supabase.from('seller_earnings').upsert(
+          {
+            seller_id: product.seller_id,
+            order_id: order.id,
+            product_slug: product.slug,
+            title: product.title,
+            gross,
+            commission,
+            net,
+          },
+          { onConflict: 'order_id,product_slug', ignoreDuplicates: true }
+        )
         await supabase.rpc('increment_product_sales', { p_slug: product.slug })
       }
     }

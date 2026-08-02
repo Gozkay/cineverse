@@ -30,7 +30,7 @@ function Login() {
   const onSubmit = async ({ email, password }) => {
     const result = await login(email, password)
     if (result.success) {
-      toast.success(`Welcome back, ${result.user.name}!`)
+      toast.success(result.user?.name ? `Welcome back, ${result.user.name}!` : 'Welcome back!')
       navigate(from, { replace: true })
     } else {
       toast.error(result.error)

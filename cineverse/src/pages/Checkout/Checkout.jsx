@@ -106,8 +106,10 @@ function Checkout() {
       payment_ref: paymentRef || null,
     }
     try {
-      if (coupon) await incrementCouponUsage(coupon.id)
       const order = await createOrder(orderData)
+      if (coupon) {
+        incrementCouponUsage(coupon.id).catch(() => {})
+      }
       setOrderId(order.id)
       setOrderPlaced(true)
       clearCart()
@@ -131,14 +133,24 @@ function Checkout() {
         setPaying(false)
         toast.error('Payment cancelled')
       },
+      onError: (message) => {
+        setPaying(false)
+        toast.error(message)
+      },
     })
   }
 
   const handlePlaceOrder = async () => {
+    if (paying) return
     if (payment.method === 'card') {
       handlePayWithPaystack()
     } else {
-      await placeOrder(null)
+      setPaying(true)
+      try {
+        await placeOrder(null)
+      } finally {
+        setPaying(false)
+      }
     }
   }
 

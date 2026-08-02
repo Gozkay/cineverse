@@ -15,12 +15,20 @@ function StaffOrders() {
     setOrders(data || [])
   }
 
-  useEffect(() => { getOrders().then(data => setOrders(data || [])) }, [])
+  useEffect(() => {
+    getOrders()
+      .then(data => setOrders(data || []))
+      .catch(() => toast.error('Failed to load orders'))
+  }, [])
 
   const handleStatusUpdate = async (id, status) => {
-    await updateOrderStatus(id, status)
-    await loadOrders()
-    toast.success(`Order updated`)
+    try {
+      await updateOrderStatus(id, status)
+      await loadOrders()
+      toast.success('Order updated')
+    } catch (e) {
+      toast.error(e?.message || 'Failed to update order')
+    }
   }
 
   return (
@@ -72,6 +80,7 @@ function StaffOrders() {
                         className="h-8 rounded-lg border border-slate-700 bg-slate-800 px-2 text-xs text-white outline-none focus:border-violet-500"
                       >
                         <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>

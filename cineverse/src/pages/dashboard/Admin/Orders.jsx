@@ -88,7 +88,7 @@ function AdminOrders() {
                     <TableCell className="text-xs text-gray-400">{formatDateTime(order.created_at)}</TableCell>
                     <TableCell>
                       <span className="text-sm text-white">{order.items?.length || 0} items</span>
-                      <div className="text-[10px] text-gray-500">{order.items?.map(i => i.title).join(', ').slice(0, 40)}</div>
+                      <div className="text-[10px] text-gray-500">{(order.items || []).map(i => i.title || i.product_slug || '').filter(Boolean).join(', ').slice(0, 40)}</div>
                     </TableCell>
                     <TableCell className="text-white font-medium">{formatCurrency(order.total_amount)}</TableCell>
                     <TableCell>

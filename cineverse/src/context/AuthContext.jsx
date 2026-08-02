@@ -10,14 +10,16 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user)
-        fetchProfile(session.user.id)
-      } else {
-        setLoading(false)
-      }
-    })
+    getSession()
+      .then(({ data: { session } }) => {
+        if (session?.user) {
+          setUser(session.user)
+          fetchProfile(session.user.id)
+        } else {
+          setLoading(false)
+        }
+      })
+      .catch(() => setLoading(false))
 
     const { data: { subscription } } = onAuthChange((event, session) => {
       if (session?.user) {
@@ -34,9 +36,14 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function fetchProfile(userId) {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
-    setProfile(data)
-    setLoading(false)
+    try {
+      const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+      setProfile(data)
+    } catch {
+      setProfile(null)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const login = useCallback(async (email, password) => {

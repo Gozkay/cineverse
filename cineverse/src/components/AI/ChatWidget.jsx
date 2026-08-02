@@ -35,7 +35,7 @@ function ChatDialog({ onClose }) {
       setMessages((m) => [...m, { role: 'model', content: reply }])
     } catch (e) {
       const busy = e?.message === 'ai_busy'
-      setMessages((m) => [...m, { role: 'model', content: busy ? "The AI is busy right now — try again in a minute." : `Sorry, I couldn't reach the AI service right now. ${e.message}` }])
+      setMessages((m) => [...m, { role: 'model', content: busy ? "The AI is busy right now — try again in a minute." : `Sorry, I couldn't reach the AI service right now. ${e?.message || ''}` }])
     } finally {
       setLoading(false)
     }

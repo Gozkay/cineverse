@@ -148,7 +148,7 @@ function Navbar() {
                 <DropdownMenuItem onClick={() => navigate(ROUTES.WISHLIST)} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">
                   <FaSearch className="mr-2" size={14} /> Wishlist
                 </DropdownMenuItem>
-                {isStaffOrAbove && (
+                {(isStaffOrAbove || role === 'seller') && (
                   <DropdownMenuItem onClick={() => navigate(getDashboardLink())} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">
                     <FaTachometerAlt className="mr-2" size={14} /> Dashboard
                   </DropdownMenuItem>
@@ -209,7 +209,7 @@ function Navbar() {
                 <Link to={ROUTES.PROFILE} onClick={() => setMobileOpen(false)} className="block rounded-xl px-3 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200 transition-all">Profile</Link>
                 <Link to={ROUTES.WISHLIST} onClick={() => setMobileOpen(false)} className="block rounded-xl px-3 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200 transition-all">Wishlist</Link>
                 <Link to={ROUTES.CART} onClick={() => setMobileOpen(false)} className="block rounded-xl px-3 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200 transition-all">Cart ({itemCount})</Link>
-                {isStaffOrAbove && (
+                {(isStaffOrAbove || role === 'seller') && (
                   <Link to={getDashboardLink()} onClick={() => setMobileOpen(false)} className="block rounded-xl px-3 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200 transition-all">Dashboard</Link>
                 )}
                 <button onClick={() => { logout(); setMobileOpen(false) }} className="block w-full rounded-xl px-3 py-2.5 text-left text-sm text-red-400 hover:bg-white/5 transition-all">Logout</button>

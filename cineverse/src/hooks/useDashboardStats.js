@@ -8,7 +8,10 @@ export function useDashboardStats() {
       const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
       const { data: orders } = await supabase.from('orders').select('total_amount, status, created_at')
       const ordersList = orders || []
-      const totalRevenue = ordersList.reduce((sum, o) => sum + (o.total_amount || 0), 0)
+      const completedStatuses = ['paid', 'processing', 'shipped', 'delivered']
+      const totalRevenue = ordersList
+        .filter(o => completedStatuses.includes(o.status))
+        .reduce((sum, o) => sum + (o.total_amount || 0), 0)
       const pendingCount = ordersList.filter(o => o.status === 'pending').length
       return {
         users: userCount || 0,
@@ -32,7 +35,7 @@ export function useRevenueData() {
         .from('orders')
         .select('total_amount, created_at')
         .gte('created_at', thirtyDaysAgo.toISOString())
-        .in('status', ['delivered', 'shipped', 'processing'])
+        .in('status', ['paid', 'delivered', 'shipped', 'processing'])
 
       const dailyMap = {}
       for (let i = 0; i < 30; i++) {

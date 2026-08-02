@@ -7,7 +7,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { supabase } from '@/lib/supabase'
-import { getUsers, banUser, unbanUser, suspendUser, unsuspendUser, removeStaff } from '@/services/auth'
+import { getUsers, manageStaff } from '@/services/auth'
 import { formatDateTime } from '@/utils/formatDate'
 import toast from 'react-hot-toast'
 
@@ -23,27 +23,40 @@ function StaffManagement() {
     setStaff((data || []).filter(u => u.role === 'staff'))
   }
 
-  useEffect(() => { getUsers().then(data => setStaff((data || []).filter(u => u.role === 'staff'))) }, [])
+  useEffect(() => {
+    getUsers()
+      .then(data => setStaff((data || []).filter(u => u.role === 'staff')))
+      .catch(() => toast.error('Failed to load staff'))
+  }, [])
 
   const handleBan = async (id, isBanned) => {
-    if (isBanned) await unbanUser(id)
-    else await banUser(id)
-    await loadStaff()
-    toast.success(isBanned ? 'Staff unbanned' : 'Staff banned')
+    try {
+      await manageStaff(isBanned ? 'unban' : 'ban', id)
+      await loadStaff()
+      toast.success(isBanned ? 'Staff unbanned' : 'Staff banned')
+    } catch (e) {
+      toast.error(e?.message || 'Action failed')
+    }
   }
 
   const handleSuspend = async (id, isSuspended) => {
-    if (isSuspended) await unsuspendUser(id)
-    else await suspendUser(id)
-    await loadStaff()
-    toast.success(isSuspended ? 'Staff unsuspended' : 'Staff suspended')
+    try {
+      await manageStaff(isSuspended ? 'unsuspend' : 'suspend', id)
+      await loadStaff()
+      toast.success(isSuspended ? 'Staff unsuspended' : 'Staff suspended')
+    } catch (e) {
+      toast.error(e?.message || 'Action failed')
+    }
   }
 
   const handleRemove = async (id) => {
-    if (window.confirm('Remove this staff member permanently?')) {
-      await removeStaff(id)
+    if (!window.confirm('Remove this staff member permanently?')) return
+    try {
+      await manageStaff('remove', id)
       await loadStaff()
       toast.success('Staff removed')
+    } catch (e) {
+      toast.error(e?.message || 'Action failed')
     }
   }
 
@@ -53,14 +66,14 @@ function StaffManagement() {
       email: newStaff.email,
       password: newStaff.password,
       options: {
-        data: { name: newStaff.name, role: 'staff' },
+        data: { name: newStaff.name },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
     if (error) { toast.error(error.message); return }
     await loadStaff()
     setDialogOpen(false)
-    toast.success(`Staff added. Temporary password: ${newStaff.password}`)
+    toast.success(`Account created. Temp password: ${newStaff.password}. An Admin must promote this user to Staff in Admin → Users.`)
     setNewStaff({ name: '', email: '', password: Math.random().toString(36).slice(-10) })
   }
 
