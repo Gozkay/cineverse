@@ -47,7 +47,7 @@ function ChatDialog({ onClose }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-      className="fixed bottom-24 left-6 z-50 flex h-[480px] w-[calc(100vw-3rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/50 backdrop-blur-xl"
+      className="fixed bottom-24 left-6 z-50 flex h-[480px] max-h-[calc(100dvh-7rem)] w-[calc(100vw-3rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/50 backdrop-blur-xl"
     >
       <div className="flex items-center justify-between border-b border-white/5 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/10 px-4 py-3">
         <div className="flex items-center gap-3">

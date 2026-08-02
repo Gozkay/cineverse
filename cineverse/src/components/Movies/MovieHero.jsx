@@ -62,7 +62,7 @@ function MovieHero({ movie }) {
             {movie.overview}
           </p>
 
-          <div className="mt-6 flex gap-3 sm:mt-10">
+          <div className="mt-6 flex flex-wrap gap-3 sm:mt-10">
             <button onClick={() => { addItem(movieWithPrice); toast.success('Added to cart') }} className="group relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-300 hover:from-violet-500 hover:to-fuchsia-500 overflow-hidden">
               <span className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.15),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <span className="relative flex items-center gap-2">

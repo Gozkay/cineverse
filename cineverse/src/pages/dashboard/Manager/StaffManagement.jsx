@@ -64,7 +64,7 @@ function StaffManagement() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black">
               <span className="text-white">Staff</span>{" "}

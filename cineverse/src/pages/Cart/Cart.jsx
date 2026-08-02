@@ -16,7 +16,7 @@ function Cart() {
       <Seo title="Shopping Cart" noIndex />
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-8">
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl sm:text-4xl font-black">
                 <span className="text-white">Shopping</span>{' '}
@@ -52,7 +52,7 @@ function Cart() {
                         </Link>
                         <p className="text-xs capitalize text-gray-500">{item.category}</p>
                       </div>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-xs text-white hover:bg-slate-700">
                             <FaMinus size={12} />

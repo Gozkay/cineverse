@@ -171,7 +171,7 @@ function AdminProducts() {
               <cat.icon size={14} /> {cat.label}
             </button>
           ))}
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex flex-wrap items-center gap-1">
             {statusTabs.map((tab) => (
               <button
                 key={tab.id}

@@ -102,7 +102,7 @@ function AdminSellers() {
           <p className="text-sm text-gray-500 mt-1">Approve seller applications and process payouts</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setTab('requests')}
             className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'requests' ? 'bg-violet-600 text-white' : 'bg-slate-900/50 text-gray-400 ring-1 ring-slate-800 hover:text-white'}`}

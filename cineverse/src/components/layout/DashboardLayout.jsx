@@ -102,9 +102,13 @@ function DashboardLayout({ children }) {
           </div>
           <div className="flex items-center gap-2 md:gap-3">
             <span className="text-xs md:text-sm text-gray-400 truncate max-w-[100px] md:max-w-none">{userName}</span>
-            <div className="flex h-7 w-7 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-[10px] md:text-sm font-semibold text-white shadow-lg shadow-violet-500/25">
-              {userName?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
+            {profile?.avatar ? (
+              <img src={profile.avatar} alt={userName} referrerPolicy="no-referrer" className="h-7 w-7 md:h-8 md:w-8 shrink-0 rounded-full object-cover ring-2 ring-white/10 shadow-lg shadow-violet-500/25" />
+            ) : (
+              <div className="flex h-7 w-7 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-[10px] md:text-sm font-semibold text-white shadow-lg shadow-violet-500/25">
+                {userName?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            )}
           </div>
         </header>
         <main className="p-4 md:p-6">

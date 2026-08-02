@@ -12,14 +12,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
-  const { user, isAuthenticated, logout, role, isStaffOrAbove } = useAuth()
+  const { user, profile, isAuthenticated, logout, role, isStaffOrAbove } = useAuth()
   const { itemCount } = useCart()
   const { isScrolled } = useScrollPosition()
 
@@ -129,9 +129,13 @@ function Navbar() {
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
                   <Avatar className="h-8 w-8 ring-2 ring-transparent hover:ring-violet-500/30 transition-all duration-300">
-                    <AvatarFallback className="bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white text-xs">
-                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                    </AvatarFallback>
+                    {profile?.avatar ? (
+                      <AvatarImage src={profile.avatar} alt="Avatar" referrerPolicy="no-referrer" />
+                    ) : (
+                      <AvatarFallback className="bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white text-xs">
+                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>

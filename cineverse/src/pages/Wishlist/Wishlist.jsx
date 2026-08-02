@@ -31,7 +31,7 @@ function Wishlist() {
       <Seo title="My Wishlist" noIndex />
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-8">
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl sm:text-4xl font-black">
                 <span className="text-white">My</span>{" "}
@@ -67,7 +67,7 @@ function Wishlist() {
                       <img src={item.image} alt={item.title} className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110" loading="lazy" onError={(e) => { e.target.src = 'https://via.placeholder.com/300x400?text=No' }} />
                     </div>
                   </Link>
-                  <div className="absolute right-2 top-2 z-10 flex flex-col gap-1.5 opacity-0 md:translate-x-4 md:opacity-0 md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-300">
+                  <div className="absolute right-2 top-2 z-10 flex flex-col gap-1.5 md:translate-x-4 md:opacity-0 transition-all duration-300 md:group-hover:translate-x-0 md:group-hover:opacity-100">
                     <button onClick={() => removeItem(item.id)} className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/80 backdrop-blur-sm text-white hover:bg-red-500 shadow-lg shadow-red-500/25">
                       <FaTrash size={12} />
                     </button>

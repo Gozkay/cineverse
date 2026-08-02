@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { loginUser, registerUser, logoutUser, onAuthChange, getSession } from '@/services/auth'
+import { loginUser, registerUser, logoutUser, onAuthChange, getSession, signInWithGoogle } from '@/services/auth'
 import { supabase } from '@/lib/supabase'
 
 const AuthContext = createContext(null)
@@ -35,6 +35,25 @@ export function AuthProvider({ children }) {
 
   async function fetchProfile(userId) {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+
+    if (data && !data.avatar) {
+      const { data: authData } = await supabase.auth.getUser()
+      const meta = authData?.user?.user_metadata || {}
+      const providerPic = meta?.avatar_url || meta?.picture || meta?.avatarUrl
+      if (providerPic) {
+        const { data: updated } = await supabase
+          .from('profiles')
+          .upsert({ id: userId, avatar: providerPic }, { onConflict: 'id' })
+          .select()
+          .maybeSingle()
+        if (updated) {
+          setProfile(updated)
+          setLoading(false)
+          return
+        }
+      }
+    }
+
     setProfile(data)
     setLoading(false)
   }
@@ -79,7 +98,7 @@ export function AuthProvider({ children }) {
   const refreshProfile = refreshUser
 
   return (
-    <AuthContext.Provider value={{ user, profile, login, register, logout, loading, isAuthenticated, role, isAdmin, isManager, isStaff, isSeller, isCustomer, isStaffOrAbove, refreshUser, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, login, register, logout, signInWithGoogle, loading, isAuthenticated, role, isAdmin, isManager, isStaff, isSeller, isCustomer, isStaffOrAbove, refreshUser, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   )

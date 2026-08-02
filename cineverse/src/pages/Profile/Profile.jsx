@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FaUser, FaShoppingBag, FaSignOutAlt, FaClipboardList, FaTachometerAlt, FaEdit, FaKey, FaTrash, FaCheck, FaTimes, FaEye } from 'react-icons/fa'
+import { FaUser, FaShoppingBag, FaSignOutAlt, FaClipboardList, FaTachometerAlt, FaEdit, FaKey, FaTrash, FaCheck, FaTimes, FaEye, FaCamera, FaSpinner } from 'react-icons/fa'
 import Seo from '@/components/Seo'
 import MainLayout from '@/components/layout/MainLayout'
 import { useAuth } from '@/context/AuthContext'
 import { getOrdersByUser } from '@/services/orders'
 import { updateProfile, updatePassword, deleteAccount } from '@/services/auth'
+import { uploadAvatar } from '@/services/avatar'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { formatDateTime } from '@/utils/formatDate'
 import { ROUTES } from '@/constants/routes'
@@ -39,6 +40,7 @@ function Profile() {
   const [savingPassword, setSavingPassword] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
   useEffect(() => {
     if (user) getOrdersByUser(user.id).then(data => setOrders(data || []))
@@ -93,14 +95,41 @@ function Profile() {
     setDeleting(false)
   }
 
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingAvatar(true)
+    try {
+      const url = await uploadAvatar(file)
+      await updateProfile(user.id, { avatar: url })
+      refreshProfile()
+      toast.success('Profile picture updated')
+    } catch (err) {
+      toast.error(err.message || 'Could not upload picture')
+    } finally {
+      setUploadingAvatar(false)
+      e.target.value = ''
+    }
+  }
+
   return (
     <MainLayout>
       <Seo title="My Profile" noIndex />
       <div className="min-h-screen bg-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-8 flex items-center gap-5">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-2xl font-bold text-white shadow-lg shadow-violet-500/25">
-              {(profile?.name || user?.user_metadata?.name || 'U')?.charAt(0)?.toUpperCase() || 'U'}
+            <div className="group relative flex h-16 w-16 shrink-0 items-center justify-center">
+              {profile?.avatar ? (
+                <img src={profile.avatar} alt="Profile" referrerPolicy="no-referrer" className="h-16 w-16 rounded-full object-cover ring-2 ring-white/10" />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-2xl font-bold text-white shadow-lg shadow-violet-500/25">
+                  {(profile?.name || user?.user_metadata?.name || 'U')?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+              )}
+              <label className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-violet-600 text-white shadow-lg ring-2 ring-slate-950 transition-colors hover:bg-violet-500" title="Upload profile picture">
+                {uploadingAvatar ? <FaSpinner className="animate-spin" size={12} /> : <FaCamera size={12} />}
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploadingAvatar} />
+              </label>
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">
@@ -110,7 +139,7 @@ function Profile() {
             </div>
           </div>
 
-          <div className="mb-6 flex items-center gap-4 border-b border-slate-800">
+          <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-slate-800">
             {tabs.map((tab) => (
               <button
                 key={tab.id}

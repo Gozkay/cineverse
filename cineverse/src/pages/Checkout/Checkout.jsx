@@ -99,7 +99,7 @@ function Checkout() {
       })),
       total_amount: total,
       discount,
-      coupon_code: coupon?.code || null,
+      coupon_id: coupon?.id || null,
       status: 'pending',
       shipping_info: shippingData,
       payment_method: payment.method,
@@ -160,7 +160,7 @@ function Checkout() {
               </div>
               <span className={`hidden text-sm font-medium sm:inline ${active ? 'text-white' : 'text-gray-500'}`}>{s}</span>
             </div>
-            {i < steps.length - 1 && <div className={`mx-3 h-px w-12 transition-all ${step > i + 1 ? 'bg-violet-500' : 'bg-slate-700'}`} />}
+            {i < steps.length - 1 && <div className={`mx-1 h-px w-6 sm:mx-3 sm:w-12 transition-all ${step > i + 1 ? 'bg-violet-500' : 'bg-slate-700'}`} />}
           </div>
         )
       })}
@@ -364,9 +364,9 @@ function Checkout() {
                 <p className="mb-2 text-gray-400">Your order has been placed successfully.</p>
                 {discount > 0 && <p className="mb-2 text-sm text-emerald-400">You saved {formatCurrency(discount)} with coupon!</p>}
                 <p className="mb-8 text-sm text-gray-500">Order ID: <span className="font-mono text-violet-400">{orderId}</span></p>
-                <div className="flex gap-4">
-                  <Link to={ROUTES.HOME} className="rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-500">Continue Shopping</Link>
-                  <Link to={ROUTES.PROFILE} className="rounded-xl border border-slate-700 px-6 py-3 text-sm font-medium text-gray-300 hover:bg-slate-800">View Orders</Link>
+                <div className="flex flex-col gap-4 sm:flex-row">
+                  <Link to={ROUTES.HOME} className="w-full rounded-xl bg-violet-600 px-6 py-3 text-center text-sm font-semibold text-white hover:bg-violet-500 sm:w-auto">Continue Shopping</Link>
+                  <Link to={ROUTES.PROFILE} className="w-full rounded-xl border border-slate-700 px-6 py-3 text-center text-sm font-medium text-gray-300 hover:bg-slate-800 sm:w-auto">View Orders</Link>
                 </div>
               </motion.div>
             )}

@@ -8,6 +8,17 @@ export async function loginUser(email, password) {
   return { success: true, user: safeUser }
 }
 
+export async function signInWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  })
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
+
 export async function registerUser({ name, email, password, sellerType }) {
   const { data, error } = await supabase.auth.signUp({
     email,
