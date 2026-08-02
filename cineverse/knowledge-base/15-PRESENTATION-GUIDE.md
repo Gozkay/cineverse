@@ -57,7 +57,6 @@ Approved seller uploads a product → it appears as `pending` → Admin approves
 | Orders stay `pending` after test payment | Paystack webhook must be re-simulated in the dashboard (or order flipped manually in SQL). Webhook code updates are deployed via `supabase functions deploy paystack-webhook --project-ref lkcdoylwdjgruyccetcl` |
 | Product sync writes fail silently for customers | `syncProduct` upserts are RLS-gated to admins/sellers (products INSERT requires `seller_id = auth.uid()`); the hook now only runs for admins |
 | `product-files` downloads need auth | Private bucket — signed URLs expire after 1h |
-| Avatar upload retest pending | Supabase bounced-email incident caused a delay; re-test avatar re-upload before demo if it matters |
 | Movie details from TMDB may be missing for some titles | External API data — pages now show `N/A` instead of crashing |
 
 ---
