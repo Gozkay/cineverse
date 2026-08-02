@@ -17,7 +17,15 @@ git commit + push   # Push to github.com/Gozkay/cineverse (master)
 **Live URL:** https://cineverse-blush.vercel.app  
 **Vercel project:** `gozkays-projects/cineverse`
 
-**Database/edge-function changes are NOT deployed by Vercel.** They ship as migration `.sql` files at the repo root (e.g. `migration-presentation-fixes.sql`) that the developer pastes into the Supabase SQL Editor, and the Deno edge functions (`supabase/functions/paystack-webhook`, `seller-payout`) are updated by pasting the new `index.ts` into the Supabase dashboard Functions editor.
+**Database/edge-function changes are NOT deployed by Vercel.** They ship as migration `.sql` files at the repo root (e.g. `migration-presentation-fixes.sql`) that the developer pastes into the Supabase **SQL Editor**, and the Deno edge functions are deployed with the Supabase CLI (project already linked — `.temp/linked-project.json`):
+
+```
+supabase functions deploy paystack-webhook --project-ref lkcdoylwdjgruyccetcl
+supabase functions deploy seller-payout --project-ref lkcdoylwdjgruyccetcl
+supabase functions list --project-ref lkcdoylwdjgruyccetcl   # verify version bump
+```
+
+**There is no code editor in the Supabase dashboard** — the Edge Functions page (https://supabase.com/dashboard/project/lkcdoylwdjgruyccetcl/functions) is for inspecting deployments, logs, invocations, and secrets only. Function code updates always go through the CLI (or the Platform API). Function secrets are managed with `supabase secrets set --project-ref <ref>`.
 
 ---
 
