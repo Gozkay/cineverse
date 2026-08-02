@@ -61,10 +61,11 @@ function DashboardLayout({ children }) {
           <NavLink
             to={ROUTES.HOME}
             onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+            title={sidebarOpen ? undefined : 'Home'}
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors ${sidebarOpen ? '' : 'md:justify-center md:px-0'}`}
           >
             <FaHome size={16} />
-            <span>Home</span>
+            <span className={sidebarOpen ? 'block' : 'hidden'}>Home</span>
           </NavLink>
           {links.map((link) => (
             <NavLink
@@ -82,9 +83,9 @@ function DashboardLayout({ children }) {
           ))}
         </nav>
         <div className="absolute bottom-0 left-0 right-0 border-t border-slate-800 p-3">
-          <button onClick={() => { logout(); navigate(ROUTES.LOGIN) }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-400 hover:bg-white/5 transition-colors">
+          <button onClick={() => { logout(); navigate(ROUTES.LOGIN) }} title={sidebarOpen ? undefined : 'Logout'} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-400 hover:bg-white/5 transition-colors ${sidebarOpen ? '' : 'md:justify-center md:px-0'}`}>
             <FaSignOutAlt size={16} />
-            <span>Logout</span>
+            <span className={sidebarOpen ? 'block' : 'hidden'}>Logout</span>
           </button>
         </div>
       </aside>
