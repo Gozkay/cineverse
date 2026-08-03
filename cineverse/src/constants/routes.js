@@ -34,4 +34,8 @@ export const ROUTES = {
   LOCAL_MOVIES: '/movies/local',
   LOCAL_MOVIE_DETAIL: (id) => `/movies/local/${id}`,
   ORDER_DETAIL: (id) => `/orders/${id}`,
+  CONTACT: '/contact',
+  FAQ: '/faq',
+  PRIVACY: '/privacy',
+  TERMS: '/terms',
 }

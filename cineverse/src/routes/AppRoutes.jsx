@@ -15,6 +15,10 @@ const Profile = lazy(() => import("@/pages/Profile/Profile"));
 const OrderDetail = lazy(() => import("@/pages/Orders/OrderDetail"));
 const Search = lazy(() => import("@/pages/Search/Search"));
 const BecomeSeller = lazy(() => import("@/pages/BecomeSeller/BecomeSeller"));
+const Contact = lazy(() => import("@/pages/Info/Contact"));
+const FAQ = lazy(() => import("@/pages/Info/FAQ"));
+const Privacy = lazy(() => import("@/pages/Info/Privacy"));
+const Terms = lazy(() => import("@/pages/Info/Terms"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword/ResetPassword"));
 const UpdatePassword = lazy(() => import("@/pages/UpdatePassword/UpdatePassword"));
 const AuthCallback = lazy(() => import("@/pages/Auth/Callback"));
@@ -95,6 +99,10 @@ function AppRoutes() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/search" element={<PageBoundary><Search /></PageBoundary>} />
         <Route path={ROUTES.BECOME_SELLER} element={<PageBoundary><BecomeSeller /></PageBoundary>} />
+        <Route path={ROUTES.CONTACT} element={<PageBoundary><Contact /></PageBoundary>} />
+        <Route path={ROUTES.FAQ} element={<PageBoundary><FAQ /></PageBoundary>} />
+        <Route path={ROUTES.PRIVACY} element={<PageBoundary><Privacy /></PageBoundary>} />
+        <Route path={ROUTES.TERMS} element={<PageBoundary><Terms /></PageBoundary>} />
 
         <Route path={ROUTES.DASHBOARD_ADMIN} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminDashboard /></PageBoundary></ProtectedRoute>} />
         <Route path={ROUTES.DASHBOARD_ADMIN_PRODUCTS} element={<ProtectedRoute roles={['admin']}><PageBoundary><AdminProducts /></PageBoundary></ProtectedRoute>} />

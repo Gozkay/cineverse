@@ -192,6 +192,14 @@ Pages imported this way:
 | `Register` | `/register` |
 | `NotFound` | any unmatched route |
 
+Public info pages (linked from footer Support column):
+| Page | Chunk loads when user visits |
+|------|------------------------------|
+| `Contact` (`@/pages/Info/Contact`) | `/contact` |
+| `FAQ` (`@/pages/Info/FAQ`) | `/faq` |
+| `Privacy` (`@/pages/Info/Privacy`) | `/privacy` |
+| `Terms` (`@/pages/Info/Terms`) | `/terms` |
+
 ### Dashboard Pages
 
 ```jsx

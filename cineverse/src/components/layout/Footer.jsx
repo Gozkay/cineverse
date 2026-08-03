@@ -46,10 +46,10 @@ function Footer() {
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-gray-300">Support</h4>
             <ul className="space-y-2">
-              <li><span className="text-sm text-gray-500">Contact Us</span></li>
-              <li><span className="text-sm text-gray-500">FAQ</span></li>
-              <li><span className="text-sm text-gray-500">Privacy Policy</span></li>
-              <li><span className="text-sm text-gray-500">Terms of Service</span></li>
+              <li><Link to={ROUTES.CONTACT} className="text-sm text-gray-500 hover:text-violet-400 transition-colors">Contact Us</Link></li>
+              <li><Link to={ROUTES.FAQ} className="text-sm text-gray-500 hover:text-violet-400 transition-colors">FAQ</Link></li>
+              <li><Link to={ROUTES.PRIVACY} className="text-sm text-gray-500 hover:text-violet-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link to={ROUTES.TERMS} className="text-sm text-gray-500 hover:text-violet-400 transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
         </div>

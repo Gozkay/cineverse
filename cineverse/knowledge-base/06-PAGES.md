@@ -243,6 +243,17 @@ The `createOrder()` service sends this to Supabase. On success: cart is cleared,
 
 ---
 
+## Info Pages (`src/pages/Info/`)
+
+Static public pages linked from the footer Support column (all wrapped in `MainLayout` + `Seo`):
+
+- **`Contact.jsx`** (`/contact`) — Business info cards (email `stompiddo3@gmail.com`, Lagos, support hours) + contact form that composes a `mailto:` link on submit (no backend — opens the visitor's email app with the message pre-filled).
+- **`FAQ.jsx`** (`/faq`) — Accordion of 10 Q&As (`<details>/<summary>`) covering payments, order status, digital downloads, 1-hour links, refunds, coupons, seller/payout flow, password reset, tracking.
+- **`Privacy.jsx`** (`/privacy`) — Static privacy policy: data collected, usage, Paystack/Supabase third parties, cookies/local storage, retention & deletion, user rights.
+- **`Terms.jsx`** (`/terms`) — Static terms: accounts, orders/payments (NGN), digital content license, coupons, seller terms/commission, prohibited conduct, liability.
+
+---
+
 ## Dashboard Pages
 
 ### Admin
